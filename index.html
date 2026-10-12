@@ -193,7 +193,7 @@ dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--mu
 
 <dialog id="settings">
   <form method="dialog" id="settingsForm">
-    <h2>Your club and group</h2>
+    <h2 tabindex="-1" autofocus style="outline: none">Your club and group</h2>
     <p>Used to mark races you and your group are entered in. Saved only in this browser.</p>
     <div class="field">
       <label for="sClub">Club</label>
@@ -960,7 +960,6 @@ $("#rangeBtn").addEventListener("click", (e) => {
   const open = e.currentTarget.getAttribute("aria-expanded") !== "true";
   e.currentTarget.setAttribute("aria-expanded", String(open));
   $("#dates").hidden = !open;
-  if (open) $("#dFrom").focus();
 });
 ["#dFrom", "#dTo"].forEach((sel) => $(sel).addEventListener("change", () => {
   const f = parseDT($("#dFrom").value, false), t = parseDT($("#dTo").value, false);
