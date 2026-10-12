@@ -104,6 +104,23 @@ button { font: inherit; color: inherit; }
 .dg-count { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px; background: var(--ink); color: #fff; font: 700 11px/18px var(--sans); text-align: center; pointer-events: none; }
 .dotgroup.open .dg-count { display: none; }
 @media (prefers-reduced-motion: reduce) { .dotgroup .dot { transition: none; } }
+/* New markers rise out of the ground: the marker slides up while everything below its
+   bottom edge (the "ground" at the map point) stays clipped, so it emerges rather than slides.
+   Moving down by 100% and clipping 100% from the bottom cancel out, keeping the ground line still. */
+@keyframes rise {
+  from { translate: 0 100%; clip-path: inset(-14px -14px 100% -14px); }
+  to   { translate: 0 0;    clip-path: inset(-14px -14px -14px -14px); }
+}
+.pin.pop, .dot.pop { animation: rise .45s cubic-bezier(.2, .7, .2, 1) both; animation-delay: var(--delay, 0ms); }
+/* A small puff of dust where the marker breaks through */
+@keyframes puff {
+  0%   { opacity: 0; scale: .2 1; }
+  30%  { opacity: 1; }
+  100% { opacity: 0; scale: 1.5 1; }
+}
+.puff { position: absolute; left: 50%; bottom: -5px; width: 44px; height: 10px; margin-left: -22px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(90,70,40,.45), rgba(90,70,40,0)); animation: puff .6s ease-out both; animation-delay: var(--delay, 0ms); }
+@media (prefers-reduced-motion: reduce) { .pin.pop, .dot.pop { animation: none; } .puff { display: none; } }
 
 /* Detail card */
 .card { position: fixed; z-index: 1000; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); max-width: 520px; max-height: calc(100vh - 320px); max-height: calc(100dvh - 320px); overflow-y: auto; padding: 16px; background: #fff; border-radius: 22px; box-shadow: 0 10px 30px rgba(20,24,31,.24); display: flex; flex-direction: column; gap: 12px; }
@@ -441,17 +458,6 @@ function daysOf(from, to) {
   for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) out.push(ymd(d));
   return out;
 }
-// Contiguous runs of days that need fetching
-function spans(days) {
-  const out = [];
-  days.forEach((d) => {
-    const last = out[out.length - 1];
-    const prev = last && new Date(last.to + "T00:00:00");
-    if (prev) prev.setDate(prev.getDate() + 1);
-    if (last && ymd(prev) === d) last.to = d; else out.push({ from: d, to: d });
-  });
-  return out;
-}
 async function pool(items, n, fn) {
   let i = 0;
   const workers = Array.from({ length: Math.min(n, items.length) }, async () => {
@@ -558,7 +564,7 @@ function pinHtml(ev, selected, showTail) {
   if (ev.entered) state += ICON.check;
   const svcs = (ev.bed ? '<span class="b-svc' + (ev.ordered.bed ? " ordered" : "") + '">' + ICON.bed + "</span>" : "") +
     (ev.meals ? '<span class="b-svc' + (ev.ordered.meals ? " ordered" : "") + '">' + ICON.meals + "</span>" : "");
-  return '<div class="pin' + (selected ? " sel" : "") + '" data-id="' + esc(ev.id) + '" tabindex="0" role="button" aria-label="' + esc(ariaLabel(ev)) + '">' +
+  return '<div class="pin' + (selected ? " sel" : "") + popClass(ev) + '" style="' + popDelay(ev) + '" data-id="' + esc(ev.id) + '" tabindex="0" role="button" aria-label="' + esc(ariaLabel(ev)) + '">' +
     '<div class="chip ' + cls + '" style="border-width:' + L.bw + "px;border-color:" + L.bc + '">' +
       '<span class="disc" style="background:' + F.bg + ";color:" + F.fg + '">' + F.text + "</span>" +
       '<span class="lines"><span class="day">' + esc(ev.date ? fmt.short(ev.date) : "?") + '</span><span class="state">' + state + "</span></span>" +
@@ -573,7 +579,7 @@ function pinHtml(ev, selected, showTail) {
 }
 function dotHtml(ev, selected, dx, dy) {
   const F = FORMAT[ev.format], L = LEVEL[ev.level];
-  return '<div class="dot' + (ev.entered ? " entered" : "") + (selected ? " sel" : "") + '" data-id="' + esc(ev.id) + '" tabindex="0" role="button" aria-label="' + esc(ariaLabel(ev)) + '" style="--dx:' + (dx || 0) + "px;--dy:" + (dy || 0) + "px;background:" + F.bg + ";color:" + F.fg + ";box-shadow:0 0 0 " + L.bw + "px " + L.bc + ', 0 1px 4px rgba(20,24,31,.35)">' + F.text + "</div>";
+  return '<div class="dot' + (ev.entered ? " entered" : "") + (selected ? " sel" : "") + popClass(ev) + '" data-id="' + esc(ev.id) + '" tabindex="0" role="button" aria-label="' + esc(ariaLabel(ev)) + '" style="' + popDelay(ev) + '--dx:' + (dx || 0) + "px;--dy:" + (dy || 0) + "px;background:" + F.bg + ";color:" + F.fg + ";box-shadow:0 0 0 " + L.bw + "px " + L.bc + ', 0 1px 4px rgba(20,24,31,.35)">' + F.text + "</div>";
 }
 function ariaLabel(ev) {
   const parts = [ev.name, ev.date ? fmt.full(ev.date) : "", FORMAT[ev.format].name, LEVEL[ev.level].name, SPORT_NAME[ev.sport]];
@@ -689,7 +695,9 @@ function addGroup(g, isCompact) {
   let html;
   if (!isCompact) {
     // Zoomed in: stack the chips above the spot, earliest on top; only the bottom one points at the map
-    html = '<div class="stack">' + g.items.map((ev, i) => pinHtml(ev, ev.id === selectedId, i === n - 1)).join("") + "</div>";
+    const last = g.items[n - 1];
+    const puff = popping.has(last.id) ? '<span class="puff" style="' + popDelay(last) + '"></span>' : "";
+    html = '<div class="stack">' + g.items.map((ev, i) => pinHtml(ev, ev.id === selectedId, i === n - 1)).join("") + puff + "</div>";
   } else if (n === 1) {
     html = dotHtml(g.items[0], hasSel, 0, 0);
   } else {
@@ -729,9 +737,17 @@ function addGroup(g, isCompact) {
   });
   layer.addLayer(m);
 }
+// Markers new since the last draw get a staggered pop-in (zooming or detail updates don't replay it)
+let drawnIds = new Set();
+let popping = new Map();   // id -> delay in ms
+const popClass = (ev) => popping.has(ev.id) ? " pop" : "";
+const popDelay = (ev) => popping.has(ev.id) ? "--delay:" + popping.get(ev.id) + "ms;" : "";
 function drawAll() {
   layer.clearLayers();
   const list = [...events.values()].filter(visible).sort((a, b) => (a.date || 0) - (b.date || 0));
+  popping = new Map();
+  list.filter((ev) => !drawnIds.has(ev.id)).forEach((ev, i) => popping.set(ev.id, Math.min(i * 35, 600)));
+  drawnIds = new Set(list.map((ev) => ev.id));
   const isCompact = compact();
   groupsFor(list, isCompact).forEach((g) => addGroup(g, isCompact));
   // Both numbers follow the active filters, so they always add up to what matches
@@ -825,27 +841,32 @@ async function load() {
   const showRange = () => {
     events.clear();
     idsInRange(from, to).forEach((id) => { const ev = buildEvent(id); if (ev) events.set(id, ev); });
-    drawAll();
+    scheduleDraw();
   };
   showRange();
   if (firstLoad && events.size) { fitToEvents(); firstLoad = false; }
 
   try {
     // 2. Event lists only for days not covered or gone stale
+    // One request per day, a few at a time, so the map fills in day by day as answers arrive
     const missing = days.filter((d) => !fresh(store.days[d], CONFIG.ttl.list));
-    for (const sp of spans(missing)) {
-      setStatus("Loading events from ORIS");
-      const list = values(await oris("getEventList", Object.assign({ datefrom: sp.from, dateto: sp.to }, CONFIG.listParams)));
+    let daysDone = 0, failed = null;
+    if (missing.length) setStatus("Loading events, day 0 of " + missing.length);
+    await pool(missing, CONFIG.concurrency, async (day) => {
+      let list;
+      try { list = values(await oris("getEventList", Object.assign({ datefrom: day, dateto: day }, CONFIG.listParams))); }
+      catch (e) { failed = e; return; }
       if (token !== loadToken) return;
-      // replace that span: events moved away or removed from ORIS disappear
-      Object.keys(store.list).forEach((id) => {
-        const d = String(store.list[id].Date || "").slice(0, 10);
-        if (d >= sp.from && d <= sp.to) delete store.list[id];
-      });
+      // replace that day: events moved away or removed from ORIS disappear
+      Object.keys(store.list).forEach((id) => { if (String(store.list[id].Date || "").slice(0, 10) === day) delete store.list[id]; });
       list.forEach((raw) => { store.list[String(raw.ID)] = raw; });
-      daysOf(new Date(sp.from + "T00:00:00"), new Date(sp.to + "T00:00:00")).forEach((d) => { store.days[d] = nowMs(); });
+      store.days[day] = nowMs();
       saveStore();
-    }
+      showRange();
+      setStatus("Loading events, day " + (++daysDone) + " of " + missing.length);
+    });
+    if (token !== loadToken) return;
+    if (failed) throw failed;
     showRange();
     if (firstLoad) { fitToEvents(); firstLoad = false; }
 
