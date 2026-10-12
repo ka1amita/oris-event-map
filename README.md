@@ -66,4 +66,14 @@ ORIS returns disciplines, levels and services as names. The patterns that map th
 | `getEventEntries` (with `clubid`) | Your and your group's entries; only when a club is set |
 | `getEventServiceEntries` (with `clubid`) | Services you ordered; only when a club and your registration numbers are set |
 
-Responses are cached in the browser for 30 minutes to go easy on ORIS.
+## Caching
+
+Data is kept in the browser (localStorage), so changing dates or filters is instant and the Home Screen app opens with the last known data.
+
+- **Event lists are stored per day.** A new date range only fetches the days that aren't stored yet or are older than 6 hours.
+- **Event details** are refetched when ORIS reports a new version of the event (every list fetch carries the version), or after 7 days.
+- **Your club's entries and service orders** expire after 30 minutes, since they change most often.
+- **Filters** (open for entry, entered) never fetch anything; they filter what is already loaded.
+- **Refresh button** (circular arrow): forgets all saved ORIS data and loads the current dates fresh. Your settings (club, registration numbers) stay.
+
+Past days are dropped automatically. The durations are in `CONFIG.ttl`.
