@@ -1,4 +1,4 @@
-# O map
+# ORIS map
 
 A map of Czech orienteering events from [ORIS](https://oris.ceskyorientak.cz/), with the context the ORIS map view leaves out: format, level, sport, night, relay, services, entry deadlines, and whether you and your group are entered.
 
