@@ -32,20 +32,33 @@ button { font: inherit; color: inherit; }
 /* Top bar */
 .top { position: fixed; z-index: 1000; left: 12px; right: 12px; top: calc(env(safe-area-inset-top, 0px) + 12px); display: flex; flex-direction: column; gap: 8px; pointer-events: none; max-width: 640px; }
 .top > * { pointer-events: auto; }
-.bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 8px 10px 16px; background: #fff; border-radius: 18px; box-shadow: 0 4px 14px rgba(20,24,31,.16); }
-.title { font-size: 20px; font-weight: 700; line-height: 26px; }
-.sub { font-size: 13px; line-height: 18px; color: var(--muted); }
-.bar-right { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 600; color: var(--muted); }
+.head { background: #fff; border-radius: 18px; box-shadow: 0 4px 14px rgba(20,24,31,.16); }
+.bar { display: flex; align-items: center; gap: 4px; padding: 6px 4px 6px 6px; }
+.range-btn { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 0; padding: 4px 10px; border: 0; border-radius: 12px; background: transparent; text-align: left; cursor: pointer; }
+.range-btn:hover { background: #F1F3F3; }
+.range-line { display: flex; align-items: center; gap: 8px; font-size: 19px; font-weight: 700; line-height: 24px; white-space: nowrap; }
+.range-line svg { flex: 0 0 auto; transition: transform .15s ease; }
+.range-btn[aria-expanded="true"] .range-line svg { transform: rotate(180deg); }
+.count { font-size: 13px; line-height: 18px; color: var(--muted); min-height: 18px; }
 .icon-btn { width: 44px; height: 44px; border: 0; border-radius: 22px; background: transparent; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ink); }
 .icon-btn:hover { background: #F1F3F3; }
 .filters { display: flex; flex-wrap: wrap; gap: 8px; }
 .fchip { flex: 0 0 auto; height: 44px; padding: 0 16px; border-radius: 22px; border: 1px solid var(--line); background: #fff; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(20,24,31,.14); }
 .fchip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
-.dates { display: flex; gap: 8px; padding: 6px; background: #fff; border-radius: 18px; box-shadow: 0 2px 8px rgba(20,24,31,.14); }
-.date-field { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 2px; padding: 4px 10px; border-radius: 12px; }
+.dates { display: flex; gap: 4px; padding: 0 6px 6px; border-top: 1px solid #E3E6E5; padding-top: 6px; }
+.dates[hidden] { display: none; }
+/* Week presets as one split pill: "This | Next week". Each half toggles; both on = one solid pill */
+.weeks { flex: 0 0 auto; display: inline-flex; height: 44px; border: 1px solid var(--line); border-radius: 22px; background: #fff; box-shadow: 0 2px 8px rgba(20,24,31,.14); overflow: hidden; }
+.weeks .fchip { height: 42px; border: 0; border-radius: 0; box-shadow: none; }
+.weeks .fchip[data-preset="this"] { padding: 0 12px 0 16px; }
+.weeks .fchip[data-preset="next"] { padding: 0 16px 0 12px; border-left: 1px solid var(--line); }
+.weeks .fchip[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.weeks .fchip[data-preset="this"][aria-pressed="true"] + .fchip[aria-pressed="true"] { border-left-color: rgba(255,255,255,.35); }
+.weeks:has(.fchip[aria-pressed="true"]) { border-color: var(--ink); }
+.date-field { flex: 1 1 0; min-width: 0; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px; border-radius: 12px; }
 .date-field:focus-within { background: #F1F3F3; }
-.date-field span { font-size: 12px; font-weight: 600; color: var(--muted); }
-.date-field input { width: 100%; min-width: 0; border: 0; padding: 0; background: transparent; font: 600 15px/22px var(--sans); color: var(--ink); }
+.date-field span { flex: 0 0 auto; font-size: 13px; font-weight: 600; color: var(--muted); }
+.date-field input { flex: 1 1 auto; width: 100%; min-width: 0; border: 0; padding: 0; background: transparent; font: 700 16px/22px var(--sans); color: var(--ink); }
 .date-field input:focus { outline: none; }
 
 /* Status line */
@@ -140,34 +153,35 @@ dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--mu
   .top { left: auto; right: 16px; top: 16px; width: 460px; max-width: none; }
   .card { left: auto; right: 16px; bottom: 16px; width: 460px; max-width: none; max-height: calc(100vh - 260px); max-height: calc(100dvh - 260px); }
 }
-@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } .range-line svg { transition: none; } }
 </style>
 </head>
 <body>
 <div id="map" aria-label="Map of orienteering events"></div>
 
 <header class="top">
-  <div class="bar">
-    <div>
-      <div class="title" id="title">This week</div>
-      <div class="sub" id="rangeLabel"></div>
-    </div>
-    <div class="bar-right">
-      <span id="count" aria-live="polite"></span>
+  <div class="head">
+    <div class="bar">
+      <button class="range-btn" id="rangeBtn" type="button" aria-expanded="false" aria-controls="dates">
+        <span class="range-line"><span id="rangeLabel"></span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="count" id="count" aria-live="polite"></span>
+      </button>
       <button class="icon-btn" id="settingsBtn" type="button" aria-label="Settings">
         <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"></circle><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z" stroke="currentColor" stroke-width="1.6"></path></svg>
       </button>
     </div>
+    <div class="dates" id="dates" hidden>
+      <label class="date-field"><span>From</span><input type="date" id="dFrom"></label>
+      <label class="date-field"><span>To</span><input type="date" id="dTo"></label>
+    </div>
   </div>
   <div class="filters" role="toolbar" aria-label="Filters">
-    <button class="fchip" type="button" data-preset="this" aria-pressed="true">This week</button>
-    <button class="fchip" type="button" data-preset="next" aria-pressed="false">Next week</button>
+    <span class="weeks">
+      <button class="fchip" type="button" data-preset="this" aria-pressed="true" aria-label="This week">This</button>
+      <button class="fchip" type="button" data-preset="next" aria-pressed="false">Next week</button>
+    </span>
     <button class="fchip" type="button" id="fOpen" aria-pressed="false">Open</button>
     <button class="fchip" type="button" id="fMine" aria-pressed="false">Entered</button>
-  </div>
-  <div class="dates">
-    <label class="date-field"><span>From</span><input type="date" id="dFrom"></label>
-    <label class="date-field"><span>To</span><input type="date" id="dTo"></label>
   </div>
 </header>
 
@@ -582,12 +596,13 @@ L.tileLayer(CONFIG.tiles.url, { maxZoom: 18, subdomains: CONFIG.tiles.subdomains
 const layer = L.layerGroup().addTo(map);
 
 function compact() { return map.getZoom() < CONFIG.compactBelowZoom; }
-function visible(ev) {
-  if (ev.cancelled || ev.lat === null) return false;
+function passesFilters(ev) {
+  if (ev.cancelled) return false;
   if (filters.open && ev.phase !== "tier") return false;
   if (filters.mine && !ev.entered) return false;
   return true;
 }
+function visible(ev) { return passesFilters(ev) && ev.lat !== null; }
 let drawQueued = false;
 function scheduleDraw() {
   if (drawQueued) return;
@@ -656,8 +671,12 @@ function drawAll() {
   const list = [...events.values()].filter(visible).sort((a, b) => (a.date || 0) - (b.date || 0));
   const isCompact = compact();
   groupsFor(list, isCompact).forEach((g) => addGroup(g, isCompact));
-  const noGps = [...events.values()].filter((e) => !e.cancelled && e.lat === null).length;
-  $("#count").textContent = list.length + (list.length === 1 ? " event" : " events") + (noGps ? ", " + noGps + " unmapped" : "");
+  // Both numbers follow the active filters, so they always add up to what matches
+  const matching = [...events.values()].filter(passesFilters);
+  const noLoc = matching.length - list.length;
+  $("#count").textContent = !matching.length
+    ? (events.size ? "No events match the filters" : "")
+    : list.length + " on map" + (noLoc ? ", " + noLoc + " without location" : "");
   if (selectedId) {
     const ev = events.get(selectedId);
     if (ev && visible(ev)) renderCard(ev); else closeCard();
@@ -799,7 +818,6 @@ function setRange(from, to) {
   $("#dTo").value = ymd(to);
   const set = pressedPresets();
   document.querySelectorAll("[data-preset]").forEach((b) => b.setAttribute("aria-pressed", String(set.has(b.dataset.preset))));
-  $("#title").textContent = set.size === 2 ? "This and next week" : set.has("this") ? "This week" : set.has("next") ? "Next week" : "Selected dates";
   $("#rangeLabel").textContent = fmt.range(from, to);
   // Presets stay relative in the URL (good for Home Screen icons); custom dates are fixed
   const url = new URL(location.href);
@@ -817,6 +835,12 @@ document.querySelectorAll("[data-preset]").forEach((b) => b.addEventListener("cl
   const r = presetRange(set);
   setRange(r.from, r.to);
 }));
+$("#rangeBtn").addEventListener("click", (e) => {
+  const open = e.currentTarget.getAttribute("aria-expanded") !== "true";
+  e.currentTarget.setAttribute("aria-expanded", String(open));
+  $("#dates").hidden = !open;
+  if (open) $("#dFrom").focus();
+});
 ["#dFrom", "#dTo"].forEach((sel) => $(sel).addEventListener("change", () => {
   const f = parseDT($("#dFrom").value, false), t = parseDT($("#dTo").value, false);
   if (f && t) setRange(f, t);
