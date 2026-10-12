@@ -36,6 +36,7 @@ Tap the gear and enter your club (abbreviation or ORIS ID), your registration nu
 
 - **Entered (orange marker, check)**: one of your registration numbers is entered.
 - **Group badge**: number of entries from your group, or from the whole club if the group is empty.
+- **Navigation app**: what "Open in Maps" on the detail card opens, with the race location as the destination. "Phone default" uses Apple Maps on iPhone, iPad and Mac, the system chooser (`geo:` link) on Android, and Google Maps on the web elsewhere. Google Maps, Mapy.com and Waze can be picked explicitly; their links open the app when it is installed.
 
 ## Marker encoding
 
