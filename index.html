@@ -166,6 +166,9 @@ dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--mu
         <span class="range-line"><span id="rangeLabel"></span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <span class="count" id="count" aria-live="polite"></span>
       </button>
+      <button class="icon-btn" id="refreshBtn" type="button" aria-label="Refresh from ORIS">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 10a6 6 0 11-1.8-4.3"/><path d="M16.5 3v3.5H13"/></svg>
+      </button>
       <button class="icon-btn" id="settingsBtn" type="button" aria-label="Settings">
         <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"></circle><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z" stroke="currentColor" stroke-width="1.6"></path></svg>
       </button>
@@ -239,7 +242,9 @@ const CONFIG = {
   },
   compactBelowZoom: 9,               // below this zoom, markers shrink to dots
   concurrency: 4,                    // parallel ORIS requests
-  cacheMinutes: 30,
+  // How long cached ORIS data counts as fresh (minutes). Event details are also
+  // refetched whenever ORIS reports a new version of the event.
+  ttl: { list: 6 * 60, details: 7 * 24 * 60, entries: 30 },
   sport: { 1: "foot", 2: "ski", 3: "mtb", 4: "trail" },
   format: [
     ["sprint", /sprint|^SP\b|^KO\b/i],
@@ -375,19 +380,77 @@ function orisRaw(method, params) {
     document.head.appendChild(s);
   });
 }
-async function oris(method, params) {
-  const key = "omap:" + method + ":" + JSON.stringify(params);
+const oris = orisRaw;   // every ORIS call goes through the store below, not a per-request cache
+
+/* ---------------- local store ----------------
+   Events are kept per day, so a new date range only fetches the days not yet
+   covered (or gone stale). Everything is saved in localStorage, so it also
+   survives closing the Home Screen app.
+     days[YYYY-MM-DD]   when that day's event list was fetched
+     list[id]           event as returned by getEventList (small)
+     details[id]        the few getEvent fields we use, with ORIS version
+     entries[club|id]   registration numbers entered for the club
+     orders[club|id]    service orders for the club
+*/
+const STORE_KEY = "omap.store.v2";
+const nowMs = () => Date.now();
+const fresh = (t, minutes) => t && nowMs() - t < minutes * 60000;
+let store = loadStore();
+function emptyStore() { return { days: {}, list: {}, details: {}, entries: {}, orders: {} }; }
+function loadStore() {
   try {
-    const hit = JSON.parse(localStorage.getItem(key) || "null");
-    if (hit && Date.now() - hit.t < CONFIG.cacheMinutes * 60000) return hit.d;
-  } catch (e) { /* ignore broken cache */ }
-  const data = await orisRaw(method, params);
-  try { localStorage.setItem(key, JSON.stringify({ t: Date.now(), d: data })); }
-  catch (e) { pruneCache(); }
-  return data;
+    // drop the old per-request cache from earlier versions of the page
+    Object.keys(localStorage).filter((k) => k.startsWith("omap:")).forEach((k) => localStorage.removeItem(k));
+    const st = Object.assign(emptyStore(), JSON.parse(localStorage.getItem(STORE_KEY) || "{}"));
+    // forget days and events that are already behind us
+    const today = ymd(new Date());
+    Object.keys(st.days).forEach((d) => { if (d < today) delete st.days[d]; });
+    Object.keys(st.list).forEach((id) => {
+      if (String(st.list[id].Date || "").slice(0, 10) < today) {
+        delete st.list[id]; delete st.details[id];
+      }
+    });
+    const live = new Set(Object.keys(st.list));
+    ["entries", "orders"].forEach((k) => Object.keys(st[k]).forEach((key) => { if (!live.has(key.split("|")[1])) delete st[k][key]; }));
+    return st;
+  } catch (e) { return emptyStore(); }
 }
-function pruneCache() {
-  try { Object.keys(localStorage).filter((k) => k.startsWith("omap:")).forEach((k) => localStorage.removeItem(k)); } catch (e) {}
+let saveTimer = null;
+function saveStore() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); }
+    catch (e) {
+      // storage full: keep what's needed for the event list, drop the rest (it can be refetched)
+      store.entries = {}; store.orders = {};
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch (e2) { /* run from memory */ }
+    }
+  }, 300);
+}
+function clearStore() { store = emptyStore(); try { localStorage.removeItem(STORE_KEY); } catch (e) {} }
+const SLIM_DETAIL_FIELDS = ["Version", "EntryStart", "EntryDate1", "EntryDate2", "EntryDate3", "Stages",
+  "UseORISForEntries", "CurrentStartsCount", "CurrentResultsCount", "Cancelled", "GPSLat", "GPSLon"];
+function slimDetails(raw) {
+  const d = {};
+  SLIM_DETAIL_FIELDS.forEach((k) => { if (raw[k] !== undefined) d[k] = raw[k]; });
+  d.Services = values(raw.Services).map((x) => ({ ID: x.ID, NameCZ: x.NameCZ, NameEN: x.NameEN }));
+  return d;
+}
+function daysOf(from, to) {
+  const out = [];
+  for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) out.push(ymd(d));
+  return out;
+}
+// Contiguous runs of days that need fetching
+function spans(days) {
+  const out = [];
+  days.forEach((d) => {
+    const last = out[out.length - 1];
+    const prev = last && new Date(last.to + "T00:00:00");
+    if (prev) prev.setDate(prev.getDate() + 1);
+    if (last && ymd(prev) === d) last.to = d; else out.push({ from: d, to: d });
+  });
+  return out;
 }
 async function pool(items, n, fn) {
   let i = 0;
@@ -709,89 +772,147 @@ function setStatus(msg, retry) {
 }
 
 /* ---------------- loading ---------------- */
+// Build the display model for one event from everything the store knows about it
+function buildEvent(id) {
+  const base = store.list[id];
+  if (!base) return null;
+  const det = store.details[id];
+  const ev = normalize(Object.assign({}, base, det ? det.d : {}));
+  ev.hasDetails = !!det;
+  ev.entered = false; ev.group = 0; ev.ordered = { bed: false, meals: false, ids: [] };
+  if (settings.club) {
+    const me = new Set(regList(settings.me)), group = new Set(regList(settings.group));
+    const en = store.entries[settings.club + "|" + id];
+    if (en) {
+      ev.entered = en.regs.some((r) => me.has(r));
+      ev.group = group.size ? en.regs.filter((r) => group.has(r)).length : en.regs.length;
+    }
+    const or = store.orders[settings.club + "|" + id];
+    if (or) {
+      or.items.forEach((o) => {
+        if (!me.has(o.reg)) return;
+        const svc = ev.services.find((x) => x.id === o.sid);
+        const kind = svc ? svc.kind : serviceKind(o.name);
+        if (o.sid) ev.ordered.ids.push(o.sid);
+        if (kind) ev.ordered[kind] = true;
+      });
+    }
+  }
+  return ev;
+}
+function idsInRange(from, to) {
+  const a = ymd(from), b = ymd(to);
+  return Object.keys(store.list).filter((id) => {
+    const d = String(store.list[id].Date || "").slice(0, 10);
+    return d >= a && d <= b;
+  });
+}
+function refreshEvent(id) {
+  const ev = buildEvent(id);
+  if (!ev) { events.delete(id); return; }
+  events.set(id, ev);
+  if (selectedId === id) renderCard(ev);
+  scheduleDraw();
+}
+
+let firstLoad = true;
 async function load() {
   const token = ++loadToken;
   const from = rangeFrom, to = rangeTo;
-  layer.clearLayers(); events.clear(); closeCard();
-  setStatus("Loading events from ORIS");
+  const days = daysOf(from, to);
 
-  let list;
+  // 1. Show whatever is already known for this range, instantly
+  const showRange = () => {
+    events.clear();
+    idsInRange(from, to).forEach((id) => { const ev = buildEvent(id); if (ev) events.set(id, ev); });
+    drawAll();
+  };
+  showRange();
+  if (firstLoad && events.size) { fitToEvents(); firstLoad = false; }
+
   try {
-    list = await oris("getEventList", Object.assign({ datefrom: ymd(from), dateto: ymd(to) }, CONFIG.listParams));
-  } catch (e) {
-    if (token === loadToken) setStatus(e.message, true);
-    return;
-  }
-  if (token !== loadToken) return;
-  values(list).forEach((raw) => { const ev = normalize(raw); events.set(ev.id, ev); });
-  drawAll();
-  fitToEvents();
-
-  const ids = [...events.keys()].filter((id) => !events.get(id).cancelled);
-  if (!ids.length) { setStatus("No events in ORIS for these dates"); return; }
-
-  let done = 0;
-  setStatus("Loading details 0 of " + ids.length);
-  await pool(ids, CONFIG.concurrency, async (id) => {
-    const raw = await oris("getEvent", { id });
-    if (token !== loadToken || !raw) return;
-    const ev = normalize(Object.assign({}, events.get(id).raw, raw), events.get(id));
-    events.set(id, ev);
-    scheduleDraw();
-    if (selectedId === id) renderCard(ev);
-    done++;
-    setStatus("Loading details " + done + " of " + ids.length);
-  });
-  if (token !== loadToken) return;
-  drawAll();
-
-  if (settings.club) {
-    const me = new Set(regList(settings.me));
-    const group = new Set(regList(settings.group));
-    done = 0;
-    setStatus("Checking your entries");
-    await pool(ids, CONFIG.concurrency, async (id) => {
-      const data = await oris("getEventEntries", { eventid: id, clubid: settings.club });
+    // 2. Event lists only for days not covered or gone stale
+    const missing = days.filter((d) => !fresh(store.days[d], CONFIG.ttl.list));
+    for (const sp of spans(missing)) {
+      setStatus("Loading events from ORIS");
+      const list = values(await oris("getEventList", Object.assign({ datefrom: sp.from, dateto: sp.to }, CONFIG.listParams)));
       if (token !== loadToken) return;
-      const entries = values(data).map((e) => String(e.RegNo || e.RegNum || "").toUpperCase());
-      const ev = events.get(id);
-      ev.entered = entries.some((r) => me.has(r));
-      ev.group = group.size ? entries.filter((r) => group.has(r)).length : entries.length;
-      scheduleDraw();
-      if (selectedId === id) renderCard(ev);
+      // replace that span: events moved away or removed from ORIS disappear
+      Object.keys(store.list).forEach((id) => {
+        const d = String(store.list[id].Date || "").slice(0, 10);
+        if (d >= sp.from && d <= sp.to) delete store.list[id];
+      });
+      list.forEach((raw) => { store.list[String(raw.ID)] = raw; });
+      daysOf(new Date(sp.from + "T00:00:00"), new Date(sp.to + "T00:00:00")).forEach((d) => { store.days[d] = nowMs(); });
+      saveStore();
+    }
+    showRange();
+    if (firstLoad) { fitToEvents(); firstLoad = false; }
+
+    const ids = idsInRange(from, to).filter((id) => String(store.list[id].Cancelled) !== "1");
+    if (!ids.length) { setStatus(events.size ? "" : "No events in ORIS for these dates"); return; }
+
+    // 3. Details: only new events, events whose ORIS version changed, or very old copies
+    const needDetails = ids.filter((id) => {
+      const det = store.details[id], v = store.list[id].Version;
+      if (!det || !fresh(det.t, CONFIG.ttl.details)) return true;
+      return v !== undefined && String(v) !== String(det.v);
+    });
+    let done = 0;
+    if (needDetails.length) setStatus("Loading details 0 of " + needDetails.length);
+    await pool(needDetails, CONFIG.concurrency, async (id) => {
+      const raw = await oris("getEvent", { id });
+      if (token !== loadToken || !raw) return;
+      store.details[id] = { t: nowMs(), v: raw.Version !== undefined ? String(raw.Version) : String(store.list[id].Version), d: slimDetails(raw) };
+      saveStore();
+      refreshEvent(id);
+      setStatus("Loading details " + (++done) + " of " + needDetails.length);
     });
     if (token !== loadToken) return;
-    drawAll();
 
-    // Additional services you ordered (accommodation, meals): only events that offer any
-    const withServices = ids.filter((id) => events.get(id).services.length);
-    if (me.size && withServices.length) {
-      setStatus("Checking your service orders");
-      let logged = false;
-      await pool(withServices, CONFIG.concurrency, async (id) => {
-        const data = await oris("getEventServiceEntries", { eventid: id, clubid: settings.club });
+    // 4. Your club's entries and service orders: these change most often, so they expire soonest
+    if (settings.club) {
+      const club = settings.club;
+      const needEntries = ids.filter((id) => !fresh((store.entries[club + "|" + id] || {}).t, CONFIG.ttl.entries));
+      if (needEntries.length) setStatus("Checking your entries");
+      await pool(needEntries, CONFIG.concurrency, async (id) => {
+        const data = await oris("getEventEntries", { eventid: id, clubid: club });
         if (token !== loadToken) return;
-        const ev = events.get(id);
-        const ordered = { bed: false, meals: false, ids: [] };
-        values(data).forEach((o) => {
-          if (DEBUG && !logged) { console.log("service order sample", o); logged = true; }
-          const reg = String(o.RegNo || o.RegNum || (o.ClubUser && o.ClubUser.RegNo) || "").toUpperCase();
-          if (!me.has(reg)) return;
-          const sid = String(o.ServiceID || (o.Service && o.Service.ID) || "");
-          const svc = ev.services.find((x) => x.id === sid);
-          const kind = svc ? svc.kind : serviceKind(o.ServiceNameCZ || (o.Service && (o.Service.NameCZ || o.Service.NameEN)) || "");
-          if (sid) ordered.ids.push(sid);
-          if (kind) ordered[kind] = true;
-        });
-        ev.ordered = ordered;
-        scheduleDraw();
-        if (selectedId === id) renderCard(ev);
+        store.entries[club + "|" + id] = { t: nowMs(), regs: values(data).map((e) => String(e.RegNo || e.RegNum || "").toUpperCase()).filter(Boolean) };
+        saveStore();
+        refreshEvent(id);
       });
       if (token !== loadToken) return;
-      drawAll();
+
+      if (regList(settings.me).length) {
+        const needOrders = ids.filter((id) => {
+          const det = store.details[id];
+          return det && det.d.Services.length && !fresh((store.orders[club + "|" + id] || {}).t, CONFIG.ttl.entries);
+        });
+        if (needOrders.length) setStatus("Checking your service orders");
+        let logged = false;
+        await pool(needOrders, CONFIG.concurrency, async (id) => {
+          const data = await oris("getEventServiceEntries", { eventid: id, clubid: club });
+          if (token !== loadToken) return;
+          store.orders[club + "|" + id] = { t: nowMs(), items: values(data).map((o) => {
+            if (DEBUG && !logged) { console.log("service order sample", o); logged = true; }
+            return {
+              reg: String(o.RegNo || o.RegNum || (o.ClubUser && o.ClubUser.RegNo) || "").toUpperCase(),
+              sid: String(o.ServiceID || (o.Service && o.Service.ID) || ""),
+              name: o.ServiceNameCZ || (o.Service && (o.Service.NameCZ || o.Service.NameEN)) || ""
+            };
+          }) };
+          saveStore();
+          refreshEvent(id);
+        });
+        if (token !== loadToken) return;
+      }
     }
+    drawAll();
+    setStatus("");
+  } catch (e) {
+    if (token === loadToken) setStatus(e.message + (events.size ? ". Showing saved data" : ""), true);
   }
-  setStatus("");
 }
 function fitToEvents() {
   const pts = [...events.values()].filter((e) => !e.cancelled && e.lat !== null).map((e) => [e.lat, e.lon]);
@@ -855,8 +976,10 @@ $("#settings").addEventListener("close", () => {
   if ($("#settings").returnValue !== "save") return;
   settings = { club: $("#sClub").value.trim(), me: $("#sMe").value.trim(), group: $("#sGroup").value.trim() };
   saveSettings(settings);
-  load();
+  load();   // entries are stored per club, so a new club is fetched and the rest comes from the store
 });
+$("#refreshBtn").addEventListener("click", () => { clearStore(); load(); });   // settings (club, numbers) are stored separately and stay
+
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#card").hidden) closeCard(); });
 
 (function init() {
