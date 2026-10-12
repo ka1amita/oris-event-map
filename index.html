@@ -42,6 +42,12 @@ button { font: inherit; color: inherit; }
 .filters::-webkit-scrollbar { display: none; }
 .fchip { flex: 0 0 auto; height: 44px; padding: 0 16px; border-radius: 22px; border: 1px solid var(--line); background: #fff; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(20,24,31,.14); }
 .fchip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.dates { display: flex; gap: 8px; padding: 6px; background: #fff; border-radius: 18px; box-shadow: 0 2px 8px rgba(20,24,31,.14); }
+.date-field { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 2px; padding: 4px 10px; border-radius: 12px; }
+.date-field:focus-within { background: #F1F3F3; }
+.date-field span { font-size: 12px; font-weight: 600; color: var(--muted); }
+.date-field input { width: 100%; min-width: 0; border: 0; padding: 0; background: transparent; font: 600 15px/22px var(--sans); color: var(--ink); }
+.date-field input:focus { outline: none; }
 
 /* Status line */
 .status { position: fixed; z-index: 1000; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); max-width: calc(100% - 24px); padding: 10px 16px; border-radius: 20px; background: var(--ink); color: #fff; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
@@ -79,7 +85,7 @@ button { font: inherit; color: inherit; }
 .dot.sel { outline: 3px solid var(--select); outline-offset: 4px; }
 
 /* Detail card */
-.card { position: fixed; z-index: 1000; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); max-width: 520px; max-height: 70vh; overflow-y: auto; padding: 16px; background: #fff; border-radius: 22px; box-shadow: 0 10px 30px rgba(20,24,31,.24); display: flex; flex-direction: column; gap: 12px; }
+.card { position: fixed; z-index: 1000; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); max-width: 520px; max-height: calc(100vh - 270px); max-height: calc(100dvh - 270px); overflow-y: auto; padding: 16px; background: #fff; border-radius: 22px; box-shadow: 0 10px 30px rgba(20,24,31,.24); display: flex; flex-direction: column; gap: 12px; }
 .card[hidden] { display: none; }
 .card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .card h2 { margin: 0; font-size: 20px; line-height: 26px; }
@@ -122,7 +128,10 @@ dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--mu
 .btn.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
 
 .leaflet-control-attribution { font-size: 10px; }
-@media (min-width: 700px) { .card { left: auto; right: 16px; bottom: 16px; width: 420px; } }
+@media (min-width: 700px) {
+  .top { left: auto; right: 16px; top: 16px; width: 420px; }
+  .card { left: auto; right: 16px; bottom: 16px; width: 420px; }
+}
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 </style>
 </head>
@@ -143,10 +152,14 @@ dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--mu
     </div>
   </div>
   <div class="filters" role="toolbar" aria-label="Filters">
-    <button class="fchip" type="button" data-range="this" aria-pressed="true">This week</button>
-    <button class="fchip" type="button" data-range="next" aria-pressed="false">Next week</button>
+    <button class="fchip" type="button" data-preset="this" aria-pressed="true">This week</button>
+    <button class="fchip" type="button" data-preset="next" aria-pressed="false">Next week</button>
     <button class="fchip" type="button" id="fOpen" aria-pressed="false">Open for entry</button>
     <button class="fchip" type="button" id="fMine" aria-pressed="false">Entered</button>
+  </div>
+  <div class="dates">
+    <label class="date-field"><span>From</span><input type="date" id="dFrom"></label>
+    <label class="date-field"><span>To</span><input type="date" id="dTo"></label>
   </div>
 </header>
 
@@ -191,8 +204,15 @@ const CONFIG = {
   api: "https://oris.ceskyorientak.cz/API/",
   eventUrl: (id) => "https://oris.ceskyorientak.cz/Zavod?id=" + id,
   listParams: { all: 1 },            // include events outside the official calendar
-  tiles: {
+  // OpenStreetMap's tile servers refuse requests without a Referer, which is what
+  // a page opened straight from disk (file://) sends. There, fall back to CARTO.
+  tiles: location.protocol === "file:" ? {
+    url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+    subdomains: "abcd",
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+  } : {
     url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    subdomains: "abc",
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   },
   compactBelowZoom: 9,               // below this zoom, markers shrink to dots
@@ -297,6 +317,21 @@ function rangeFor(kind) {
   }
   const to = new Date(t); to.setDate(t.getDate() + toSunday);
   return { from: t, to };
+}
+
+const sameDay = (a, b) => ymd(a) === ymd(b);
+const dayDiff = (a, b) => Math.round((new Date(b).setHours(0, 0, 0, 0) - new Date(a).setHours(0, 0, 0, 0)) / 86400000);
+// Which presets the current range matches: "this", "next", or both (this week through next Sunday)
+function pressedPresets() {
+  const t = rangeFor("this"), n = rangeFor("next");
+  if (sameDay(rangeFrom, t.from) && sameDay(rangeTo, n.to)) return new Set(["this", "next"]);
+  if (sameDay(rangeFrom, t.from) && sameDay(rangeTo, t.to)) return new Set(["this"]);
+  if (sameDay(rangeFrom, n.from) && sameDay(rangeTo, n.to)) return new Set(["next"]);
+  return new Set();
+}
+function presetRange(set) {
+  const t = rangeFor("this"), n = rangeFor("next");
+  return { from: set.has("this") ? t.from : n.from, to: set.has("next") ? n.to : t.to };
 }
 
 /* ---------------- ORIS access (JSONP, as the ORIS API documents for cross-domain use) ---------------- */
@@ -526,7 +561,8 @@ function cardHtml(ev) {
 
 /* ---------------- app state ---------------- */
 const params = new URLSearchParams(location.search);
-let rangeKind = params.get("range") === "next" ? "next" : "this";
+const MAX_DAYS = 62;   // keeps the number of ORIS requests reasonable
+let rangeFrom, rangeTo;
 let settings = loadSettings();
 let events = new Map();     // id -> event
 let markers = new Map();    // id -> Leaflet marker
@@ -535,7 +571,7 @@ let filters = { open: false, mine: false };
 let loadToken = 0;
 
 const map = L.map("map", { zoomControl: false, attributionControl: true }).setView([49.8, 15.5], 7);
-L.tileLayer(CONFIG.tiles.url, { maxZoom: 18, attribution: CONFIG.tiles.attribution }).addTo(map);
+L.tileLayer(CONFIG.tiles.url, { maxZoom: 18, subdomains: CONFIG.tiles.subdomains, attribution: CONFIG.tiles.attribution, referrerPolicy: "strict-origin-when-cross-origin" }).addTo(map);
 const layer = L.layerGroup().addTo(map);
 
 function compact() { return map.getZoom() < CONFIG.compactBelowZoom; }
@@ -602,10 +638,7 @@ function setStatus(msg, retry) {
 /* ---------------- loading ---------------- */
 async function load() {
   const token = ++loadToken;
-  const { from, to } = rangeFor(rangeKind);
-  $("#title").textContent = rangeKind === "next" ? "Next week" : "This week";
-  $("#rangeLabel").textContent = fmt.range(from, to);
-  document.querySelectorAll("[data-range]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.range === rangeKind)));
+  const from = rangeFrom, to = rangeTo;
   layer.clearLayers(); markers.clear(); events.clear(); closeCard();
   setStatus("Loading events from ORIS");
 
@@ -695,13 +728,39 @@ function fitToEvents() {
 /* ---------------- wiring ---------------- */
 map.on("zoomend", drawAll);
 map.on("click", closeCard);
-document.querySelectorAll("[data-range]").forEach((b) => b.addEventListener("click", () => {
-  if (rangeKind === b.dataset.range) return;
-  rangeKind = b.dataset.range;
+function setRange(from, to) {
+  if (to < from) { const x = from; from = to; to = x; }
+  let note = "";
+  if (dayDiff(from, to) > MAX_DAYS) {
+    to = new Date(from); to.setDate(from.getDate() + MAX_DAYS);
+    note = "Range shortened to " + MAX_DAYS + " days";
+  }
+  rangeFrom = from; rangeTo = to;
+  $("#dFrom").value = ymd(from);
+  $("#dTo").value = ymd(to);
+  const set = pressedPresets();
+  document.querySelectorAll("[data-preset]").forEach((b) => b.setAttribute("aria-pressed", String(set.has(b.dataset.preset))));
+  $("#title").textContent = set.size === 2 ? "This and next week" : set.has("this") ? "This week" : set.has("next") ? "Next week" : "Selected dates";
+  $("#rangeLabel").textContent = fmt.range(from, to);
+  // Presets stay relative in the URL (good for Home Screen icons); custom dates are fixed
   const url = new URL(location.href);
-  if (rangeKind === "next") url.searchParams.set("range", "next"); else url.searchParams.delete("range");
+  ["range", "from", "to"].forEach((k) => url.searchParams.delete(k));
+  if (set.size === 2) url.searchParams.set("range", "both");
+  else if (set.has("next")) url.searchParams.set("range", "next");
+  else if (!set.size) { url.searchParams.set("from", ymd(from)); url.searchParams.set("to", ymd(to)); }
   history.replaceState(null, "", url);
-  load();
+  load().then(() => { if (note) setStatus(note); });
+}
+document.querySelectorAll("[data-preset]").forEach((b) => b.addEventListener("click", () => {
+  const set = pressedPresets();
+  if (set.has(b.dataset.preset)) set.delete(b.dataset.preset); else set.add(b.dataset.preset);
+  if (!set.size) return;   // keep at least one week selected; use the dates for anything else
+  const r = presetRange(set);
+  setRange(r.from, r.to);
+}));
+["#dFrom", "#dTo"].forEach((sel) => $(sel).addEventListener("change", () => {
+  const f = parseDT($("#dFrom").value, false), t = parseDT($("#dTo").value, false);
+  if (f && t) setRange(f, t);
 }));
 $("#fOpen").addEventListener("click", (e) => { filters.open = !filters.open; e.currentTarget.setAttribute("aria-pressed", String(filters.open)); drawAll(); });
 $("#fMine").addEventListener("click", (e) => { filters.mine = !filters.mine; e.currentTarget.setAttribute("aria-pressed", String(filters.mine)); drawAll(); });
@@ -717,7 +776,14 @@ $("#settings").addEventListener("close", () => {
 });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#card").hidden) closeCard(); });
 
-load();
+(function init() {
+  const f = parseDT(params.get("from"), false), t = parseDT(params.get("to"), false);
+  if (f && t) return setRange(f, t);
+  const r = params.get("range");
+  const set = r === "both" ? new Set(["this", "next"]) : r === "next" ? new Set(["next"]) : new Set(["this"]);
+  const pr = presetRange(set);
+  setRange(pr.from, pr.to);
+})();
 </script>
 </body>
 </html>
