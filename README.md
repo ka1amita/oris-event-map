@@ -1,4 +1,4 @@
-# ORIS event map
+# O map
 
 A map of Czech orienteering events from [ORIS](https://oris.ceskyorientak.cz/), with the context the ORIS map view leaves out: format, level, sport, night, relay, services, entry deadlines, and whether you and your group are entered.
 
@@ -22,8 +22,13 @@ README.md
 
 The page no longer redirects, so Safari → Share → **Add to Home Screen** works directly.
 
-- This week: `https://<username>.github.io/oris-map/`
-- Next week: `https://<username>.github.io/oris-map/?range=next`
+- This week (today to Sunday): `https://<username>.github.io/oris-map/`
+- Next week (Monday to Sunday): `https://<username>.github.io/oris-map/?range=next`
+- Both weeks (today to next Sunday): `https://<username>.github.io/oris-map/?range=both`
+
+## Dates
+
+"This week" and "Next week" can be switched on together to span both. The From and To fields show the current range and accept any dates (up to 62 days, to keep the number of ORIS requests reasonable). Week presets stay relative in the URL; custom dates are saved as fixed `?from=…&to=…`.
 
 ## Settings
 
