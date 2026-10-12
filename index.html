@@ -632,16 +632,22 @@ function addGroup(g, isCompact) {
     const t = e.originalEvent && e.originalEvent.target;
     const el = t && t.closest ? t.closest("[data-id]") : null;
     const ring = m.getElement() && m.getElement().querySelector(".dotgroup");
-    if (ring && !ring.classList.contains("open")) { ring.classList.add("open"); return; }   // first tap fans out
+    // A ring that was folded when the tap started only fans out; nothing gets selected yet
+    if (ring && ring.dataset.wasOpen !== "1") { ring.classList.add("open"); return; }
     if (el) select(el.dataset.id);
     else if (n === 1) select(g.items[0].id);
   });
   m.on("add", () => {
     const ring = m.getElement() && m.getElement().querySelector(".dotgroup");
     if (!ring) return;
-    ring.addEventListener("mouseenter", () => ring.classList.add("open"));
-    ring.addEventListener("mouseleave", () => { if (!g.items.some((e) => e.id === selectedId)) ring.classList.remove("open"); });
-    ring.addEventListener("focusin", () => ring.classList.add("open"));
+    // Remember whether the ring was already open when the press began (before any hover or focus opens it)
+    ring.addEventListener("pointerdown", () => { ring.dataset.wasOpen = ring.classList.contains("open") ? "1" : "0"; });
+    // Hover fans out only with a real mouse; on touch screens the first tap does it
+    ring.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") ring.classList.add("open"); });
+    ring.addEventListener("pointerleave", (e) => {
+      if (e.pointerType === "mouse" && !g.items.some((x) => x.id === selectedId)) ring.classList.remove("open");
+    });
+    ring.addEventListener("keyup", (e) => { if (e.key === "Tab") { ring.classList.add("open"); ring.dataset.wasOpen = "1"; } });
   });
   layer.addLayer(m);
 }
