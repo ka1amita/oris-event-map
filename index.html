@@ -150,7 +150,9 @@ button { font: inherit; color: inherit; }
 .pill.entered { background: var(--orange); border-color: var(--orange); }
 .pill.group { border: 1.5px solid var(--ink); }
 .pill .letter { width: 22px; height: 22px; border-radius: 11px; color: #fff; display: inline-flex; align-items: center; justify-content: center; font: 700 11px/1 var(--disc); margin-left: -6px; }
-.open-btn { display: flex; align-items: center; justify-content: center; height: 48px; border-radius: 24px; background: var(--ink); color: #fff; font-size: 16px; font-weight: 600; text-decoration: none; }
+.open-btn { display: flex; align-items: center; justify-content: center; gap: 8px; height: 48px; border-radius: 24px; background: var(--ink); color: #fff; font-size: 16px; font-weight: 600; text-decoration: none; }
+.open-btn.secondary { background: #fff; color: var(--ink); border: 1.5px solid var(--ink); margin-top: -4px; }
+.field select { height: 44px; padding: 0 10px; border-radius: 12px; border: 1px solid #B9C0C4; background: #fff; font: inherit; color: var(--ink); }
 
 /* Settings */
 dialog { border: 0; border-radius: 22px; padding: 20px; width: min(440px, calc(100% - 24px)); box-shadow: 0 10px 40px rgba(20,24,31,.3); }
@@ -225,6 +227,17 @@ dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--mu
     <div class="field">
       <label for="sGroup">Group registration numbers</label>
       <input id="sGroup" name="group" autocomplete="off" placeholder="Leave empty to count the whole club">
+    </div>
+    <div class="field">
+      <label for="sNav">Navigation app</label>
+      <select id="sNav" name="nav">
+        <option value="auto">Phone default</option>
+        <option value="apple">Apple Maps</option>
+        <option value="google">Google Maps</option>
+        <option value="mapy">Mapy.com</option>
+        <option value="waze">Waze</option>
+      </select>
+      <small>Used by "Open in Maps". Phone default is Apple Maps on iPhone and the chooser on Android.</small>
     </div>
     <div class="dlg-actions">
       <button class="btn" value="cancel" type="submit">Cancel</button>
@@ -468,8 +481,8 @@ async function pool(items, n, fn) {
 
 /* ---------------- settings ---------------- */
 function loadSettings() {
-  try { return Object.assign({ club: "", me: "", group: "" }, JSON.parse(localStorage.getItem("omap.settings") || "{}")); }
-  catch (e) { return { club: "", me: "", group: "" }; }
+  try { return Object.assign({ club: "", me: "", group: "", nav: "auto" }, JSON.parse(localStorage.getItem("omap.settings") || "{}")); }
+  catch (e) { return { club: "", me: "", group: "", nav: "auto" }; }
 }
 function saveSettings(s) { try { localStorage.setItem("omap.settings", JSON.stringify(s)); } catch (e) {} }
 
@@ -595,6 +608,25 @@ function ariaLabel(ev) {
   return parts.filter(Boolean).join(", ");
 }
 
+/* Navigation to the event: a link the phone hands to the navigation app.
+   Apple Maps links open the Maps app on iPhone/iPad/Mac, geo: opens Android's default app or chooser,
+   Google Maps, Mapy.com and Waze links open their apps when installed, otherwise their websites. */
+const NAV_NAME = { apple: "Apple Maps", google: "Google Maps", mapy: "Mapy.com", waze: "Waze" };
+function navTarget(ev) {
+  let app = settings.nav || "auto";
+  const ua = navigator.userAgent;
+  const isApple = /iPhone|iPad|iPod|Macintosh/.test(ua);
+  const isAndroid = /Android/.test(ua);
+  if (app === "auto") app = isApple ? "apple" : isAndroid ? "android" : "google";
+  const lat = ev.lat.toFixed(6), lon = ev.lon.toFixed(6), name = encodeURIComponent(ev.name);
+  switch (app) {
+    case "apple": return { url: "https://maps.apple.com/?daddr=" + lat + "," + lon + "&q=" + name, label: "Open in Maps" };
+    case "android": return { url: "geo:0,0?q=" + lat + "," + lon + "(" + name + ")", label: "Open in Maps", sameTab: true };
+    case "mapy": return { url: "https://mapy.com/fnc/v1/route?mapset=outdoor&end=" + lon + "," + lat + "&routeType=car_fast_traffic", label: "Open in Mapy.com" };
+    case "waze": return { url: "https://waze.com/ul?ll=" + lat + "," + lon + "&navigate=yes", label: "Open in Waze" };
+    default: return { url: "https://www.google.com/maps/dir/?api=1&destination=" + lat + "," + lon + "&travelmode=driving", label: settings.nav === "google" ? "Open in Google Maps" : "Open in Maps" };
+  }
+}
 function cardHtml(ev) {
   const F = FORMAT[ev.format], L = LEVEL[ev.level];
   const tags = [];
@@ -647,7 +679,12 @@ function cardHtml(ev) {
     (ev.services.length ? '<div class="svc-names">' + ev.services.map((x) => esc(x.name) + (ev.ordered.ids.indexOf(x.id) >= 0 ? " (ordered)" : "")).join(", ") + "</div>" : "") +
     steps + closes +
     (pills.length ? '<div class="pills">' + pills.join("") + "</div>" : "") +
-    '<a class="open-btn" href="' + CONFIG.eventUrl(ev.id) + '" target="_blank" rel="noopener">Open in ORIS</a>';
+    '<a class="open-btn" href="' + CONFIG.eventUrl(ev.id) + '" target="_blank" rel="noopener">Open in ORIS</a>' +
+    (ev.lat !== null ? (() => {
+      const nav = navTarget(ev);
+      return '<a class="open-btn secondary" href="' + esc(nav.url) + '"' + (nav.sameTab ? "" : ' target="_blank" rel="noopener"') + '>' +
+        '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8z"/></svg>' + nav.label + "</a>";
+    })() : "");
 }
 
 /* ---------------- app state ---------------- */
@@ -989,12 +1026,12 @@ $("#rangeBtn").addEventListener("click", (e) => {
 $("#fOpen").addEventListener("click", (e) => { filters.open = !filters.open; e.currentTarget.setAttribute("aria-pressed", String(filters.open)); drawAll(); });
 $("#fMine").addEventListener("click", (e) => { filters.mine = !filters.mine; e.currentTarget.setAttribute("aria-pressed", String(filters.mine)); drawAll(); });
 $("#settingsBtn").addEventListener("click", () => {
-  $("#sClub").value = settings.club; $("#sMe").value = settings.me; $("#sGroup").value = settings.group;
+  $("#sClub").value = settings.club; $("#sMe").value = settings.me; $("#sGroup").value = settings.group; $("#sNav").value = settings.nav || "auto";
   $("#settings").showModal();
 });
 $("#settings").addEventListener("close", () => {
   if ($("#settings").returnValue !== "save") return;
-  settings = { club: $("#sClub").value.trim(), me: $("#sMe").value.trim(), group: $("#sGroup").value.trim() };
+  settings = { club: $("#sClub").value.trim(), me: $("#sMe").value.trim(), group: $("#sGroup").value.trim(), nav: $("#sNav").value };
   saveSettings(settings);
   load();   // entries are stored per club, so a new club is fetched and the rest comes from the store
 });
