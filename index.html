@@ -118,6 +118,20 @@ button { font: inherit; color: inherit; }
 .dotgroup.open .dot { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))); }
 .dg-count { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px; background: var(--ink); color: #fff; font: 700 11px/18px var(--sans); text-align: center; pointer-events: none; }
 .dotgroup.open .dg-count { display: none; }
+/* Races without a location: dots in the filter row. Up to 5 sit side by side; more stack into one dot
+   with a count and fan out into rows on tap (or mouse hover), on the same white-ish tray as map groups.
+   Each row is 44px, so the tray lines up with the filter pills next to it. */
+.noloc { flex: 0 1 auto; max-width: 100%; display: flex; flex-wrap: wrap; align-items: center; padding: 0 4px 0 2px; border-radius: 22px;
+  background: rgba(255,255,255,.6); box-shadow: 0 2px 10px rgba(20,24,31,.2); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+.noloc[hidden] { display: none; }
+.noloc.folded { cursor: pointer; }
+.noloc .pinoff { flex: 0 0 auto; width: 30px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--muted); }
+.noloc.unfolded .pinoff { cursor: pointer; }
+.noloc .cell { flex: 0 0 auto; position: relative; width: 40px; height: 44px; display: flex; align-items: center; justify-content: center; }
+.noloc .dot { position: relative; left: auto; top: auto; transform: none; }
+.noloc .dot.sel { outline-offset: 3px; }
+.noloc .dg-count { top: 1px; right: -1px; }
+.noloc.folded .cell .dot { position: absolute; left: 7px; top: 9px; }   /* stacked on one spot */
 @media (prefers-reduced-motion: reduce) { .dotgroup .dot { transition: none; } }
 /* New markers rise out of the ground: the marker slides up while everything below its
    bottom edge (the "ground" at the map point) stays clipped, so it emerges rather than slides.
@@ -222,6 +236,7 @@ dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--mu
     </span>
     <button class="fchip" type="button" id="fOpen" aria-pressed="false">Open</button>
     <button class="fchip" type="button" id="fMine" aria-pressed="false">Entered</button>
+    <div class="noloc" id="noloc" hidden role="group" aria-label="Races without a location"></div>
   </div>
 </header>
 
@@ -872,11 +887,56 @@ function drawAll() {
   $("#count").textContent = !matching.length
     ? (events.size ? "No events match the filters" : "")
     : list.length + " on map" + (noLoc ? ", " + noLoc + " without location" : "");
+  renderNoloc(matching.filter((e) => e.lat === null).sort((a, b) => (a.date || 0) - (b.date || 0)));
   if (selectedId) {
     const ev = events.get(selectedId);
-    if (ev && visible(ev)) renderCard(ev); else closeCard();
+    if (ev && passesFilters(ev)) renderCard(ev); else closeCard();
   }
 }
+
+const NOLOC_STACK_ABOVE = 5;   // more than this many fold into one stacked dot
+let nolocOpen = false;
+let nolocList = [];
+const PINOFF_ICON = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.4-6-11a6 6 0 0 1 10.2-4.3"/><path d="M17.7 8.6A6 6 0 0 1 18 10c0 2.9-1.6 5.6-3.3 7.6"/><path d="M3 3l18 18"/></svg>';
+function nolocFolded() {
+  return nolocList.length > NOLOC_STACK_ABOVE && !nolocOpen && !nolocList.some((e) => e.id === selectedId);
+}
+function renderNoloc(list) {
+  nolocList = list;
+  const el = $("#noloc");
+  if (!list.length) { el.hidden = true; el.innerHTML = ""; return; }
+  el.hidden = false;
+  const folded = nolocFolded();
+  el.classList.toggle("folded", folded);
+  el.classList.toggle("unfolded", !folded && list.length > NOLOC_STACK_ABOVE);
+  const pin = '<span class="pinoff" title="Without location">' + PINOFF_ICON + "</span>";
+  if (folded) {
+    // all dots on one spot, the earliest on top, with a count: same as an overlapping group on the map
+    el.setAttribute("aria-label", list.length + " races without a location, tap to show");
+    el.innerHTML = pin + '<span class="cell">' + list.slice().reverse().map((ev) => dotHtml(ev, false, 0, 0)).join("") +
+      '<span class="dg-count">' + list.length + "</span></span>";
+  } else {
+    el.setAttribute("aria-label", "Races without a location");
+    el.innerHTML = pin + list.map((ev) => '<span class="cell">' + dotHtml(ev, ev.id === selectedId, 0, 0) + "</span>").join("");
+  }
+}
+$("#noloc").addEventListener("pointerdown", () => { $("#noloc").dataset.wasFolded = nolocFolded() ? "1" : "0"; });
+$("#noloc").addEventListener("click", (e) => {
+  // a tap on the folded stack only unfolds it; nothing gets selected yet
+  if ($("#noloc").dataset.wasFolded === "1" && nolocList.length > NOLOC_STACK_ABOVE) { nolocOpen = true; renderNoloc(nolocList); return; }
+  const dot = e.target.closest("[data-id]");
+  if (dot) { nolocOpen = true; select(dot.dataset.id); return; }
+  // the pin icon folds an unfolded stack again
+  if (e.target.closest(".pinoff") && nolocList.length > NOLOC_STACK_ABOVE) { nolocOpen = false; if (nolocList.some((x) => x.id === selectedId)) closeCard(); renderNoloc(nolocList); }
+});
+// with a mouse, hovering unfolds like the groups on the map
+$("#noloc").addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse" && nolocList.length > NOLOC_STACK_ABOVE && !nolocOpen) { nolocOpen = true; renderNoloc(nolocList); } });
+$("#noloc").addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse" && nolocOpen && !nolocList.some((x) => x.id === selectedId)) { nolocOpen = false; renderNoloc(nolocList); } });
+$("#noloc").addEventListener("keydown", (e) => {
+  const id = e.target && e.target.dataset ? e.target.dataset.id : null;
+  if (id && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); nolocOpen = true; select(id); }
+  else if (!id && (e.key === "Enter" || e.key === " ") && nolocFolded()) { e.preventDefault(); nolocOpen = true; renderNoloc(nolocList); }
+});
 function select(id) {
   if (!events.get(id)) return;
   selectedId = id;
@@ -1059,7 +1119,7 @@ document.getElementById("map").addEventListener("keydown", (e) => {
   const id = e.target && e.target.dataset ? e.target.dataset.id : null;
   if (id && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); select(id); }
 });
-map.on("click", () => { closeCard(); scheduleDraw(); });   // also folds any fanned-out group
+map.on("click", () => { nolocOpen = false; closeCard(); scheduleDraw(); });   // also folds any fanned-out group and the no-location tray
 const fmtDay = (d) => d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
 const fmtRange = (r) => ymd(r.from) === ymd(r.to) ? fmtDay(r.from) : fmtDay(r.from) + " – " + fmtDay(r.to);
 
