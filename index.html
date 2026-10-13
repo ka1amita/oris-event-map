@@ -69,6 +69,12 @@ button { font: inherit; color: inherit; }
 .date-field span { flex: 0 0 auto; font-size: 13px; font-weight: 600; color: var(--muted); }
 .date-field input { flex: 1 1 auto; width: 100%; min-width: 0; border: 0; padding: 0; background: transparent; font: 700 16px/22px var(--sans); color: var(--ink); }
 .date-field input:focus { outline: none; }
+.date-field { position: relative; }
+.date-field .inp { position: relative; flex: 1 1 auto; min-width: 0; display: flex; align-items: center; }
+.date-field .hint { display: none; position: absolute; left: 0; top: 50%; transform: translateY(-50%); font-size: 15px; font-weight: 600; color: #8A949B; pointer-events: none; white-space: nowrap; }
+.date-field.empty .hint { display: block; }
+.date-field.empty input { color: transparent; }
+.add-range[hidden] { display: none; }
 
 /* Status line */
 .status { position: fixed; z-index: 1000; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); max-width: calc(100% - 24px); padding: 10px 16px; border-radius: 20px; background: var(--ink); color: #fff; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
@@ -1101,13 +1107,27 @@ function renderDates() {
   more.hidden = ranges.length < 2;
   more.textContent = "+" + (ranges.length - 1);
   more.setAttribute("aria-label", "and " + (ranges.length - 1) + " more");
-  const xIcon = '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l10 10M15 5L5 15"/></svg>';
-  $("#rangeRows").innerHTML = ranges.map((r, i) =>
-    '<div class="range-row" data-i="' + i + '">' +
-      '<label class="date-field"><span>From</span><input type="date" data-edge="from" value="' + ymd(r.from) + '"></label>' +
-      '<label class="date-field"><span>To</span><input type="date" data-edge="to" value="' + ymd(r.to) + '"></label>' +
-      (ranges.length > 1 ? '<button class="icon-btn" type="button" data-remove="' + i + '" aria-label="Remove ' + esc(fmtRange(r)) + '">' + xIcon + "</button>" : "") +
+  renderRows();
+}
+// A new range starts empty and joins the selection only once both From and To are set
+let draft = null;
+const X_ICON = '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l10 10M15 5L5 15"/></svg>';
+function dateField(edge, value) {
+  return '<label class="date-field' + (value ? "" : " empty") + '"><span>' + (edge === "from" ? "From" : "To") + '</span>' +
+    '<span class="inp"><input type="date" data-edge="' + edge + '" value="' + (value ? ymd(value) : "") + '">' +
+    '<span class="hint" aria-hidden="true">pick a date</span></span></label>';
+}
+function renderRows() {
+  let html = ranges.map((r, i) =>
+    '<div class="range-row" data-i="' + i + '">' + dateField("from", r.from) + dateField("to", r.to) +
+      (ranges.length > 1 ? '<button class="icon-btn" type="button" data-remove="' + i + '" aria-label="Remove ' + esc(fmtRange(r)) + '">' + X_ICON + "</button>" : "") +
     "</div>").join("");
+  if (draft) {
+    html += '<div class="range-row" data-draft="1">' + dateField("from", draft.from) + dateField("to", draft.to) +
+      '<button class="icon-btn" type="button" data-remove="draft" aria-label="Remove new range">' + X_ICON + "</button></div>";
+  }
+  $("#rangeRows").innerHTML = html;
+  $("#addRange").hidden = !!draft;
 }
 // What the selection becomes after tapping a word (null = not possible)
 function tapWord(sel, word) {
@@ -1136,8 +1156,15 @@ $("#rangeRows").addEventListener("change", (e) => {
   const input = e.target.closest("input[data-edge]");
   if (!input) return;
   const d = parseDT(input.value, false);
+  const row = input.closest(".range-row");
+  input.closest(".date-field").classList.toggle("empty", !d);
+  if (row.dataset.draft) {
+    draft[input.dataset.edge] = d;
+    if (draft.from && draft.to) { const r = draft; draft = null; applyRanges(ranges.concat([r]), "dates"); }
+    return;   // incomplete: wait for the other boundary
+  }
   if (!d) return;
-  const i = +input.closest(".range-row").dataset.i;
+  const i = +row.dataset.i;
   const list = ranges.map((r) => ({ from: r.from, to: r.to }));
   list[i][input.dataset.edge] = d;
   applyRanges(list, "dates");
@@ -1145,13 +1172,14 @@ $("#rangeRows").addEventListener("change", (e) => {
 $("#rangeRows").addEventListener("click", (e) => {
   const btn = e.target.closest("[data-remove]");
   if (!btn) return;
+  if (btn.dataset.remove === "draft") { draft = null; renderRows(); return; }
   const list = ranges.filter((_, i) => i !== +btn.dataset.remove);
   applyRanges(list, "dates");
 });
+// Add range: an empty row. The calendar opens only when you tap From or To.
 $("#addRange").addEventListener("click", () => {
-  const last = ranges[ranges.length - 1];
-  const day = addDays(last ? last.to : new Date(), 1);
-  applyRanges(ranges.concat([{ from: day, to: day }]), "dates");
+  if (!draft) draft = { from: null, to: null };
+  renderRows();
 });
 $("#fOpen").addEventListener("click", (e) => { filters.open = !filters.open; e.currentTarget.setAttribute("aria-pressed", String(filters.open)); drawAll(); });
 $("#fMine").addEventListener("click", (e) => { filters.mine = !filters.mine; e.currentTarget.setAttribute("aria-pressed", String(filters.mine)); drawAll(); });
