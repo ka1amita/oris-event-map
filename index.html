@@ -43,18 +43,17 @@ button { font: inherit; color: inherit; }
 .icon-btn { width: 44px; height: 44px; border: 0; border-radius: 22px; background: transparent; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ink); }
 .icon-btn:hover { background: #F1F3F3; }
 .filters { display: flex; flex-wrap: wrap; gap: 12px 8px; align-items: center; }
-.fchip { flex: 0 0 auto; height: 44px; padding: 0 16px; border-radius: 22px; border: 1px solid var(--line); background: #fff; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(20,24,31,.14); }
+.fchip { -webkit-appearance: none; appearance: none; margin: 0; line-height: 1; flex: 0 0 auto; height: 44px; padding: 0 16px; border-radius: 22px; border: 0; background: #fff; font-size: 15px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 8px rgba(20,24,31,.14); }
 .fchip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
 .dates { display: flex; flex-direction: column; padding: 4px 4px 6px; border-top: 1px solid #E3E6E5; }
 .dates[hidden] { display: none; }
 /* Week presets as one split pill: "This | Next week". Each half toggles; both on = one solid pill */
 /* Weeks and days as one phrase pill: This | Next | work | week | end. The lit words read as the selection */
-.weeks { flex: 0 0 auto; display: inline-flex; height: 44px; border: 1px solid var(--line); border-radius: 22px; background: #fff; box-shadow: 0 2px 8px rgba(20,24,31,.14); overflow: hidden; }
-.weeks:has(.fchip[aria-pressed="true"]) { border-color: var(--ink); }
-.weeks .fchip { height: 42px; padding: 0 12px; border: 0; border-radius: 0; box-shadow: none; }
+.weeks { flex: 0 0 auto; display: inline-flex; height: 44px; border: 0; border-radius: 22px; background: #fff; box-shadow: 0 2px 8px rgba(20,24,31,.14); overflow: hidden; }
+.weeks .fchip { height: 44px; padding: 0 12px; border: 0; border-radius: 0; box-shadow: none; }
 .weeks .fchip:first-child { padding-left: 16px; }
 .weeks .fchip:last-child { padding-right: 16px; }
-.weeks .fchip + .fchip { border-left: 1px solid var(--line); }
+.weeks .fchip + .fchip { border-left: 1px solid var(--ink); }
 .weeks .fchip[aria-pressed="true"] { background: var(--ink); color: #fff; }
 .weeks .fchip[aria-pressed="true"] + .fchip[aria-pressed="true"] { border-left-color: rgba(255,255,255,.35); }
 .weeks .fchip:disabled { color: #A3AAB0; cursor: default; }
@@ -85,7 +84,7 @@ button { font: inherit; color: inherit; }
 .leaflet-div-icon, .omark { background: transparent; border: 0; }
 .stack { position: absolute; left: 0; top: 0; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .pin { position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; border-radius: 22px; }
-.chip { position: relative; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px 0 7px; border-radius: 22px; background: #fff; color: var(--ink); border-style: solid; box-shadow: 0 2px 6px rgba(20,24,31,.22); font-family: var(--sans); }
+.chip { position: relative; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px 0 7px; border-radius: 22px; background: #fff; color: var(--ink); border: 0; box-shadow: 0 2px 6px rgba(20,24,31,.22); font-family: var(--sans); }
 .chip.closed { background: #F1F3F3; color: #5A636B; }
 .chip.entered { background: var(--orange); color: var(--ink); }
 .pin.sel .chip { box-shadow: 0 0 0 3px var(--select), 0 8px 18px rgba(20,24,31,.3); }
@@ -94,21 +93,22 @@ button { font: inherit; color: inherit; }
 .tail.entered { border-top-color: var(--orange); }
 .disc { flex: 0 0 auto; width: 30px; height: 30px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font: 700 12px/1 var(--disc); }
 .lines { display: flex; flex-direction: column; gap: 3px; }
-.day { font-size: 15px; font-weight: 600; line-height: 18px; white-space: nowrap; }
+.day { font-size: 15px; font-weight: 500; line-height: 18px; white-space: nowrap; }
 .state { display: flex; align-items: center; gap: 4px; height: 8px; }
 .pips { display: flex; gap: 3px; }
 .pip { width: 7px; height: 7px; border-radius: 4px; border: 1px solid currentColor; }
 .pip.on { background: currentColor; }
 .badge { position: absolute; width: 22px; height: 22px; border-radius: 11px; display: flex; align-items: center; justify-content: center; }
 .b-sport { top: -9px; left: -7px; border: 2px solid var(--orange-dark); background: #fff; color: var(--orange-dark); }
-.b-night { top: -9px; right: -7px; border: 2px solid #fff; background: #24307A; color: #fff; }
+.b-level { top: -9px; right: -7px; border: 1.5px solid var(--ink); font: 700 8.5px/1 var(--disc); letter-spacing: -.02em; }
+.b-night { position: static; width: 20px; height: 20px; border-radius: 10px; border: 0; background: #24307A; color: #fff; }
 .b-relay { bottom: -9px; left: -7px; border: 2px solid #fff; background: #5A636B; color: #fff; }
 .b-group { bottom: -9px; right: -9px; width: auto; padding: 0 6px 0 5px; gap: 3px; border: 1.5px solid var(--ink); background: #fff; color: var(--ink); font: 700 11px/1 var(--sans); }
 .svcs { position: absolute; top: -8px; left: 19px; display: flex; gap: 2px; }
 .b-svc { width: 20px; height: 20px; border-radius: 10px; border: 1.5px solid var(--ink); background: #fff; color: var(--ink); display: flex; align-items: center; justify-content: center; }
 .b-svc.ordered { background: var(--orange); }
 /* Compact marker for zoomed-out views */
-.dot { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); width: 26px; height: 26px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font: 700 11px/1 var(--disc); cursor: pointer; box-shadow: 0 1px 4px rgba(20,24,31,.35); }
+.dot { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); width: 26px; height: 26px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font: 700 10px/1 var(--disc); cursor: pointer; box-shadow: 0 1px 4px rgba(20,24,31,.35); }
 .dot.entered::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 3px solid var(--orange); }
 .dot.sel { outline: 3px solid var(--select); outline-offset: 4px; }
 /* Several events at (nearly) the same spot when zoomed out: one dot with a count, fans out on hover or tap */
@@ -170,7 +170,7 @@ button { font: inherit; color: inherit; }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .tag { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 14px; background: #F1F3F3; font-size: 13px; font-weight: 600; white-space: nowrap; }
 .sw { width: 12px; height: 12px; border-radius: 6px; }
-.sw.ring { background: #fff; border-style: solid; box-shadow: 0 0 0 1px var(--line); }
+.lvl { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 10px; border: 1.5px solid var(--ink); font: 700 8px/1 var(--disc); letter-spacing: -.02em; }
 .tag.ordered { background: var(--orange); }
 .svc-names { font-size: 13px; line-height: 18px; color: var(--muted); }
 .steps { position: relative; display: grid; gap: 8px; }
@@ -330,13 +330,19 @@ const CONFIG = {
   team: /team|družst|druzst/i,
   knockout: /knock|vyřazov|vyrazov/i,
   freeOrder: /score|volné pořadí|volne poradi|rogain|free order/i,
+  // Level: first the ORIS short name, exactly; then patterns on the full names (order matters: regional before national)
+  levelShort: { "MČR": "NC", "MCR": "NC", "ČP": "NP", "CP": "NP", "ŽA": "AL", "ZA": "AL", "ŽB": "BL", "ZB": "BL",
+                "OM": "RC", "KM": "RC", "OŽ": "RL", "OZ": "RL", "ŽC": "RL", "ZC": "RL" },
   level: [
-    ["unofficial", /ostatní|ostatni|neofic|unofficial|trénink|trenink|training|školení|skoleni|soustřed|soustred/i],
-    ["regional", /oblast|krajsk|region/i],
-    ["champ", /mistrovstv|championship|MČR|\bMCR\b/i],
-    ["ranking", /žebříček|zebricek|ranking|pohár|pohar|cup/i]
+    ["NN", /neveřejn|neverejn|trénink|trenink|training|soustřed|soustred|školení|skoleni|non-competition|nesoutěž|nesoutez/i],
+    ["RC", /oblastní mistrovství|oblastni mistrovstvi|mistrovství oblast|mistrovstvi oblast|krajské mistrovství|krajske mistrovstvi|regional championship/i],
+    ["RL", /oblastní žebříček|oblastni zebricek|krajský žebříček|krajsky zebricek|žebříček c|zebricek c|regional ladder/i],
+    ["NC", /mistrovství čr|mistrovstvi cr|mistrovství české|mistrovstvi ceske|national championship|czech championship/i],
+    ["NP", /český pohár|cesky pohar|czech cup|national cup/i],
+    ["AL", /žebříček a|zebricek a|ladder a/i],
+    ["BL", /žebříček b|zebricek b|ladder b/i]
   ],
-  levelFallback: "regional",
+  levelFallback: "OP",   // other public race
   services: {
     bed: /ubytov|nocleh|spaní|spani|tělocvič|telocvic|kemp|camp|accommod|hostel|hotel/i,
     meals: /strav|večeř|vecer|oběd|obed|snídan|snidan|jídl|jidl|meal|dinner|lunch|breakfast|penz|pension/i
@@ -344,17 +350,25 @@ const CONFIG = {
 };
 
 const FORMAT = {
-  sprint: { bg: "#F2B705", fg: "#2A2000", text: "S", name: "Sprint" },
+  sprint: { bg: "#D0342C", fg: "#FFFFFF", text: "S", name: "Sprint" },
   middle: { bg: "#2A6FD1", fg: "#FFFFFF", text: "M", name: "Middle" },
   long:   { bg: "#1B7F43", fg: "#FFFFFF", text: "L", name: "Long" },
   other:  { bg: "#C9CED2", fg: "#2B323A", text: "+", name: "Other" }
 };
+// Level: a two-letter code in a corner badge; the fill groups levels from white (lowest) to black (highest).
+// Compact dots show the same fill as their centre.
+const LEVEL_FILL = { top: ["#14181F", "#FFFFFF"], ladder: ["#6B747C", "#FFFFFF"], regional: ["#BFC5CA", "#14181F"], other: ["#FFFFFF", "#14181F"] };
 const LEVEL = {
-  unofficial: { bc: "#FFFFFF", bw: 1.5, name: "Unofficial" },
-  regional:   { bc: "#8A949B", bw: 1.5, name: "Regional" },
-  ranking:    { bc: "#A8672D", bw: 2.5, name: "National ranking" },
-  champ:      { bc: "#B8860B", bw: 3.5, name: "Championship" }
+  NC: { name: "National championship", group: "top" },
+  NP: { name: "National cup", group: "top" },
+  AL: { name: "A ladder", group: "ladder" },
+  BL: { name: "B ladder", group: "ladder" },
+  RC: { name: "Regional championship", group: "regional" },
+  RL: { name: "Regional ladder", group: "regional" },
+  OP: { name: "Other public", group: "other" },
+  NN: { name: "Non-competition", group: "other" }
 };
+Object.keys(LEVEL).forEach((k) => { const f = LEVEL_FILL[LEVEL[k].group]; LEVEL[k].code = k; LEVEL[k].bg = f[0]; LEVEL[k].fg = f[1]; });
 const SPORT_NAME = { foot: "Foot-O", ski: "Ski-O", mtb: "MTBO", trail: "Trail-O" };
 const TIER = {
   1: { bg: "#5BC44A", fg: "#0C2A08" },
@@ -594,8 +608,9 @@ function classify(raw) {
 
   let format = "other";
   for (const [key, re] of CONFIG.format) if (re.test(discText)) { format = key; break; }
-  let level = CONFIG.levelFallback;
-  for (const [key, re] of CONFIG.level) if (re.test(lvlText)) { level = key; break; }
+  let level = CONFIG.levelShort[String(lvl.ShortName || "").trim().toUpperCase()] || null;
+  if (!level) for (const [key, re] of CONFIG.level) if (re.test(text(lvl.NameCZ, lvl.NameEN))) { level = key; break; }
+  if (!level) level = CONFIG.levelFallback;
 
   const services = values(raw.Services).map((s) => {
     const name = s.NameCZ || s.NameEN || "";
@@ -673,15 +688,16 @@ function pinHtml(ev, selected, showTail) {
     state += '<span class="pips">' + ev.deadlines.map((d, i) => '<span class="pip' + (ev.phase === "tier" && i < ev.tier ? " on" : "") + '"></span>').join("") + "</span>";
   }
   if (ev.entered) state += ICON.check;
+  const night = ev.night ? '<span class="badge b-night">' + ICON.night + "</span>" : "";
   const svcs = (ev.bed ? '<span class="b-svc' + (ev.ordered.bed ? " ordered" : "") + '">' + ICON.bed + "</span>" : "") +
     (ev.meals ? '<span class="b-svc' + (ev.ordered.meals ? " ordered" : "") + '">' + ICON.meals + "</span>" : "");
   return '<div class="pin' + (selected ? " sel" : "") + popClass(ev) + '" style="' + popDelay(ev) + '" data-id="' + esc(ev.id) + '" tabindex="0" role="button" aria-label="' + esc(ariaLabel(ev)) + '">' +
-    '<div class="chip ' + cls + '" style="border-width:' + L.bw + "px;border-color:" + L.bc + '">' +
+    '<div class="chip ' + cls + '">' +
       '<span class="disc" style="background:' + F.bg + ";color:" + F.fg + '">' + F.text + "</span>" +
       '<span class="lines"><span class="day">' + esc(ev.date ? fmt.short(ev.date) : "?") + '</span><span class="state">' + state + "</span></span>" +
       '<span class="badge b-sport">' + ICON[ev.sport] + "</span>" +
-      (svcs ? '<span class="svcs">' + svcs + "</span>" : "") +
-      (ev.night ? '<span class="badge b-night">' + ICON.night + "</span>" : "") +
+      (svcs || night ? '<span class="svcs">' + svcs + night + "</span>" : "") +
+      '<span class="badge b-level" style="background:' + L.bg + ";color:" + L.fg + '">' + L.code + "</span>" +
       (ev.relay || ev.team ? '<span class="badge b-relay">' + ICON.relay + "</span>" : "") +
       (ev.group > 0 ? '<span class="badge b-group">' + ICON.person + "<span>" + ev.group + "</span></span>" : "") +
     "</div>" +
@@ -690,7 +706,7 @@ function pinHtml(ev, selected, showTail) {
 }
 function dotHtml(ev, selected, dx, dy) {
   const F = FORMAT[ev.format], L = LEVEL[ev.level];
-  return '<div class="dot' + (ev.entered ? " entered" : "") + (selected ? " sel" : "") + popClass(ev) + '" data-id="' + esc(ev.id) + '" tabindex="0" role="button" aria-label="' + esc(ariaLabel(ev)) + '" style="' + popDelay(ev) + '--dx:' + (dx || 0) + "px;--dy:" + (dy || 0) + "px;background:" + F.bg + ";color:" + F.fg + ";box-shadow:0 0 0 " + L.bw + "px " + L.bc + ', 0 1px 4px rgba(20,24,31,.35)">' + F.text + "</div>";
+  return '<div class="dot' + (ev.entered ? " entered" : "") + (selected ? " sel" : "") + popClass(ev) + '" data-id="' + esc(ev.id) + '" tabindex="0" role="button" aria-label="' + esc(ariaLabel(ev)) + '" style="' + popDelay(ev) + '--dx:' + (dx || 0) + "px;--dy:" + (dy || 0) + "px;background:" + L.bg + ";color:" + L.fg + ";border:5px solid " + F.bg + '">' + F.text + "</div>";
 }
 function ariaLabel(ev) {
   const parts = [ev.name, ev.date ? fmt.full(ev.date) : "", FORMAT[ev.format].name, LEVEL[ev.level].name, SPORT_NAME[ev.sport]];
@@ -729,7 +745,7 @@ function cardHtml(ev) {
   const F = FORMAT[ev.format], L = LEVEL[ev.level];
   const tags = [];
   tags.push('<span class="tag"><span class="sw" style="background:' + F.bg + '"></span>' + F.name + "</span>");
-  tags.push('<span class="tag"><span class="sw ring" style="border-width:' + Math.max(2, L.bw) + "px;border-color:" + L.bc + '"></span>' + L.name + "</span>");
+  tags.push('<span class="tag"><span class="lvl" style="background:' + L.bg + ";color:" + L.fg + '">' + L.code + "</span>" + L.name + "</span>");
   tags.push('<span class="tag">' + ICON[ev.sport] + SPORT_NAME[ev.sport] + "</span>");
   if (ev.night) tags.push('<span class="tag">' + ICON.night + "Night</span>");
   if (ev.relay) tags.push('<span class="tag">' + ICON.relay + "Relay</span>");
