@@ -30,7 +30,7 @@ The pill **This | Next | work | week | end** reads as a phrase; the lit words ar
 | this work week / next work week | Monday to Friday only |
 | this week end / this next week end | Saturday and Sunday only |
 
-Tap the date line in the header to see and edit all ranges. Each range has From and To; **Add range** adds another. When there are several ranges, the header shows the first one and a "+N" badge. Edited dates that match a pill combination light it up. Up to 62 days in total.
+Tap the date line in the header to see and edit all ranges. Each range has From and To; **Add range** adds an empty row that joins the selection once both dates are picked. When there are several ranges, the header shows the first one and a "+N" badge. Edited dates that match a pill combination light it up. Up to 62 days in total.
 
 ## URL
 
