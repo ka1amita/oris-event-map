@@ -36,25 +36,34 @@ button { font: inherit; color: inherit; }
 .bar { display: flex; align-items: center; gap: 4px; padding: 6px 4px 6px 6px; }
 .range-btn { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 0; padding: 4px 10px; border: 0; border-radius: 12px; background: transparent; text-align: left; cursor: pointer; }
 .range-btn:hover { background: #F1F3F3; }
-.range-line { display: flex; align-items: center; gap: 8px; font-size: 19px; font-weight: 700; line-height: 24px; white-space: nowrap; }
-.range-line svg { flex: 0 0 auto; transition: transform .15s ease; }
-.range-btn[aria-expanded="true"] .range-line svg { transform: rotate(180deg); }
+.range-line { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; line-height: 24px; white-space: nowrap; }
+.range-line .chev { flex: 0 0 auto; transition: transform .15s ease; }
+.range-btn[aria-expanded="true"] .range-line .chev { transform: rotate(180deg); }
 .count { font-size: 13px; line-height: 18px; color: var(--muted); min-height: 18px; }
 .icon-btn { width: 44px; height: 44px; border: 0; border-radius: 22px; background: transparent; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ink); }
 .icon-btn:hover { background: #F1F3F3; }
 .filters { display: flex; flex-wrap: wrap; gap: 8px; }
 .fchip { flex: 0 0 auto; height: 44px; padding: 0 16px; border-radius: 22px; border: 1px solid var(--line); background: #fff; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(20,24,31,.14); }
 .fchip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
-.dates { display: flex; gap: 4px; padding: 0 6px 6px; border-top: 1px solid #E3E6E5; padding-top: 6px; }
+.dates { display: flex; flex-direction: column; padding: 4px 4px 6px; border-top: 1px solid #E3E6E5; }
 .dates[hidden] { display: none; }
 /* Week presets as one split pill: "This | Next week". Each half toggles; both on = one solid pill */
+/* Weeks and days as one phrase pill: This | Next | work | week | end. The lit words read as the selection */
 .weeks { flex: 0 0 auto; display: inline-flex; height: 44px; border: 1px solid var(--line); border-radius: 22px; background: #fff; box-shadow: 0 2px 8px rgba(20,24,31,.14); overflow: hidden; }
-.weeks .fchip { height: 42px; border: 0; border-radius: 0; box-shadow: none; }
-.weeks .fchip[data-preset="this"] { padding: 0 12px 0 16px; }
-.weeks .fchip[data-preset="next"] { padding: 0 16px 0 12px; border-left: 1px solid var(--line); }
-.weeks .fchip[aria-pressed="true"] { background: var(--ink); color: #fff; }
-.weeks .fchip[data-preset="this"][aria-pressed="true"] + .fchip[aria-pressed="true"] { border-left-color: rgba(255,255,255,.35); }
 .weeks:has(.fchip[aria-pressed="true"]) { border-color: var(--ink); }
+.weeks .fchip { height: 42px; padding: 0 12px; border: 0; border-radius: 0; box-shadow: none; }
+.weeks .fchip:first-child { padding-left: 16px; }
+.weeks .fchip:last-child { padding-right: 16px; }
+.weeks .fchip + .fchip { border-left: 1px solid var(--line); }
+.weeks .fchip[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.weeks .fchip[aria-pressed="true"] + .fchip[aria-pressed="true"] { border-left-color: rgba(255,255,255,.35); }
+.weeks .fchip:disabled { color: #A3AAB0; cursor: default; }
+.more { flex: 0 0 auto; display: inline-flex; align-items: center; height: 22px; padding: 0 7px; border-radius: 11px; border: 1.5px solid var(--ink); font-size: 12px; font-weight: 700; line-height: 1; }
+.more[hidden] { display: none; }
+.range-row { display: flex; align-items: center; gap: 2px; }
+.add-range { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px; margin-top: 2px; border: 0; border-radius: 12px; background: transparent; font-size: 15px; font-weight: 600; cursor: pointer; }
+.add-range:hover { background: #F1F3F3; }
+.add-range .plus { width: 24px; height: 24px; border-radius: 12px; border: 1.5px solid var(--ink); display: flex; align-items: center; justify-content: center; }
 .date-field { flex: 1 1 0; min-width: 0; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px; border-radius: 12px; }
 .date-field:focus-within { background: #F1F3F3; }
 .date-field span { flex: 0 0 auto; font-size: 13px; font-weight: 600; color: var(--muted); }
@@ -172,7 +181,7 @@ dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--mu
   .top { left: auto; right: 16px; top: 16px; width: 460px; max-width: none; }
   .card { left: auto; right: 16px; bottom: 16px; width: 460px; max-width: none; max-height: calc(100vh - 260px); max-height: calc(100dvh - 260px); }
 }
-@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } .range-line svg { transition: none; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } .range-line .chev { transition: none; } }
 </style>
 </head>
 <body>
@@ -182,7 +191,7 @@ dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--mu
   <div class="head">
     <div class="bar">
       <button class="range-btn" id="rangeBtn" type="button" aria-expanded="false" aria-controls="dates">
-        <span class="range-line"><span id="rangeLabel"></span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="range-line"><span id="rangeLabel"></span><span class="more" id="moreRanges" hidden></span><svg class="chev" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <span class="count" id="count" aria-live="polite"></span>
       </button>
       <button class="icon-btn" id="refreshBtn" type="button" aria-label="Refresh from ORIS">
@@ -193,14 +202,17 @@ dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--mu
       </button>
     </div>
     <div class="dates" id="dates" hidden>
-      <label class="date-field"><span>From</span><input type="date" id="dFrom"></label>
-      <label class="date-field"><span>To</span><input type="date" id="dTo"></label>
+      <div id="rangeRows"></div>
+      <button class="add-range" type="button" id="addRange"><span class="plus"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 1.5v9M1.5 6h9"/></svg></span>Add range</button>
     </div>
   </div>
   <div class="filters" role="toolbar" aria-label="Filters">
-    <span class="weeks">
-      <button class="fchip" type="button" data-preset="this" aria-pressed="true" aria-label="This week">This</button>
-      <button class="fchip" type="button" data-preset="next" aria-pressed="false">Next week</button>
+    <span class="weeks" role="group" aria-label="Weeks and days">
+      <button class="fchip" type="button" data-word="this" aria-pressed="false" aria-label="This week">This</button>
+      <button class="fchip" type="button" data-word="next" aria-pressed="false" aria-label="Next week">Next</button>
+      <button class="fchip" type="button" data-word="work" aria-pressed="false" aria-label="Weekdays only">work</button>
+      <button class="fchip" type="button" data-word="week" aria-pressed="false" aria-label="Whole week">week</button>
+      <button class="fchip" type="button" data-word="end" aria-pressed="false" aria-label="Weekend only">end</button>
     </span>
     <button class="fchip" type="button" id="fOpen" aria-pressed="false">Open</button>
     <button class="fchip" type="button" id="fMine" aria-pressed="false">Entered</button>
@@ -376,21 +388,75 @@ function rangeFor(kind) {
   return { from: t, to };
 }
 
-const sameDay = (a, b) => ymd(a) === ymd(b);
+/* ---------------- date ranges ----------------
+   The selection is a list of day ranges. The pill (This | Next | work | week | end) produces them,
+   the editor lets you change them by hand, and the URL carries them in one parameter:
+     ?days=this-next-week-end                      words, relative to today (good for Home Screen icons)
+     ?days=2026-10-17..2026-10-18,2026-10-24..2026-10-25   fixed dates
+*/
+const WORDS = ["this", "next", "work", "week", "end"];
 const dayDiff = (a, b) => Math.round((new Date(b).setHours(0, 0, 0, 0) - new Date(a).setHours(0, 0, 0, 0)) / 86400000);
-// Which presets the current range matches: "this", "next", or both (this week through next Sunday)
-function pressedPresets() {
-  const t = rangeFor("this"), n = rangeFor("next");
-  if (sameDay(rangeFrom, t.from) && sameDay(rangeTo, n.to)) return new Set(["this", "next"]);
-  if (sameDay(rangeFrom, t.from) && sameDay(rangeTo, t.to)) return new Set(["this"]);
-  if (sameDay(rangeFrom, n.from) && sameDay(rangeTo, n.to)) return new Set(["next"]);
-  return new Set();
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const isWeekend = (d) => d.getDay() === 0 || d.getDay() === 6;
+function rangeDays(r) { const out = []; for (let d = new Date(r.from); d <= r.to; d = addDays(d, 1)) out.push(new Date(d)); return out; }
+// Sort, then merge ranges that overlap or touch
+function normalizeRanges(list) {
+  const sorted = list.filter((r) => r.from && r.to).map((r) => (r.to < r.from ? { from: r.to, to: r.from } : r)).sort((a, b) => a.from - b.from);
+  const out = [];
+  sorted.forEach((r) => {
+    const last = out[out.length - 1];
+    if (last && r.from <= addDays(last.to, 1)) { if (r.to > last.to) last.to = new Date(r.to); }
+    else out.push({ from: new Date(r.from), to: new Date(r.to) });
+  });
+  return out;
 }
-function presetRange(set) {
-  const t = rangeFor("this"), n = rangeFor("next");
-  return { from: set.has("this") ? t.from : n.from, to: set.has("next") ? n.to : t.to };
+// Days of a list of dates grouped into contiguous ranges
+function toRanges(days) {
+  const out = [];
+  days.forEach((d) => {
+    const last = out[out.length - 1];
+    if (last && ymd(addDays(last.to, 1)) === ymd(d)) last.to = d; else out.push({ from: d, to: d });
+  });
+  return out;
 }
-
+// sel: { weeks: Set("this","next"), part: "all" | "work" | "end" }
+function presetRanges(sel) {
+  let days = [];
+  ["this", "next"].forEach((w) => { if (sel.weeks.has(w)) days = days.concat(rangeDays(rangeFor(w))); });
+  if (sel.part === "work") days = days.filter((d) => !isWeekend(d));
+  if (sel.part === "end") days = days.filter(isWeekend);
+  return normalizeRanges(toRanges(days));
+}
+const rangesKey = (list) => list.map((r) => ymd(r.from) + ".." + ymd(r.to)).join(",");
+const ALL_SELS = [];
+[["this"], ["next"], ["this", "next"]].forEach((w) => ["all", "work", "end"].forEach((part) => ALL_SELS.push({ weeks: new Set(w), part })));
+// Which pill combination (if any) produces exactly these ranges
+function matchingSel(list) {
+  const key = rangesKey(list);
+  return ALL_SELS.find((sel) => { const r = presetRanges(sel); return r.length && rangesKey(r) === key; }) || null;
+}
+function selWords(sel) {
+  const w = [];
+  if (sel.weeks.has("this")) w.push("this");
+  if (sel.weeks.has("next")) w.push("next");
+  if (sel.part === "work") w.push("work");
+  w.push("week");
+  if (sel.part === "end") w.push("end");
+  return w;
+}
+function parseDaysParam(v) {
+  if (!v) return null;
+  const words = v.toLowerCase().split("-");
+  if (words.every((w) => WORDS.includes(w)) && words.includes("week") && (words.includes("this") || words.includes("next"))) {
+    const sel = { weeks: new Set(words.filter((w) => w === "this" || w === "next")), part: words.includes("work") ? "work" : words.includes("end") ? "end" : "all" };
+    return { mode: "words", sel };
+  }
+  const list = v.split(",").map((part) => {
+    const m = /^(\d{4}-\d\d-\d\d)\.\.(\d{4}-\d\d-\d\d)$/.exec(part.trim());
+    return m ? { from: parseDT(m[1], false), to: parseDT(m[2], false) } : null;
+  }).filter(Boolean);
+  return list.length ? { mode: "dates", ranges: normalizeRanges(list) } : null;
+}
 /* ---------------- ORIS access (JSONP, as the ORIS API documents for cross-domain use) ---------------- */
 let seq = 0;
 function orisRaw(method, params) {
@@ -690,7 +756,14 @@ function cardHtml(ev) {
 /* ---------------- app state ---------------- */
 const params = new URLSearchParams(location.search);
 const MAX_DAYS = 62;   // keeps the number of ORIS requests reasonable
-let rangeFrom, rangeTo;
+let ranges = [];          // the selected day ranges
+let rangesMode = "words";  // how the URL describes them: "words" (relative) or "dates" (fixed)
+let chosenSel = null;      // the pill words last tapped; wins when several word sets give the same days (e.g. on a weekend)
+function currentSel() {
+  if (chosenSel && rangesKey(presetRanges(chosenSel)) === rangesKey(ranges)) return chosenSel;
+  return matchingSel(ranges);
+}
+const allDays = () => ranges.flatMap((r) => rangeDays(r)).map(ymd);
 let settings = loadSettings();
 let events = new Map();     // id -> event
 let selectedId = null;
@@ -853,12 +926,9 @@ function buildEvent(id) {
   }
   return ev;
 }
-function idsInRange(from, to) {
-  const a = ymd(from), b = ymd(to);
-  return Object.keys(store.list).filter((id) => {
-    const d = String(store.list[id].Date || "").slice(0, 10);
-    return d >= a && d <= b;
-  });
+function idsInRange(days) {
+  const set = new Set(days);
+  return Object.keys(store.list).filter((id) => set.has(String(store.list[id].Date || "").slice(0, 10)));
 }
 function refreshEvent(id) {
   const ev = buildEvent(id);
@@ -871,13 +941,12 @@ function refreshEvent(id) {
 let firstLoad = true;
 async function load() {
   const token = ++loadToken;
-  const from = rangeFrom, to = rangeTo;
-  const days = daysOf(from, to);
+  const days = allDays();
 
   // 1. Show whatever is already known for this range, instantly
   const showRange = () => {
     events.clear();
-    idsInRange(from, to).forEach((id) => { const ev = buildEvent(id); if (ev) events.set(id, ev); });
+    idsInRange(days).forEach((id) => { const ev = buildEvent(id); if (ev) events.set(id, ev); });
     scheduleDraw();
   };
   showRange();
@@ -907,7 +976,7 @@ async function load() {
     showRange();
     if (firstLoad) { fitToEvents(); firstLoad = false; }
 
-    const ids = idsInRange(from, to).filter((id) => String(store.list[id].Cancelled) !== "1");
+    const ids = idsInRange(days).filter((id) => String(store.list[id].Cancelled) !== "1");
     if (!ids.length) { setStatus(events.size ? "" : "No events in ORIS for these dates"); return; }
 
     // 3. Details: only new events, events whose ORIS version changed, or very old copies
@@ -985,44 +1054,105 @@ document.getElementById("map").addEventListener("keydown", (e) => {
   if (id && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); select(id); }
 });
 map.on("click", () => { closeCard(); scheduleDraw(); });   // also folds any fanned-out group
-function setRange(from, to) {
-  if (to < from) { const x = from; from = to; to = x; }
+const fmtDay = (d) => d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+const fmtRange = (r) => ymd(r.from) === ymd(r.to) ? fmtDay(r.from) : fmtDay(r.from) + " – " + fmtDay(r.to);
+
+// Apply a new selection: update the pill, header, editor and URL, then load
+function applyRanges(list, mode, sel) {
+  chosenSel = sel || null;
   let note = "";
-  if (dayDiff(from, to) > MAX_DAYS) {
-    to = new Date(from); to.setDate(from.getDate() + MAX_DAYS);
-    note = "Range shortened to " + MAX_DAYS + " days";
-  }
-  rangeFrom = from; rangeTo = to;
-  $("#dFrom").value = ymd(from);
-  $("#dTo").value = ymd(to);
-  const set = pressedPresets();
-  document.querySelectorAll("[data-preset]").forEach((b) => b.setAttribute("aria-pressed", String(set.has(b.dataset.preset))));
-  $("#rangeLabel").textContent = fmt.range(from, to);
-  // Presets stay relative in the URL (good for Home Screen icons); custom dates are fixed
+  list = normalizeRanges(list);
+  if (!list.length) return;
+  // keep the total number of days reasonable for ORIS
+  let total = 0;
+  list = list.reduce((acc, r) => {
+    if (total >= MAX_DAYS) return acc;
+    const n = dayDiff(r.from, r.to) + 1;
+    if (total + n > MAX_DAYS) { note = "Dates shortened to " + MAX_DAYS + " days"; acc.push({ from: r.from, to: addDays(r.from, MAX_DAYS - total - 1) }); total = MAX_DAYS; }
+    else { acc.push(r); total += n; }
+    return acc;
+  }, []);
+  ranges = list;
+  rangesMode = mode;
+  renderDates();
+  const cur = currentSel();
   const url = new URL(location.href);
-  ["range", "from", "to"].forEach((k) => url.searchParams.delete(k));
-  if (set.size === 2) url.searchParams.set("range", "both");
-  else if (set.has("next")) url.searchParams.set("range", "next");
-  else if (!set.size) { url.searchParams.set("from", ymd(from)); url.searchParams.set("to", ymd(to)); }
-  history.replaceState(null, "", url);
+  ["days", "range", "from", "to"].forEach((k) => url.searchParams.delete(k));
+  if (mode === "words" && cur) {
+    const w = selWords(cur).join("-");
+    if (w !== "this-week") url.searchParams.set("days", w);   // no parameter = this week
+  } else {
+    url.searchParams.set("days", rangesKey(ranges));
+  }
+  history.replaceState(null, "", url.toString().replace(/%2C/g, ","));
   load().then(() => { if (note) setStatus(note); });
 }
-document.querySelectorAll("[data-preset]").forEach((b) => b.addEventListener("click", () => {
-  const set = pressedPresets();
-  if (set.has(b.dataset.preset)) set.delete(b.dataset.preset); else set.add(b.dataset.preset);
-  if (!set.size) return;   // keep at least one week selected; use the dates for anything else
-  const r = presetRange(set);
-  setRange(r.from, r.to);
+function renderDates() {
+  const sel = currentSel();
+  const lit = new Set(sel ? selWords(sel) : []);
+  document.querySelectorAll("[data-word]").forEach((b) => {
+    b.setAttribute("aria-pressed", String(lit.has(b.dataset.word)));
+    // a word that would leave no days (e.g. "this work week" on a Saturday) can't be picked
+    const next = tapWord(sel, b.dataset.word);
+    b.disabled = !next || !presetRanges(next).length;
+  });
+  $("#rangeLabel").textContent = ranges.length ? fmtRange(ranges[0]) : "";
+  const more = $("#moreRanges");
+  more.hidden = ranges.length < 2;
+  more.textContent = "+" + (ranges.length - 1);
+  more.setAttribute("aria-label", "and " + (ranges.length - 1) + " more");
+  const xIcon = '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l10 10M15 5L5 15"/></svg>';
+  $("#rangeRows").innerHTML = ranges.map((r, i) =>
+    '<div class="range-row" data-i="' + i + '">' +
+      '<label class="date-field"><span>From</span><input type="date" data-edge="from" value="' + ymd(r.from) + '"></label>' +
+      '<label class="date-field"><span>To</span><input type="date" data-edge="to" value="' + ymd(r.to) + '"></label>' +
+      (ranges.length > 1 ? '<button class="icon-btn" type="button" data-remove="' + i + '" aria-label="Remove ' + esc(fmtRange(r)) + '">' + xIcon + "</button>" : "") +
+    "</div>").join("");
+}
+// What the selection becomes after tapping a word (null = not possible)
+function tapWord(sel, word) {
+  const cur = sel ? { weeks: new Set(sel.weeks), part: sel.part } : { weeks: new Set(["this"]), part: "all" };
+  if (word === "this" || word === "next") {
+    if (!sel) { cur.weeks = new Set([word]); return cur; }
+    if (cur.weeks.has(word)) cur.weeks.delete(word); else cur.weeks.add(word);
+    return cur.weeks.size ? cur : null;   // keep at least one week
+  }
+  if (word === "week") cur.part = "all";
+  if (word === "work") cur.part = sel && sel.part === "work" ? "all" : "work";
+  if (word === "end") cur.part = sel && sel.part === "end" ? "all" : "end";
+  return cur;
+}
+document.querySelectorAll("[data-word]").forEach((b) => b.addEventListener("click", () => {
+  const next = tapWord(currentSel(), b.dataset.word);
+  if (next && presetRanges(next).length) applyRanges(presetRanges(next), "words", next);
 }));
 $("#rangeBtn").addEventListener("click", (e) => {
   const open = e.currentTarget.getAttribute("aria-expanded") !== "true";
   e.currentTarget.setAttribute("aria-expanded", String(open));
   $("#dates").hidden = !open;
 });
-["#dFrom", "#dTo"].forEach((sel) => $(sel).addEventListener("change", () => {
-  const f = parseDT($("#dFrom").value, false), t = parseDT($("#dTo").value, false);
-  if (f && t) setRange(f, t);
-}));
+// Editing ranges by hand switches the URL to fixed dates
+$("#rangeRows").addEventListener("change", (e) => {
+  const input = e.target.closest("input[data-edge]");
+  if (!input) return;
+  const d = parseDT(input.value, false);
+  if (!d) return;
+  const i = +input.closest(".range-row").dataset.i;
+  const list = ranges.map((r) => ({ from: r.from, to: r.to }));
+  list[i][input.dataset.edge] = d;
+  applyRanges(list, "dates");
+});
+$("#rangeRows").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-remove]");
+  if (!btn) return;
+  const list = ranges.filter((_, i) => i !== +btn.dataset.remove);
+  applyRanges(list, "dates");
+});
+$("#addRange").addEventListener("click", () => {
+  const last = ranges[ranges.length - 1];
+  const day = addDays(last ? last.to : new Date(), 1);
+  applyRanges(ranges.concat([{ from: day, to: day }]), "dates");
+});
 $("#fOpen").addEventListener("click", (e) => { filters.open = !filters.open; e.currentTarget.setAttribute("aria-pressed", String(filters.open)); drawAll(); });
 $("#fMine").addEventListener("click", (e) => { filters.mine = !filters.mine; e.currentTarget.setAttribute("aria-pressed", String(filters.mine)); drawAll(); });
 $("#settingsBtn").addEventListener("click", () => {
@@ -1040,12 +1170,15 @@ $("#refreshBtn").addEventListener("click", () => { clearStore(); load(); });   /
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#card").hidden) closeCard(); });
 
 (function init() {
-  const f = parseDT(params.get("from"), false), t = parseDT(params.get("to"), false);
-  if (f && t) return setRange(f, t);
-  const r = params.get("range");
-  const set = r === "both" ? new Set(["this", "next"]) : r === "next" ? new Set(["next"]) : new Set(["this"]);
-  const pr = presetRange(set);
-  setRange(pr.from, pr.to);
+  let parsed = parseDaysParam(params.get("days"));
+  // links saved by earlier versions: ?range=next|both, ?from=&to=
+  if (!parsed && params.get("range") === "next") parsed = parseDaysParam("next-week");
+  if (!parsed && params.get("range") === "both") parsed = parseDaysParam("this-next-week");
+  if (!parsed && params.get("from") && params.get("to")) parsed = parseDaysParam(params.get("from") + ".." + params.get("to"));
+  // words that give no days today (e.g. "this-work-week" on a Saturday) fall back to this week
+  if (!parsed || (parsed.mode === "words" && !presetRanges(parsed.sel).length)) parsed = parseDaysParam("this-week");
+  if (parsed.mode === "words") applyRanges(presetRanges(parsed.sel), "words", parsed.sel);
+  else applyRanges(parsed.ranges, "dates");
 })();
 </script>
 </body>
