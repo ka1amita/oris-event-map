@@ -63,17 +63,16 @@ Tap the gear and enter your club (abbreviation or ORIS ID), your registration nu
 
 | Element | Meaning |
 |---|---|
-| Disc color and letter | Format: S sprint (yellow), M middle (blue), L long (green), + other (gray) |
-| Border | Level: white unofficial, thin gray regional, bronze national ranking, thick gold championship |
+| Disc color and letter | Format: S sprint (red), M middle (blue), L long (green), + other (gray) |
+| Badge, top right | Level code: NC national championship, NP national cup, AL A ladder, BL B ladder, RC regional championship, RL regional ladder, OP other public, NN non-competition. Fill from black (NC, NP) through dark gray (AL, BL) and light gray (RC, RL) to white (OP, NN) |
 | Badge, top left | Sport: shoe, bike, ski, trail |
-| Badges, top edge | Services: bed = accommodation, fork and knife = meals. Orange background = you ordered it |
-| Badge, top right | Night race |
+| Badges, top edge | Services (bed = accommodation, fork and knife = meals; orange = you ordered it), then a moon for night races |
 | Badge, bottom left | Relay or team |
 | Badge, bottom right | Entries from your group |
 | Dots | Current entry deadline (1–3). Clock and empty dots = not open yet. Lock = closed |
 | Orange marker | You are entered |
 
-Zoomed out, markers shrink to colored dots. Zoom in to see the full markers.
+Zoomed out, markers shrink to dots: the ring is the format color, the center the level fill. Zoom in to see the full markers.
 
 ## Tuning the mapping
 
