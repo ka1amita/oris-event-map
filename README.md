@@ -18,17 +18,38 @@ README.md
 2. Settings → Pages → *Deploy from a branch* → `main` / `(root)`.
 3. Open `https://<username>.github.io/oris-map/`.
 
+## Choosing dates
+
+The pill **This | Next | work | week | end** reads as a phrase; the lit words are the selection:
+
+| Lit words | Days |
+|---|---|
+| this week | today to Sunday |
+| next week | Monday to Sunday of next week |
+| this next week | today to next Sunday |
+| this work week / next work week | Monday to Friday only |
+| this week end / this next week end | Saturday and Sunday only |
+
+Tap the date line in the header to see and edit all ranges. Each range has From and To; **Add range** adds another. When there are several ranges, the header shows the first one and a "+N" badge. Edited dates that match a pill combination light it up. Up to 62 days in total.
+
+## URL
+
+One parameter, `days`:
+
+- Words, relative to today: `?days=next-week`, `?days=this-next-work-week`, `?days=this-next-week-end`. No parameter means this week.
+- Fixed dates, `from..to`, ranges separated by commas: `?days=2026-10-12..2026-10-18` or `?days=2026-10-17..2026-10-18,2026-10-24..2026-10-25`. A single day is `2026-10-17..2026-10-17`.
+
+Picking with the pill writes words; editing ranges writes dates. Older links with `?range=` or `?from=&to=` still work.
+
 ## Home Screen
 
-The page no longer redirects, so Safari → Share → **Add to Home Screen** works directly.
+Words stay relative, so use them for Home Screen icons (Safari → Share → **Add to Home Screen**):
 
-- This week (today to Sunday): `https://<username>.github.io/oris-map/`
-- Next week (Monday to Sunday): `https://<username>.github.io/oris-map/?range=next`
-- Both weeks (today to next Sunday): `https://<username>.github.io/oris-map/?range=both`
+- This week: `https://<site>/oris-event-map/`
+- Next week: `https://<site>/oris-event-map/?days=next-week`
+- Both weekends: `https://<site>/oris-event-map/?days=this-next-week-end`
 
-## Dates
-
-"This week" and "Next week" can be switched on together to span both. The From and To fields show the current range and accept any dates (up to 62 days, to keep the number of ORIS requests reasonable). Week presets stay relative in the URL; custom dates are saved as fixed `?from=…&to=…`.
+A link with fixed dates keeps showing those dates.
 
 ## Settings
 
