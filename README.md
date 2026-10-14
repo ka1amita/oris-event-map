@@ -67,6 +67,7 @@ Without a club, enter your SI IDs instead. Unregistered runners get a one-off re
 - **Group badge**: number of entries from your group, or from your whole club if the group is empty.
 - **Entered** and **Free** filters appear once a club registration ID or an SI ID is set. Entered shows only events you are entered in; Free hides other events on days you already have one (your own stay visible).
 - **Navigation app**: what "Open in Maps" on the detail card opens, with the event location as the destination. "Phone default" uses Apple Maps on iPhone, iPad and Mac, the system chooser (`geo:` link) on Android, and Google Maps on the web elsewhere. Google Maps, Mapy.com and Waze can be picked explicitly; their links open the app when it is installed.
+- **Calendar**: what "Add to calendar" on the detail card does. It adds the event as one all-day calendar event (name, place, ORIS link) and is a one-time import, not a subscription. A stage of a multi-day event (E1, E2, …) is its own day; the multi-day event itself spans from its first to its last stage (ORIS keeps no last day, so the app looks up the stages' dates). "Calendar file" opens an `.ics` file: on iPhone and iPad it goes to Calendar, elsewhere it downloads and opens in Apple Calendar, Outlook or another calendar app. "Google Calendar" opens a prefilled Google Calendar event. "Phone default" is Google Calendar on Android, which can't open a calendar file into Google Calendar, and a calendar file elsewhere.
 
 ## Marker encoding
 

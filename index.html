@@ -293,6 +293,15 @@ dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--mu
       </select>
       <small>Used by "Open in Maps". Phone default is Apple Maps on iPhone and the chooser on Android.</small>
     </div>
+    <div class="field">
+      <label for="sCal">Calendar</label>
+      <select id="sCal" name="cal">
+        <option value="auto">Phone default</option>
+        <option value="file">Calendar file (Apple Calendar, Outlook, …)</option>
+        <option value="google">Google Calendar</option>
+      </select>
+      <small>Used by "Add to calendar". Phone default is Google Calendar on Android and a calendar file elsewhere.</small>
+    </div>
     <div class="dlg-actions">
       <button class="btn" value="cancel" type="submit">Cancel</button>
       <button class="btn primary" value="save" type="submit">Save</button>
@@ -642,8 +651,8 @@ async function pool(items, n, fn) {
 
 /* ---------------- settings ---------------- */
 function loadSettings() {
-  try { return Object.assign({ me: "", group: "", si: "", nav: "auto" }, JSON.parse(localStorage.getItem("omap.settings") || "{}")); }
-  catch (e) { return { me: "", group: "", si: "", nav: "auto" }; }
+  try { return Object.assign({ me: "", group: "", si: "", nav: "auto", cal: "auto" }, JSON.parse(localStorage.getItem("omap.settings") || "{}")); }
+  catch (e) { return { me: "", group: "", si: "", nav: "auto", cal: "auto" }; }
 }
 // Czech registration IDs start with the club code: ABC1234 belongs to club ABC
 const clubOf = (reg) => { const m = /^([^\d\s]+)\d+$/.exec(reg); return m ? m[1] : null; };
@@ -803,6 +812,84 @@ function navTarget(ev) {
     default: return { url: "https://www.google.com/maps/dir/?api=1&destination=" + lat + "," + lon + "&travelmode=driving", label: settings.nav === "google" ? "Open in Google Maps" : "Open in Maps" };
   }
 }
+/* "Add to calendar": the event as one all-day calendar event. A stage (E1, E2, …) or a single event is its own day;
+   a multi-day event (the parent of stages) spans from its first to its last stage. It's a one-time import, not a
+   subscription. Apple Calendar, Outlook and others take a calendar file; Android can't open one into Google Calendar,
+   so there it is a Google Calendar link. */
+function calendarApp() {
+  let app = settings.cal || "auto";
+  if (app === "auto") app = /Android/.test(navigator.userAgent) ? "google" : "file";
+  return app;
+}
+const isoPlusDays = (iso, n) => ymd(addDays(parseDT(iso, false), n));
+const icsDate = (iso) => iso.replace(/-/g, "");
+const isParent = (ev) => ev.stages > 1 && !isStage(ev.id);
+// ORIS keeps no last day on a multi-day event; its stages carry their dates
+const lastDays = new Map();   // parent ID -> { last: "YYYY-MM-DD", failed }
+const findingLastDay = new Set();
+async function findLastDay(ev) {
+  const first = String(ev.raw.Date).slice(0, 10);
+  findingLastDay.add(ev.id);
+  try {
+    // one event list over the month from the first day finds the stages, also outside the selected dates
+    const list = values(await oris("getEventList", Object.assign({ datefrom: first, dateto: isoPlusDays(first, 31) }, CONFIG.listParams)));
+    const dates = list.filter((raw) => String(raw.ParentID || "0") === ev.id).map((raw) => String(raw.Date).slice(0, 10)).sort();
+    lastDays.set(ev.id, { last: dates.length ? dates[dates.length - 1] : first, failed: false });
+  } catch (e) {
+    if (DEBUG) console.warn(e);
+    lastDays.set(ev.id, { last: first, failed: true });
+  }
+  findingLastDay.delete(ev.id);
+  refreshEvent(ev.id);
+}
+// the event's days, { first, last, partial }, or null while the last day of a multi-day event is being found
+function eventDays(ev) {
+  const first = String(ev.raw.Date).slice(0, 10);
+  let days = { first, last: first, partial: false };
+  if (isParent(ev)) {
+    const found = lastDays.get(ev.id);
+    days = found ? { first, last: found.last, partial: found.failed } : null;
+  }
+  return days;
+}
+function eventIcs(ev, days) {
+  const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
+  return ICS.text(["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//oris-event-map//ORIS map//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
+    "BEGIN:VEVENT",
+    "UID:oris-event-map-" + ev.id + "-event",
+    "DTSTAMP:" + stamp,
+    // all-day: plain dates without a time zone, the end is the day after the last day
+    "DTSTART;VALUE=DATE:" + icsDate(days.first),
+    "DTEND;VALUE=DATE:" + icsDate(isoPlusDays(days.last, 1)),
+    "SUMMARY:" + ICS.esc(ev.name),
+    ...ICS.location(ev.place, ev.lat, ev.lon),
+    "DESCRIPTION:" + ICS.esc(CONFIG.eventUrl(ev.id)),
+    "URL:" + CONFIG.eventUrl(ev.id),
+    "END:VEVENT", "END:VCALENDAR"]);
+}
+function calendarButton(ev) {
+  const icon = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>';
+  const days = eventDays(ev);
+  let html = '<button class="open-btn secondary" type="button" disabled>' + icon + "Finding the event's days…</button>";
+  if (days) {
+    const label = (calendarApp() === "google" ? "Add to Google Calendar" : "Add to calendar") + (days.partial ? " (first day only)" : "");
+    let href = "", attrs = "";
+    if (calendarApp() === "google") {
+      href = "https://calendar.google.com/calendar/render?" + new URLSearchParams({ action: "TEMPLATE", text: ev.name,
+        dates: icsDate(days.first) + "/" + icsDate(isoPlusDays(days.last, 1)), details: CONFIG.eventUrl(ev.id), location: ev.place }).toString();
+      attrs = ' target="_blank" rel="noopener"';
+    } else {
+      href = "data:text/calendar;charset=utf-8," + encodeURIComponent(eventIcs(ev, days));
+      // iPhone and iPad open a calendar file into Calendar; elsewhere it is downloaded and opened from there
+      if (!/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        const file = ev.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "") || "event";
+        attrs = ' download="' + esc(file) + '.ics"';
+      }
+    }
+    html = '<a class="open-btn secondary" href="' + esc(href) + '"' + attrs + ">" + icon + label + "</a>";
+  }
+  return html;
+}
 function cardHtml(ev) {
   const F = FORMAT[ev.format], L = LEVEL[ev.level];
   const tags = [];
@@ -863,7 +950,8 @@ function cardHtml(ev) {
       const nav = navTarget(ev);
       return '<a class="open-btn secondary" href="' + esc(nav.url) + '"' + (nav.sameTab ? "" : ' target="_blank" rel="noopener"') + '>' +
         '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8z"/></svg>' + nav.label + "</a>";
-    })() : "");
+    })() : "") +
+    calendarButton(ev);
 }
 
 /* ---------------- app state ---------------- */
@@ -1117,6 +1205,7 @@ function renderCard(ev) {
   $("#cardClose").addEventListener("click", closeCard);
   const check = $("#checkNow");
   if (check) check.addEventListener("click", () => checkNow(ev.id));
+  if (isParent(ev) && !lastDays.has(ev.id) && !findingLastDay.has(ev.id)) findLastDay(ev);
 }
 function closeCard() {
   const had = selectedId !== null;
@@ -1604,12 +1693,13 @@ $("#sGroup").addEventListener("input", updateRegWarnings);
 $("#sSi").addEventListener("input", updateRegWarnings);
 $("#settingsBtn").addEventListener("click", () => {
   $("#sMe").value = settings.me; $("#sGroup").value = settings.group; $("#sSi").value = settings.si || ""; $("#sNav").value = settings.nav || "auto";
+  $("#sCal").value = settings.cal || "auto";
   updateRegWarnings();
   $("#settings").showModal();
 });
 $("#settings").addEventListener("close", () => {
   if ($("#settings").returnValue !== "save") return;
-  settings = { me: $("#sMe").value.trim(), group: $("#sGroup").value.trim(), si: $("#sSi").value.trim(), nav: $("#sNav").value };
+  settings = { me: $("#sMe").value.trim(), group: $("#sGroup").value.trim(), si: $("#sSi").value.trim(), nav: $("#sNav").value, cal: $("#sCal").value };
   saveSettings(settings);
   updateFreeChip();
   load();   // entries are stored per club, so a new club (or the first SI ID) is fetched and the rest comes from the store
