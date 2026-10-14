@@ -543,7 +543,7 @@ const oris = orisRaw;   // every ORIS call goes through the store below, not a p
    survives closing the Home Screen app.
      days[YYYY-MM-DD]   when that day's event list was fetched
      list[id]           event as returned by getEventList (small)
-     details[id]        the few getEvent fields we use, with ORIS version
+     details[id]        the few getEvent fields we use, with ORIS version (also for the parent of a stage)
      entries[club|id]   registration IDs entered for the club
      entries[*|id]      entries without a club (SI ID, one-off registration ID and club), matched by SI ID
      orders[club|id]    service orders for the club (or for the one-off club of an entry without a club)
@@ -567,6 +567,9 @@ function loadStore() {
       }
     });
     const live = new Set(Object.keys(st.list));
+    // details of a stage's parent are kept while one of its stages is
+    const parents = new Set(Object.values(st.list).map((raw) => String(raw.ParentID || "0")));
+    Object.keys(st.details).forEach((id) => { if (!live.has(id) && !parents.has(id)) delete st.details[id]; });
     ["entries", "orders"].forEach((k) => Object.keys(st[k]).forEach((key) => { if (!live.has(key.split("|")[1])) delete st[k][key]; }));
     return st;
   } catch (e) { return emptyStore(); }
@@ -1103,7 +1106,7 @@ function buildEvent(id) {
   const base = store.list[id];
   if (!base) return null;
   const det = store.details[id];
-  const ev = normalize(Object.assign({}, base, det ? det.d : {}));
+  const ev = normalize(Object.assign({}, base, det ? det.d : {}, parentEntryInfo(id)));
   ev.hasDetails = !!det;
   ev.entered = false; ev.group = 0; ev.ordered = { bed: false, meals: false, ids: [] };
   const clubs = entryClubs();
@@ -1131,9 +1134,22 @@ function oneOffEntries(id) {
   const sis = new Set(siList());
   return (store.entries[ONE_OFF + "|" + id] || { items: [] }).items.filter((e) => sis.has(e.si));
 }
+// A stage of a multi-day event (e.g. E1, E2) has its own entry list, but ORIS keeps the entry start, deadlines and
+// "entries in ORIS" on the parent event, so the stage itself says it doesn't take entries in ORIS
+const parentOf = (id) => String((store.list[id] || {}).ParentID || "0");
+const isStage = (id) => parentOf(id) !== "0";
+function parentEntryInfo(id) {
+  const det = store.details[id], par = store.details[parentOf(id)];
+  let info = {};
+  if (isStage(id) && par && (!det || String(det.d.UseORISForEntries) === "0")) {
+    info = { UseORISForEntries: par.d.UseORISForEntries, EntryStart: par.d.EntryStart,
+      EntryDate1: par.d.EntryDate1, EntryDate2: par.d.EntryDate2, EntryDate3: par.d.EntryDate3 };
+  }
+  return info;
+}
 function fullEntriesTaken(id) {
   const det = store.details[id];
-  return !!det && String(det.d.UseORISForEntries) !== "0";
+  return !!det && (String(det.d.UseORISForEntries) !== "0" || isStage(id));
 }
 // events further away change less often, so their full entry list is kept longer
 function fullEntriesTtl(id) {
@@ -1226,6 +1242,10 @@ function refreshEvent(id) {
   if (selectedId === id) renderCard(ev);
   scheduleDraw();
 }
+// after a parent's details change, its stages shown on the map take the parent's entry info again
+function refreshStagesOf(id) {
+  [...events.keys()].filter((c) => parentOf(c) === id).forEach(refreshEvent);
+}
 
 let firstLoad = true;
 async function load() {
@@ -1283,7 +1303,20 @@ async function load() {
       store.details[id] = { t: nowMs(), v: raw.Version !== undefined ? String(raw.Version) : String(store.list[id].Version), d: slimDetails(raw) };
       saveStore();
       refreshEvent(id);
+      refreshStagesOf(id);
       setStatus("Loading details " + (++done) + " of " + needDetails.length);
+    });
+    if (token !== loadToken) return;
+
+    // parents of stages whose parent isn't in the dates (e.g. only day 2 is shown): their entry info is used by the stages
+    const needParents = [...new Set(ids.map(parentOf))]
+      .filter((p) => p !== "0" && !store.list[p] && !fresh((store.details[p] || {}).t, CONFIG.ttl.details));
+    await pool(needParents, CONFIG.concurrency, async (p) => {
+      const raw = await oris("getEvent", { id: p });
+      if (token !== loadToken || !raw) return;
+      store.details[p] = { t: nowMs(), v: String(raw.Version), d: slimDetails(raw) };
+      saveStore();
+      refreshStagesOf(p);
     });
     if (token !== loadToken) return;
 
