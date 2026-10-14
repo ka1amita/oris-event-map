@@ -365,6 +365,8 @@ const CONFIG = {
     ["BL", /žebříček b|zebricek b|ladder b/i]
   ],
   levelFallback: "OP",   // other public event
+  // ORIS region ID -> two-letter code (feeds, calendar dialog); IDs not listed are already two letters
+  regionCode: { "Č": "ČE", "M": "MO", "P": "PR", "StČ": "SČ", "MSK": "MS" },
   services: {
     bed: /ubytov|nocleh|spaní|spani|tělocvič|telocvic|kemp|camp|accommod|hostel|hotel/i,
     meals: /strav|večeř|vecer|oběd|obed|snídan|snidan|jídl|jidl|meal|dinner|lunch|breakfast|penz|pension/i

@@ -29,8 +29,6 @@ const CONFIG = {
   alert: "-P1D",
   refresh: "PT6H",
   timeZone: "Europe/Prague",
-  // ORIS region ID -> two-letter code; IDs not listed are already two letters
-  regionCode: { "Č": "ČE", "M": "MO", "P": "PR", "StČ": "SČ", "MSK": "MS" },
   // Level feeds, by the one level ORIS files an event under (as the marker badge codes), never by its name.
   // ORIS gives an event a single level, even when the race counts for several. "Kitl Český pohár, INOV-8 CUP -
   // žebříček A, žebříček B-Morava" (ID 8948) has Level ČP (Český pohár) only; žebříček A and žebříček B-Morava
@@ -59,7 +57,7 @@ async function appBlocks() {
   // CONFIG reads location.protocol (to pick map tiles); any value does here
   return new Function("location", block("CONFIG") + "\n" + block("ICS") + "\nreturn { app: CONFIG, ics: ICS };")({ protocol: "https:" });
 }
-let ICS = null;   // set from index.html in main()
+let APP = null, ICS = null;   // CONFIG and ICS from index.html, set in main()
 
 /* ---------------- Levels: the same codes as the marker badges ---------------- */
 // as classify() in index.html: the ORIS short name first, then patterns on the full names, then the fallback
@@ -81,7 +79,8 @@ async function oris(method, params) {
 }
 
 /* ---------------- Regions ---------------- */
-const regionCode = (orisId) => CONFIG.regionCode[orisId] || orisId;
+// ORIS region ID -> two-letter code, from the app's CONFIG
+const regionCode = (orisId) => APP.regionCode[orisId] || orisId;
 // plain ASCII for file names and UIDs: ČR -> CR
 const ascii = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 function eventRegions(ev) {
@@ -178,6 +177,7 @@ async function main() {
   const outDir = args.find((a) => !a.startsWith("--")) || "feeds";
   const shared = await appBlocks();
   const app = shared.app;
+  APP = shared.app;
   ICS = shared.ics;
   const now = new Date();
   const to = new Date(now);
