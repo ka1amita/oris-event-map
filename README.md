@@ -72,7 +72,7 @@ Tap the gear and enter your club (abbreviation or ORIS ID), your registration nu
 | Dots | Current entry deadline (1–3). Clock and empty dots = not open yet. Lock = closed |
 | Orange marker | You are entered |
 
-Zoomed out, markers shrink to dots: the ring is the format color, the center the level fill. Zoom in to see the full markers.
+Zoomed out, markers shrink to dots: the ring is the format color (orange when you are entered; the letter still gives the format), the center the level fill. Zoom in to see the full markers.
 
 ## Tuning the mapping
 
