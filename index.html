@@ -203,6 +203,7 @@ dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--mu
 .field label { font-size: 14px; font-weight: 600; }
 .field input { height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid #B9C0C4; font: inherit; }
 .field small { font-size: 12px; line-height: 16px; color: var(--muted); }
+.field small.warn { color: #A8430A; font-weight: 600; }
 .dlg-actions { display: flex; justify-content: flex-end; gap: 8px; }
 .btn { height: 44px; padding: 0 18px; border-radius: 22px; border: 1px solid #B9C0C4; background: #fff; font-weight: 600; cursor: pointer; }
 .btn.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
@@ -264,11 +265,13 @@ dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--mu
       <label for="sMe">Your registration IDs</label>
       <input id="sMe" name="me" autocomplete="off" autocapitalize="characters" placeholder="ABC1234, XYZ5678">
       <small>Separate several with commas, for example if you enter for family too. The club comes from the letters at the start.</small>
+      <small class="warn" id="sMeWarn" hidden role="status"></small>
     </div>
     <div class="field">
       <label for="sGroup">Group registration IDs</label>
       <input id="sGroup" name="group" autocomplete="off" autocapitalize="characters" placeholder="ABC1234, XYZ5678">
       <small>Separate several with commas, for example if you want to see your friends. Leave empty to count everyone from your club(s), taken from your registration IDs above.</small>
+      <small class="warn" id="sGroupWarn" hidden role="status"></small>
     </div>
     <div class="field">
       <label for="sNav">Navigation app</label>
@@ -1366,8 +1369,26 @@ function updateFreeChip() {
   }
 }
 updateFreeChip();
+// IDs without a club code (e.g. 0270001, a one-off ID given to an unregistered runner for a single event) can't be matched
+function updateRegWarnings() {
+  const unknown = (s) => regList(s).filter((r) => !clubOf(r));
+  const notClub = (list) => list.join(", ") + (list.length > 1 ? " are not club registration IDs" : " is not a club registration ID")
+    + " (ABC1234), so " + (list.length > 1 ? "they are" : "it is") + " ignored.";
+  const me = $("#sMe").value, meBad = unknown(me), groupBad = unknown($("#sGroup").value);
+  let meMsg = "";
+  if (meBad.length) {
+    meMsg = notClub(meBad);
+    if (!regList(me).some(clubOf)) meMsg += " Some filters stay hidden until you add a club registration ID.";
+  }
+  const groupMsg = groupBad.length ? notClub(groupBad) : "";
+  $("#sMeWarn").textContent = meMsg; $("#sMeWarn").hidden = !meMsg;
+  $("#sGroupWarn").textContent = groupMsg; $("#sGroupWarn").hidden = !groupMsg;
+}
+$("#sMe").addEventListener("input", updateRegWarnings);
+$("#sGroup").addEventListener("input", updateRegWarnings);
 $("#settingsBtn").addEventListener("click", () => {
   $("#sMe").value = settings.me; $("#sGroup").value = settings.group; $("#sNav").value = settings.nav || "auto";
+  updateRegWarnings();
   $("#settings").showModal();
 });
 $("#settings").addEventListener("close", () => {
