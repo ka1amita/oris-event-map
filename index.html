@@ -1858,16 +1858,21 @@ $("#refreshBtn").addEventListener("click", () => { clearStore(); load(); });   /
 
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#card").hidden) closeCard(); });
 
-(function init() {
-  // ?calendars (the link in every feed entry) opens the reminders dialog; the parameter is dropped so that it doesn't
-  // end up in a Home Screen icon
-  const calendars = params.has("calendars");
-  if (calendars) {
-    const url = new URL(location.href);
+// #calendars (the link in every feed entry) opens the reminders dialog; the first feeds (Oct 14, 2026) linked
+// ?calendars. Both are dropped from the URL after opening, so that they don't end up in a Home Screen icon.
+function openCalendarsFromUrl() {
+  const url = new URL(location.href);
+  if (url.hash === "#calendars" || url.searchParams.has("calendars")) {
+    url.hash = "";
     url.searchParams.delete("calendars");
-    history.replaceState(null, "", url.toString().replace(/%2C/g, ","));
-    setTimeout(openCalendars, 0);
+    history.replaceState(null, "", url.toString().replace(/%2C/g, ",").replace(/#$/, ""));
+    openCalendars();
   }
+}
+window.addEventListener("hashchange", openCalendarsFromUrl);
+
+(function init() {
+  setTimeout(openCalendarsFromUrl, 0);
   let parsed = parseDaysParam(params.get("days"));
   // links saved by earlier versions: ?range=next|both, ?from=&to=
   if (!parsed && params.get("range") === "next") parsed = parseDaysParam("next-week");

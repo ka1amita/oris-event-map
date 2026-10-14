@@ -114,7 +114,7 @@ const VTIMEZONE = [
   "BEGIN:STANDARD", "TZOFFSETFROM:+0200", "TZOFFSETTO:+0100", "TZNAME:CET", "DTSTART:19701025T030000", "RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU", "END:STANDARD",
   "END:VTIMEZONE",
 ];
-const feedNote = (f) => "ORIS map · " + f.kind + " " + f.code + " entry deadline feed. Manage or unsubscribe: " + CONFIG.appUrl + "?calendars";
+const feedNote = (f) => "ORIS map · " + f.kind + " " + f.code + " entry deadline feed. Manage or unsubscribe: " + CONFIG.appUrl + "#calendars";
 
 // one calendar entry per entry deadline of the event that is still ahead
 function entryDeadlineEntries(app, ev, feed, now, stamp) {

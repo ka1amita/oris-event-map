@@ -47,7 +47,7 @@ One parameter, `days`:
 
 Picking with the pill writes words; editing ranges writes dates. Older links with `?range=` or `?from=&to=` still work.
 
-`?calendars` (the link in every entry of the calendar feeds) opens the entry deadline reminders dialog; the app then drops it from the URL.
+`#calendars` (the link in every entry of the calendar feeds) opens the entry deadline reminders dialog; it's a fragment, not a parameter, as it opens a part of the page rather than setting the map view. The app then drops it from the URL.
 
 ## Home Screen
 
