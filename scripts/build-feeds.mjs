@@ -29,18 +29,7 @@ const CONFIG = {
   alert: "-P1D",
   refresh: "PT6H",
   timeZone: "Europe/Prague",
-  // Level feeds, by the one level ORIS files an event under (as the marker badge codes), never by its name.
-  // ORIS gives an event a single level, even when the race counts for several. "Kitl Český pohár, INOV-8 CUP -
-  // žebříček A, žebříček B-Morava" (ID 8948) has Level ČP (Český pohár) only; žebříček A and žebříček B-Morava
-  // appear just in its name, and ČP + ŽA in RankingKoef ("1,06 (pro ČP+ŽA)"). Its regions "ČR, JM, M" do list
-  // the B ladder region (M). ORIS doesn't separate these levels properly for now; until it does, the levels a
-  // combined race is filed under (the highest) share a feed, so NC, NP and AL are one feed, and the B ladder is
-  // split by region and also takes the higher levels there.
-  levelFeeds: [
-    { code: "NC-NP-AL", levels: ["NC", "NP", "AL"] },
-    { code: "BL-ČE", region: "ČE", levels: ["NC", "NP", "AL", "BL"] },
-    { code: "BL-MO", region: "MO", levels: ["NC", "NP", "AL", "BL"] },
-  ],
+  // the level feeds (levelFeeds) are defined in the app's CONFIG
 };
 
 /* ---------------- Code shared with the app ---------------- */
@@ -95,7 +84,7 @@ const feedFile = (f) => f.kind + "-" + ascii(f.code).toUpperCase() + ".ics";
 const feedId = (f) => f.kind + "-" + ascii(f.code).toLowerCase();
 function eventLevelFeeds(app, ev) {
   const level = levelCode(app, ev), regions = eventRegions(ev);
-  return CONFIG.levelFeeds.filter((f) => f.levels.includes(level) && (!f.region || regions.includes(f.region))).map((f) => f.code);
+  return APP.levelFeeds.filter((f) => f.levels.includes(level) && (!f.region || regions.includes(f.region))).map((f) => f.code);
 }
 
 /* ---------------- Dates (ORIS times are local Prague time without a zone) ---------------- */
@@ -188,7 +177,7 @@ async function main() {
   const live = list.filter((ev) => String(ev.Cancelled) !== "1");
 
   // every feed is written, also an empty one, so a subscription never breaks
-  const levels = CONFIG.levelFeeds.map((f) => f.code);
+  const levels = APP.levelFeeds.map((f) => f.code);
   const feeds = new Map([...regions.map((code) => ["region|" + code, { kind: "region", code, events: [] }]),
     ...levels.map((code) => ["level|" + code, { kind: "level", code, events: [] }])]);
   const add = (kind, code, ev) => {

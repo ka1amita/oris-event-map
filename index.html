@@ -367,6 +367,18 @@ const CONFIG = {
   levelFallback: "OP",   // other public event
   // ORIS region ID -> two-letter code (feeds, calendar dialog); IDs not listed are already two letters
   regionCode: { "Č": "ČE", "M": "MO", "P": "PR", "StČ": "SČ", "MSK": "MS" },
+  // Level feeds of entry deadlines (built by scripts/build-feeds.mjs, listed in the calendar dialog), by the one level
+  // ORIS files an event under (as the badge codes), never by its name. ORIS gives an event a single level, even when
+  // the event counts for several. "Kitl Český pohár, INOV-8 CUP - žebříček A, žebříček B-Morava" (ID 8948) has Level
+  // ČP (Český pohár) only; žebříček A and žebříček B-Morava appear just in its name, and ČP + ŽA in RankingKoef
+  // ("1,06 (pro ČP+ŽA)"). Its regions "ČR, JM, M" do list the B ladder region (M). ORIS doesn't separate these levels
+  // properly for now; until it does, the levels a combined event is filed under (the highest) share a feed, so NC, NP
+  // and AL are one feed, and the B ladder is split by region and also takes the higher levels there.
+  levelFeeds: [
+    { code: "NC-NP-AL", name: "National championship, national cup, A ladder", levels: ["NC", "NP", "AL"] },
+    { code: "BL-ČE", name: "B ladder Čechy", region: "ČE", levels: ["NC", "NP", "AL", "BL"] },
+    { code: "BL-MO", name: "B ladder Morava", region: "MO", levels: ["NC", "NP", "AL", "BL"] }
+  ],
   services: {
     bed: /ubytov|nocleh|spaní|spani|tělocvič|telocvic|kemp|camp|accommod|hostel|hotel/i,
     meals: /strav|večeř|vecer|oběd|obed|snídan|snidan|jídl|jidl|meal|dinner|lunch|breakfast|penz|pension/i
