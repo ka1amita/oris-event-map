@@ -19,7 +19,7 @@ README.md
 GitHub Pages serves the `gh-pages` branch, which the *Deploy* workflow (`.github/workflows/deploy.yml`) writes; never edit it by hand. A push to `main` deploys nothing: test on `main`, then deploy.
 
 - **Deploy the app:** Actions → Deploy → Run workflow (*app and feeds*), or `gh workflow run deploy.yml`. It publishes the app files from `main` and freshly built feeds.
-- **Feeds** are rebuilt and published every 6 hours; the app files on `gh-pages` stay as they are.
+- **Feeds** are rebuilt and published every 6 hours; the app files on `gh-pages` stay as they are. These runs use the feed script (and the level mapping in `index.html`) from `main`, so a change to them goes live with the next feed run, without a deploy. Run the script locally before pushing such a change (see below); a broken run fails and leaves the last good feeds online.
 - **Checks:** the deploy fails when a file tracked on `main` is neither in the `DEPLOY` list (`index.html`, `icon.png`, `README.md`) nor matches `NOT_DEPLOYED` (`scripts/`, `.github/`) in `deploy.yml`, so add new files to one of them. It also fails when the page's script doesn't parse, a required feed is missing or incomplete, or a feed now on `gh-pages` would be removed (allowed only by hand, with *Allow removing feeds*, as it breaks its subscriptions).
 
 Setting up a new copy: create a public repo, push `main`, run the workflow by hand once (it creates `gh-pages`), then Settings → Pages → *Deploy from a branch* → `gh-pages` / `(root)`.
@@ -94,7 +94,7 @@ Zoomed out, markers shrink to dots: the ring is the format color (orange when yo
 - **Multi-day events** appear once: ORIS keeps the entry deadlines on the parent event, not on its stages.
 - **Unsubscribe:** on iPhone, Settings → Apps → Calendar → Calendar Accounts → Subscribed Calendars → the feed → Delete Account; in Google Calendar, the calendar's options → Settings → Unsubscribe.
 
-Run it with `node scripts/build-feeds.mjs [output directory]` (default `feeds`).
+Run it with `node scripts/build-feeds.mjs [--debug] [output directory]` (default `feeds`). `--debug` logs each event: its ORIS level and badge code, regions, entry deadlines and feeds.
 
 ### Levels of combined races
 
