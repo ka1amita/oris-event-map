@@ -99,6 +99,7 @@ Data is kept in the browser (localStorage), so changing dates or filters is inst
 - **Event details** are refetched when ORIS reports a new version of the event (every list fetch carries the version), or after 7 days.
 - **Your club's entries and service orders** expire after 30 minutes, since they change most often.
 - **Full entry lists** (only with an SI ID set) are heavy for ORIS, so they are fetched one at a time, 1.5 s apart, nearest events first, at most 120 per hour (also across reloads and refreshes). Events that don't take entries in ORIS are skipped. Lists expire after 30 minutes for events within 14 days, 12 hours for later ones. Events not reached within the hourly cap show "Entries not checked yet for all SI IDs" and are checked on a later load.
+- **Refresh from ORIS** on the event card refetches that event's entries and service orders right away, e.g. right after you entered. It skips the hourly cap (it is one request you ask for), but counts toward it.
 - **Filters** (open for entry, entered) never fetch anything; they filter what is already loaded.
 - **Refresh button** (circular arrow): forgets all saved ORIS data and loads the current dates fresh. Your settings (registration IDs, SI IDs, navigation app) stay.
 

@@ -192,6 +192,10 @@ button { font: inherit; color: inherit; }
 .pill .letter { width: 22px; height: 22px; border-radius: 11px; color: #fff; display: inline-flex; align-items: center; justify-content: center; font: 700 11px/1 var(--disc); margin-left: -6px; }
 .open-btn { display: flex; align-items: center; justify-content: center; gap: 8px; height: 48px; border-radius: 24px; background: var(--ink); color: #fff; font-size: 16px; font-weight: 600; text-decoration: none; }
 .open-btn.secondary { background: #fff; color: var(--ink); border: 1.5px solid var(--ink); margin-top: -4px; }
+button.open-btn { width: 100%; font-family: inherit; cursor: pointer; }
+button.open-btn:disabled { color: var(--muted); border-color: var(--muted); cursor: default; }
+.open-btn.refresh { margin-top: 0; }
+.open-btn.refresh + .open-btn { margin-top: -4px; }
 .field select { height: 44px; padding: 0 10px; border-radius: 12px; border: 1px solid #B9C0C4; background: #fff; font: inherit; color: var(--ink); }
 
 /* Settings */
@@ -816,6 +820,9 @@ function cardHtml(ev) {
     (ev.services.length ? '<div class="svc-names">' + ev.services.map((x) => esc(x.name) + (ev.ordered.ids.indexOf(x.id) >= 0 ? " (ordered)" : "")).join(", ") + "</div>" : "") +
     steps + closes +
     (pills.length ? '<div class="pills">' + pills.join("") + "</div>" : "") +
+    (knowsEntries() ? '<button class="open-btn secondary refresh" type="button" id="checkNow"' + (checking.has(ev.id) ? " disabled>" : ">") +
+      '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>' +
+      (checking.has(ev.id) ? "Refreshing…" : "Refresh from ORIS") + "</button>" : "") +
     '<a class="open-btn" href="' + CONFIG.eventUrl(ev.id) + '" target="_blank" rel="noopener">Open in ORIS</a>' +
     (ev.lat !== null ? (() => {
       const nav = navTarget(ev);
@@ -1073,6 +1080,8 @@ function renderCard(ev) {
   card.innerHTML = cardHtml(ev);
   card.hidden = false;
   $("#cardClose").addEventListener("click", closeCard);
+  const check = $("#checkNow");
+  if (check) check.addEventListener("click", () => checkNow(ev.id));
 }
 function closeCard() {
   const had = selectedId !== null;
@@ -1136,16 +1145,57 @@ function fullEntriesTtl(id) {
 // Resolves false when the hourly cap is used up; the remaining events are checked on a later load.
 const PACE_KEY = "omap.fullEntries";
 async function fullEntriesSlot() {
-  let log = [];
-  try { log = JSON.parse(localStorage.getItem(PACE_KEY) || "[]").filter((t) => nowMs() - t < 3600000); } catch (e) {}
+  const log = paceLog();
   const ok = log.length < CONFIG.fullEntries.perHour;
   if (ok) {
     const wait = log.length ? log[log.length - 1] + CONFIG.fullEntries.gapMs - nowMs() : 0;
     if (wait > 0) await new Promise((r) => setTimeout(r, wait));
-    log.push(nowMs());
-    try { localStorage.setItem(PACE_KEY, JSON.stringify(log)); } catch (e) {}
+    logFullEntries();
   }
   return ok;
+}
+function paceLog() {
+  try { return JSON.parse(localStorage.getItem(PACE_KEY) || "[]").filter((t) => nowMs() - t < 3600000); }
+  catch (e) { return []; }
+}
+function logFullEntries() {
+  try { localStorage.setItem(PACE_KEY, JSON.stringify(paceLog().concat(nowMs()))); } catch (e) {}
+}
+function storeClubEntries(club, id, data) {
+  store.entries[club + "|" + id] = { t: nowMs(), regs: values(data).map((e) => String(e.RegNo || e.RegNum || "").toUpperCase()).filter(Boolean) };
+}
+// keeps only the entries without a club (one-off registration ID, digits only) that have an SI ID
+function storeOneOffEntries(id, data) {
+  store.entries[ONE_OFF + "|" + id] = { t: nowMs(), items: values(data)
+    .map((e) => ({ si: String(e.SI || ""), reg: String(e.RegNo || ""), club: String(e.ClubID || "") }))
+    .filter((e) => e.si && e.club && /^\d+$/.test(e.reg)) };
+}
+function storeOrders(club, id, data) {
+  store.orders[club + "|" + id] = { t: nowMs(), items: orderItems(data) };
+}
+// "Refresh from ORIS" on the card refetches this event's entries and service orders right away. It is a single request the
+// user asks for, so it skips the hourly cap on full entry lists, but it is logged so the automatic checks count it.
+const checking = new Set();   // events being checked now
+async function checkNow(id) {
+  checking.add(id);
+  refreshEvent(id);
+  try {
+    await Promise.all(entryClubs().map(async (club) => storeClubEntries(club, id, await oris("getEventEntries", { eventid: id, clubid: club }))));
+    if (siList().length && fullEntriesTaken(id)) {
+      logFullEntries();
+      storeOneOffEntries(id, await oris("getEventEntries", { eventid: id }));
+    }
+    const det = store.details[id];
+    if (det && det.d.Services.length) {
+      const clubs = homeClubs().concat(oneOffEntries(id).map((e) => e.club));
+      await Promise.all(clubs.map(async (club) => storeOrders(club, id, await oris("getEventServiceEntries", { eventid: id, clubid: club }))));
+    }
+  } catch (e) {
+    setStatus(e.message);
+  }
+  checking.delete(id);
+  saveStore();
+  refreshEvent(id);
 }
 // mark the services ordered under the given registration IDs
 function markOrders(ev, or, regs) {
@@ -1247,7 +1297,7 @@ async function load() {
       await pool(pairs, CONFIG.concurrency, async ([club, id]) => {
         const data = await oris("getEventEntries", { eventid: id, clubid: club });
         if (token !== loadToken) return;
-        store.entries[club + "|" + id] = { t: nowMs(), regs: values(data).map((e) => String(e.RegNo || e.RegNum || "").toUpperCase()).filter(Boolean) };
+        storeClubEntries(club, id, data);
         saveStore();
         refreshEvent(id);
       });
@@ -1264,7 +1314,7 @@ async function load() {
         const data = await oris("getEventServiceEntries", { eventid: id, clubid: club });
         if (token !== loadToken) return;
         if (DEBUG && values(data).length) console.log("service order sample", values(data)[0]);
-        store.orders[club + "|" + id] = { t: nowMs(), items: orderItems(data) };
+        storeOrders(club, id, data);
         saveStore();
         refreshEvent(id);
       });
@@ -1286,9 +1336,7 @@ async function load() {
           try {
             const data = await oris("getEventEntries", { eventid: id });
             if (token === loadToken) {
-              store.entries[ONE_OFF + "|" + id] = { t: nowMs(), items: values(data)
-                .map((e) => ({ si: String(e.SI || ""), reg: String(e.RegNo || ""), club: String(e.ClubID || "") }))
-                .filter((e) => e.si && e.club && /^\d+$/.test(e.reg)) };
+              storeOneOffEntries(id, data);
               saveStore();
               refreshEvent(id);
             }
@@ -1309,7 +1357,7 @@ async function load() {
       await pool(orderPairs, CONFIG.concurrency, async ([club, id]) => {
         const data = await oris("getEventServiceEntries", { eventid: id, clubid: club });
         if (token !== loadToken) return;
-        store.orders[club + "|" + id] = { t: nowMs(), items: orderItems(data) };
+        storeOrders(club, id, data);
         saveStore();
         refreshEvent(id);
       });
