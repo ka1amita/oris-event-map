@@ -892,8 +892,10 @@ function calendarButton(ev) {
   if (file === "checking") {
     html = '<button class="open-btn secondary" type="button" disabled>' + icon + "Checking…</button>";
   } else if (file === "yes") {
-    // the Home Screen app hands the file to Safari's viewer; Safari opens it in place
-    html = '<a class="open-btn secondary" href="' + eventFileUrl(ev.id) + '"' + (navigator.standalone ? ' target="_blank" rel="noopener"' : "") + ">" + icon + "Add to calendar</a>";
+    // Safari opens the file in place. The Home Screen app and Safari's in-app viewer don't hand it to Calendar, so there
+    // the link opens real Safari: the x-safari-https: scheme (iOS 17+, not documented by Apple)
+    const url = new URL(eventFileUrl(ev.id), location.href).href;
+    html = '<a class="open-btn secondary" href="' + esc(navigator.standalone ? "x-safari-" + url : url) + '">' + icon + "Add to calendar</a>";
   } else if (days) {
     // without a published file (beyond the 6-month horizon, or added since the last feed run) iOS gets Google Calendar
     const google = calendarApp() === "google" || file === "no";
