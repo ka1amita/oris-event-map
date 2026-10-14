@@ -9,7 +9,8 @@
    An event filed under several regions (e.g. "ČR, JČ") is in each of their feeds.
    Stages of a multi-day event carry no entry deadlines in ORIS; their parent does, so it appears once.
 
-   Usage: node scripts/build-feeds.mjs [output directory, default "feeds"]
+   Usage: node scripts/build-feeds.mjs [--debug] [output directory, default "feeds"]
+   --debug logs each event: ORIS level and its badge code, regions, entry deadlines and the feeds it is in.
    Needs Node 18+ (built-in fetch); no dependencies. */
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";
@@ -179,7 +180,9 @@ function calendar(app, feed, now) {
 
 /* ---------------- Main ---------------- */
 async function main() {
-  const outDir = process.argv[2] || "feeds";
+  const args = process.argv.slice(2);
+  const debug = args.includes("--debug");
+  const outDir = args.find((a) => !a.startsWith("--")) || "feeds";
   const app = await appConfig();
   const now = new Date();
   const to = new Date(now);
@@ -198,8 +201,15 @@ async function main() {
     feeds.get(kind + "|" + code).events.push(ev);
   };
   live.forEach((ev) => {
-    eventRegions(ev).forEach((code) => add("region", code, ev));
-    eventLevelFeeds(app, ev).forEach((code) => add("level", code, ev));
+    const regions = eventRegions(ev), levels = eventLevelFeeds(app, ev);
+    regions.forEach((code) => add("region", code, ev));
+    levels.forEach((code) => add("level", code, ev));
+    if (debug) {
+      const files = [...regions.map((code) => ({ kind: "region", code })), ...levels.map((code) => ({ kind: "level", code }))].map(feedId);
+      const deadlines = [1, 2, 3].map((n) => ev["EntryDate" + n]).filter(Boolean);
+      console.log(ev.ID + " " + ev.Name + " | ORIS level " + ((ev.Level || {}).ShortName || "-") + " → " + levelCode(app, ev) +
+        " | regions " + (regions.join(", ") || "-") + " | entry deadlines " + (deadlines.join(", ") || "-") + " | feeds " + (files.join(", ") || "-"));
+    }
   });
 
   await mkdir(outDir, { recursive: true });

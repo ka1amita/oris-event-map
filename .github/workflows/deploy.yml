@@ -1,0 +1,182 @@
+# Deploys the site to the gh-pages branch, which GitHub Pages serves ("Deploy from a branch", gh-pages, root).
+# - By hand (Actions → Deploy → Run workflow, or `gh workflow run deploy.yml`): the app files from main plus fresh feeds.
+# - Every 6 hours: only the feeds; the app files on gh-pages stay as they are.
+# A push to main deploys nothing: test on main first, then deploy by hand.
+# gh-pages is always one commit, force-pushed; it is never edited by hand.
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      what:
+        description: What to deploy
+        type: choice
+        options: [app and feeds, feeds only]
+        default: app and feeds
+      debug:
+        description: Log each event while building the feeds
+        type: boolean
+        default: false
+      allow_feed_removal:
+        description: Allow removing feeds now on gh-pages (breaks their subscriptions)
+        type: boolean
+        default: false
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: write   # push gh-pages
+  actions: write    # keep the schedule from being switched off
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+env:
+  # Files from main that are deployed. Every other tracked file must match NOT_DEPLOYED, else the deploy fails,
+  # so a new file is never left out (or published) by accident.
+  DEPLOY: index.html icon.png README.md
+  NOT_DEPLOYED: '^(scripts/|\.github/)'
+  # Feeds that must always be built
+  REQUIRED_FEEDS: level-NC-NP-AL.ics level-BL-CE.ics level-BL-MO.ics region-CR.ics region-CE.ics region-MO.ics
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the branch
+        run: |
+          if [ "$GITHUB_REF" != "refs/heads/main" ]; then
+            echo "::error::Deploy runs from main only, not from $GITHUB_REF_NAME"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - name: Mode
+        id: mode
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ "${{ inputs.what }}" = "app and feeds" ]; then
+            echo "app=true" >> "$GITHUB_OUTPUT"
+            echo "Deploying the app from main ${GITHUB_SHA::7} and the feeds"
+          else
+            echo "app=false" >> "$GITHUB_OUTPUT"
+            echo "Deploying the feeds only"
+          fi
+          node --version
+
+      - name: Fetch the current gh-pages
+        id: current
+        run: |
+          mkdir -p "$RUNNER_TEMP/current"
+          if git fetch --depth 1 origin gh-pages; then
+            git archive FETCH_HEAD | tar -x -C "$RUNNER_TEMP/current"
+            echo "subject=$(git log -1 --format=%s FETCH_HEAD)" >> "$GITHUB_OUTPUT"
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          elif [ "${{ steps.mode.outputs.app }}" = "true" ]; then
+            echo "No gh-pages yet; this deploy creates it"
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::No gh-pages branch yet: deploy the app and feeds by hand first"
+            exit 1
+          fi
+
+      - name: Check the app files
+        if: steps.mode.outputs.app == 'true'
+        run: |
+          failed=0
+          for f in $DEPLOY; do
+            if ! git ls-files --error-unmatch "$f" > /dev/null 2>&1; then
+              echo "::error::$f is listed in DEPLOY but not tracked on main"
+              failed=1
+            fi
+          done
+          while read -r f; do
+            # grep without -q, so an early exit can't fail the pipeline (pipefail)
+            if ! printf '%s\n' $DEPLOY | grep -xF "$f" > /dev/null && ! printf '%s\n' "$f" | grep -E "$NOT_DEPLOYED" > /dev/null; then
+              echo "::error::$f is tracked on main but neither in DEPLOY nor NOT_DEPLOYED (in deploy.yml); add it to one of them"
+              failed=1
+            fi
+          done < <(git ls-files)
+          # the check from CLAUDE.md: the page's script must at least parse
+          if ! node -e "const h=require('fs').readFileSync('index.html','utf8');new Function(h.split('<script>\n')[1].split('</script>')[0])"; then
+            echo "::error::The script in index.html doesn't parse"
+            failed=1
+          fi
+          exit $failed
+
+      - name: Build the feeds
+        run: node scripts/build-feeds.mjs ${{ inputs.debug && '--debug' || '' }} "$RUNNER_TEMP/feeds"
+
+      - name: Check the feeds
+        run: |
+          failed=0
+          cd "$RUNNER_TEMP/feeds"
+          for f in $REQUIRED_FEEDS; do
+            if [ ! -f "$f" ]; then
+              echo "::error::Required feed $f was not built"
+              failed=1
+            fi
+          done
+          for f in *.ics; do
+            if [ "$(head -n 1 "$f" | tr -d '\r')" != "BEGIN:VCALENDAR" ] || [ "$(tail -n 1 "$f" | tr -d '\r')" != "END:VCALENDAR" ]; then
+              echo "::error::$f is not a complete calendar"
+              failed=1
+            fi
+          done
+          # a feed that disappears breaks every subscription to it
+          if [ -d "$RUNNER_TEMP/current/feeds" ] && [ "${{ inputs.allow_feed_removal }}" != "true" ]; then
+            for f in "$RUNNER_TEMP/current/feeds"/*.ics; do
+              if [ ! -f "$(basename "$f")" ]; then
+                echo "::error::Feed $(basename "$f") is on gh-pages but was not built; run by hand with 'Allow removing feeds' if that is intended"
+                failed=1
+              fi
+            done
+          fi
+          exit $failed
+
+      - name: Assemble the site
+        run: |
+          site="$RUNNER_TEMP/site"
+          if [ "${{ steps.mode.outputs.app }}" = "true" ]; then
+            mkdir -p "$site"
+            for f in $DEPLOY; do cp --parents "$f" "$site/"; done
+            # serve the files as they are, without Jekyll
+            touch "$site/.nojekyll"
+          else
+            cp -a "$RUNNER_TEMP/current" "$site"
+            rm -rf "$site/feeds"
+          fi
+          cp -a "$RUNNER_TEMP/feeds" "$site/feeds"
+          find "$site" -type f | sort
+
+      - name: Push gh-pages
+        env:
+          TOKEN: ${{ github.token }}
+        run: |
+          # DTSTAMP is the build time, so it differs on every run; any other change is a real one
+          if [ "${{ steps.current.outputs.exists }}" = "true" ] && diff -r -I '^DTSTAMP:' "$RUNNER_TEMP/current" "$RUNNER_TEMP/site" > /dev/null; then
+            echo "Nothing changed; gh-pages stays as it is"
+            exit 0
+          fi
+          if [ "${{ steps.mode.outputs.app }}" = "true" ]; then
+            app="${GITHUB_SHA::7}"
+          else
+            # keep the app commit named in the current gh-pages commit
+            app="$(printf '%s' "${{ steps.current.outputs.subject }}" | sed -nE 's/^App from main ([0-9a-f]+).*/\1/p')"
+          fi
+          cd "$RUNNER_TEMP/site"
+          git init -q -b gh-pages
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "App from main ${app:-unknown}, feeds built $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -q --force "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
+          git log -1 --format='Pushed gh-pages: %s'
+
+      # GitHub switches scheduled workflows off after 60 days without repository activity; enabling the workflow
+      # again through the API counts as activity
+      - name: Keep the schedule alive
+        if: github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/deploy.yml/enable"
