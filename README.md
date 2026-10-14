@@ -55,9 +55,11 @@ A link with fixed dates keeps showing those dates.
 
 Tap the gear and enter your registration IDs (several are fine, e.g. if you enter for family) and optionally your group's (e.g. friends). The club comes from the letters at the start of each ID (ABC1234 → club ABC), so there is nothing else to set. With no group IDs, the group is everyone from the club(s) of your own IDs. Everything is stored only in your browser.
 
-- **Entered (orange marker, check)**: one of your registration IDs is entered.
+Without a club, enter your SI IDs instead. Unregistered runners get a one-off registration ID per event (e.g. 0270001: one-off club 027, member 0001), which changes every time, so such IDs are flagged in the settings and ignored. Your entries are found by SI ID in each event's full entry list.
+
+- **Entered (orange marker, check)**: one of your registration IDs or SI IDs is entered.
 - **Group badge**: number of entries from your group, or from your whole club if the group is empty.
-- **Entered** and **Free** filters appear once a registration ID is set. Entered shows only events you are entered in; Free hides other events on days you already have one (your own stay visible).
+- **Entered** and **Free** filters appear once a club registration ID or an SI ID is set. Entered shows only events you are entered in; Free hides other events on days you already have one (your own stay visible).
 - **Navigation app**: what "Open in Maps" on the detail card opens, with the event location as the destination. "Phone default" uses Apple Maps on iPhone, iPad and Mac, the system chooser (`geo:` link) on Android, and Google Maps on the web elsewhere. Google Maps, Mapy.com and Waze can be picked explicitly; their links open the app when it is installed.
 
 ## Marker encoding
@@ -86,7 +88,8 @@ ORIS returns disciplines, levels and services as names. The patterns that map th
 | `getEventList` | Events in the date range (with `all=1`; cancelled events are hidden) |
 | `getEvent` | Entry start and deadlines, services, start list and results counts, stages |
 | `getEventEntries` (with `clubid`) | Your and your group's entries, per club taken from the registration IDs |
-| `getEventServiceEntries` (with `clubid`) | Services you ordered, for your own club(s) |
+| `getEventEntries` (without `clubid`) | Entries without a club, matched by SI ID; only when an SI ID is set |
+| `getEventServiceEntries` (with `clubid`) | Services you ordered, for your own club(s) or the one-off club of your entry without a club |
 
 ## Caching
 
@@ -95,7 +98,8 @@ Data is kept in the browser (localStorage), so changing dates or filters is inst
 - **Event lists are stored per day.** A new date range only fetches the days that aren't stored yet or are older than 6 hours.
 - **Event details** are refetched when ORIS reports a new version of the event (every list fetch carries the version), or after 7 days.
 - **Your club's entries and service orders** expire after 30 minutes, since they change most often.
+- **Full entry lists** (only with an SI ID set) are heavy for ORIS, so they are fetched one at a time, 1.5 s apart, nearest events first, at most 120 per hour (also across reloads and refreshes). Events that don't take entries in ORIS are skipped. Lists expire after 30 minutes for events within 14 days, 12 hours for later ones. Events not reached within the hourly cap show "Entries not checked yet for all SI IDs" and are checked on a later load.
 - **Filters** (open for entry, entered) never fetch anything; they filter what is already loaded.
-- **Refresh button** (circular arrow): forgets all saved ORIS data and loads the current dates fresh. Your settings (registration IDs, navigation app) stay.
+- **Refresh button** (circular arrow): forgets all saved ORIS data and loads the current dates fresh. Your settings (registration IDs, SI IDs, navigation app) stay.
 
 Past days are dropped automatically. The durations are in `CONFIG.ttl`.

@@ -268,6 +268,11 @@ dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--mu
       <small class="warn" id="sMeWarn" hidden role="status"></small>
     </div>
     <div class="field">
+      <label for="sSi">Your SI IDs</label>
+      <input id="sSi" name="si" autocomplete="off" inputmode="numeric" placeholder="1234567, 7654321">
+      <small>For entries without a club, whose registration ID changes with every event. Separate several with commas.</small>
+    </div>
+    <div class="field">
       <label for="sGroup">Group registration IDs</label>
       <input id="sGroup" name="group" autocomplete="off" autocapitalize="characters" placeholder="ABC1234, XYZ5678">
       <small>Separate several with commas, for example if you want to see your friends. Leave empty to count everyone from your club(s), taken from your registration IDs above.</small>
@@ -320,6 +325,9 @@ const CONFIG = {
   // How long cached ORIS data counts as fresh (minutes). Event details are also
   // refetched whenever ORIS reports a new version of the event.
   ttl: { list: 6 * 60, details: 7 * 24 * 60, entries: 30 },
+  // Full entry lists (to find entries without a club by SI ID) are heavy for ORIS, so they are fetched one at a
+  // time, spaced out, capped per hour, and kept longer for events further away
+  fullEntries: { gapMs: 1500, perHour: 120, soonDays: 14, ttlLater: 12 * 60 },
   sport: { 1: "foot", 2: "ski", 3: "mtb", 4: "trail" },
   format: [
     ["sprint", /sprint|^SP\b|^KO\b/i],
@@ -533,7 +541,8 @@ const oris = orisRaw;   // every ORIS call goes through the store below, not a p
      list[id]           event as returned by getEventList (small)
      details[id]        the few getEvent fields we use, with ORIS version
      entries[club|id]   registration IDs entered for the club
-     orders[club|id]    service orders for the club
+     entries[*|id]      entries without a club (SI ID, one-off registration ID and club), matched by SI ID
+     orders[club|id]    service orders for the club (or for the one-off club of an entry without a club)
 */
 const STORE_KEY = "omap.store.v2";
 const nowMs = () => Date.now();
@@ -594,8 +603,8 @@ async function pool(items, n, fn) {
 
 /* ---------------- settings ---------------- */
 function loadSettings() {
-  try { return Object.assign({ me: "", group: "", nav: "auto" }, JSON.parse(localStorage.getItem("omap.settings") || "{}")); }
-  catch (e) { return { me: "", group: "", nav: "auto" }; }
+  try { return Object.assign({ me: "", group: "", si: "", nav: "auto" }, JSON.parse(localStorage.getItem("omap.settings") || "{}")); }
+  catch (e) { return { me: "", group: "", si: "", nav: "auto" }; }
 }
 // Czech registration IDs start with the club code: ABC1234 belongs to club ABC
 const clubOf = (reg) => { const m = /^([^\d\s]+)\d+$/.exec(reg); return m ? m[1] : null; };
@@ -604,6 +613,12 @@ const homeClubs = () => [...new Set(regList(settings.me).map(clubOf).filter(Bool
 function entryClubs() {
   return [...new Set(regList(settings.me).concat(regList(settings.group)).map(clubOf).filter(Boolean))];
 }
+// Entries without a club get a one-off registration ID (club number + member number, e.g. 0270001) that changes with
+// every event, so they are matched by SI ID instead
+const siList = () => regList(settings.si).filter((x) => /^\d+$/.test(x));
+const ONE_OFF = "*";
+// "Entered", "Free" and the entered pill need to know your entries
+const knowsEntries = () => homeClubs().length > 0 || siList().length > 0;
 function saveSettings(s) { try { localStorage.setItem("omap.settings", JSON.stringify(s)); } catch (e) {} }
 
 /* ---------------- domain mapping ---------------- */
@@ -788,7 +803,7 @@ function cardHtml(ev) {
   }
 
   const pills = [];
-  if (homeClubs().length) pills.push(ev.entered ? '<span class="pill entered">' + ICON.check.replace('width="9" height="9"', 'width="14" height="14"') + "You are entered</span>" : '<span class="pill">Not entered</span>');
+  if (knowsEntries()) pills.push(ev.entered ? '<span class="pill entered">' + ICON.check.replace('width="9" height="9"', 'width="14" height="14"') + "You are entered</span>" : '<span class="pill">' + (ev.unchecked ? "Entries not checked yet for all SI IDs" : "Not entered") + "</span>");
   if (ev.group > 0) pills.push('<span class="pill group">' + ICON.person + ev.group + " from your group</span>");
   if (ev.startList) pills.push('<span class="pill"><span class="letter" style="background:#D42A7C">S</span>Start list</span>');
   if (ev.results) pills.push('<span class="pill"><span class="letter" style="background:#7B2CBF">V</span>Results</span>');
@@ -1091,17 +1106,64 @@ function buildEvent(id) {
     ev.entered = all.some((r) => me.has(r));
     // group: the listed group IDs, or everyone from the clubs of your own IDs when no group is set
     ev.group = group.size ? all.filter((r) => group.has(r)).length : regsOf([...home]).length;
-    homeClubs().map((c) => store.orders[c + "|" + id]).filter(Boolean).forEach((or) => {
-      or.items.forEach((o) => {
-        if (!me.has(o.reg)) return;
-        const svc = ev.services.find((x) => x.id === o.sid);
-        const kind = svc ? svc.kind : serviceKind(o.name);
-        if (o.sid) ev.ordered.ids.push(o.sid);
-        if (kind) ev.ordered[kind] = true;
-      });
+    homeClubs().forEach((c) => markOrders(ev, store.orders[c + "|" + id], me));
+  }
+  oneOffEntries(id).forEach((e) => {
+    ev.entered = true;
+    markOrders(ev, store.orders[e.club + "|" + id], new Set([e.reg]));
+  });
+  // an event whose full entry list wasn't fetched yet (hourly cap) is unknown rather than "not entered"; one list covers
+  // all SI IDs, as it keeps every entry without a club, so they are always unchecked together
+  ev.unchecked = !ev.entered && siList().length > 0 && fullEntriesTaken(id) && !store.entries[ONE_OFF + "|" + id];
+  return ev;
+}
+// your entries without a club in the event, found by SI ID
+function oneOffEntries(id) {
+  const sis = new Set(siList());
+  return (store.entries[ONE_OFF + "|" + id] || { items: [] }).items.filter((e) => sis.has(e.si));
+}
+function fullEntriesTaken(id) {
+  const det = store.details[id];
+  return !!det && String(det.d.UseORISForEntries) !== "0";
+}
+// events further away change less often, so their full entry list is kept longer
+function fullEntriesTtl(id) {
+  const days = (new Date(String(store.list[id].Date).slice(0, 10)) - new Date(ymd(new Date()))) / 86400000;
+  return days <= CONFIG.fullEntries.soonDays ? CONFIG.ttl.entries : CONFIG.fullEntries.ttlLater;
+}
+// Waits for the next allowed full entry list request: at least gapMs after the previous one and at most perHour per
+// rolling hour. The log is kept apart from the store, so neither reloading nor "refresh" resets it.
+// Resolves false when the hourly cap is used up; the remaining events are checked on a later load.
+const PACE_KEY = "omap.fullEntries";
+async function fullEntriesSlot() {
+  let log = [];
+  try { log = JSON.parse(localStorage.getItem(PACE_KEY) || "[]").filter((t) => nowMs() - t < 3600000); } catch (e) {}
+  const ok = log.length < CONFIG.fullEntries.perHour;
+  if (ok) {
+    const wait = log.length ? log[log.length - 1] + CONFIG.fullEntries.gapMs - nowMs() : 0;
+    if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+    log.push(nowMs());
+    try { localStorage.setItem(PACE_KEY, JSON.stringify(log)); } catch (e) {}
+  }
+  return ok;
+}
+// mark the services ordered under the given registration IDs
+function markOrders(ev, or, regs) {
+  if (or) {
+    or.items.filter((o) => regs.has(o.reg)).forEach((o) => {
+      const svc = ev.services.find((x) => x.id === o.sid);
+      const kind = svc ? svc.kind : serviceKind(o.name);
+      if (o.sid) ev.ordered.ids.push(o.sid);
+      if (kind) ev.ordered[kind] = true;
     });
   }
-  return ev;
+}
+function orderItems(data) {
+  return values(data).map((o) => ({
+    reg: String(o.RegNo || o.RegNum || (o.ClubUser && o.ClubUser.RegNo) || "").toUpperCase(),
+    sid: String(o.ServiceID || (o.Service && o.Service.ID) || ""),
+    name: o.ServiceNameCZ || (o.Service && (o.Service.NameCZ || o.Service.NameEN)) || ""
+  }));
 }
 function idsInRange(days) {
   const set = new Set(days);
@@ -1129,6 +1191,7 @@ async function load() {
   showRange();
   if (firstLoad && events.size) { fitToEvents(); firstLoad = false; }
 
+  let capped = false;   // the hourly cap on full entry lists stopped the check
   try {
     // 2. Event lists only for days not covered or gone stale
     // One request per day, a few at a time, so the map fills in day by day as answers arrive
@@ -1197,25 +1260,63 @@ async function load() {
         if (det && det.d.Services.length && !fresh((store.orders[club + "|" + id] || {}).t, CONFIG.ttl.entries)) orderPairs.push([club, id]);
       }));
       if (orderPairs.length) setStatus("Checking your service orders");
-      let logged = false;
       await pool(orderPairs, CONFIG.concurrency, async ([club, id]) => {
         const data = await oris("getEventServiceEntries", { eventid: id, clubid: club });
         if (token !== loadToken) return;
-        store.orders[club + "|" + id] = { t: nowMs(), items: values(data).map((o) => {
-          if (DEBUG && !logged) { console.log("service order sample", o); logged = true; }
-          return {
-            reg: String(o.RegNo || o.RegNum || (o.ClubUser && o.ClubUser.RegNo) || "").toUpperCase(),
-            sid: String(o.ServiceID || (o.Service && o.Service.ID) || ""),
-            name: o.ServiceNameCZ || (o.Service && (o.Service.NameCZ || o.Service.NameEN)) || ""
-          };
-        }) };
+        if (DEBUG && values(data).length) console.log("service order sample", values(data)[0]);
+        store.orders[club + "|" + id] = { t: nowMs(), items: orderItems(data) };
+        saveStore();
+        refreshEvent(id);
+      });
+      if (token !== loadToken) return;
+    }
+
+    // 5. Entries without a club, matched by SI ID. These are not filtered by club, so ORIS sends each event's
+    //    full entry list: only asked for when an SI ID is set, and only the entries without a club are kept
+    if (siList().length) {
+      // nearest events first; events that don't take entries in ORIS have none to find
+      const need = ids.filter((id) => fullEntriesTaken(id) && !fresh((store.entries[ONE_OFF + "|" + id] || {}).t, fullEntriesTtl(id)))
+        .sort((a, b) => String(store.list[a].Date).localeCompare(String(store.list[b].Date)));
+      let checked = 0;
+      for (const id of need) {
+        if (token === loadToken && !(await fullEntriesSlot())) capped = true;
+        if (token !== loadToken || capped) break;
+        if (token === loadToken) {
+          setStatus("Checking entries without a club " + (++checked) + " of " + need.length);
+          try {
+            const data = await oris("getEventEntries", { eventid: id });
+            if (token === loadToken) {
+              store.entries[ONE_OFF + "|" + id] = { t: nowMs(), items: values(data)
+                .map((e) => ({ si: String(e.SI || ""), reg: String(e.RegNo || ""), club: String(e.ClubID || "") }))
+                .filter((e) => e.si && e.club && /^\d+$/.test(e.reg)) };
+              saveStore();
+              refreshEvent(id);
+            }
+          } catch (e) { if (DEBUG) console.warn(e); }
+        }
+      }
+      if (token !== loadToken) return;
+
+      // their service orders, asked for by the one-off club of the entry
+      const orderPairs = [];
+      ids.forEach((id) => {
+        const det = store.details[id];
+        if (det && det.d.Services.length) {
+          oneOffEntries(id).forEach((e) => { if (!fresh((store.orders[e.club + "|" + id] || {}).t, CONFIG.ttl.entries)) orderPairs.push([e.club, id]); });
+        }
+      });
+      if (orderPairs.length) setStatus("Checking your service orders");
+      await pool(orderPairs, CONFIG.concurrency, async ([club, id]) => {
+        const data = await oris("getEventServiceEntries", { eventid: id, clubid: club });
+        if (token !== loadToken) return;
+        store.orders[club + "|" + id] = { t: nowMs(), items: orderItems(data) };
         saveStore();
         refreshEvent(id);
       });
       if (token !== loadToken) return;
     }
     drawAll();
-    setStatus("");
+    setStatus(capped ? "Some entries without a club are not checked yet. Try again in an hour" : "");
   } catch (e) {
     if (token === loadToken) setStatus(e.message + (events.size ? ". Showing saved data" : ""), true);
   }
@@ -1357,9 +1458,9 @@ $("#addRange").addEventListener("click", () => {
 $("#fOpen").addEventListener("click", (e) => { filters.open = !filters.open; e.currentTarget.setAttribute("aria-pressed", String(filters.open)); drawAll(); });
 $("#fMine").addEventListener("click", (e) => { filters.mine = !filters.mine; e.currentTarget.setAttribute("aria-pressed", String(filters.mine)); drawAll(); });
 $("#fFree").addEventListener("click", (e) => { filters.free = !filters.free; e.currentTarget.setAttribute("aria-pressed", String(filters.free)); drawAll(); });
-// "Entered" and "Free" need to know your entries, so they only show once your registration ID is set
+// "Entered" and "Free" need to know your entries, so they only show once your registration ID or SI ID is set
 function updateFreeChip() {
-  const ok = homeClubs().length > 0;
+  const ok = knowsEntries();
   $("#fMine").hidden = !ok;
   $("#fFree").hidden = !ok;
   if (!ok) {
@@ -1375,10 +1476,11 @@ function updateRegWarnings() {
   const notClub = (list) => list.join(", ") + (list.length > 1 ? " are not club registration IDs" : " is not a club registration ID")
     + " (ABC1234), so " + (list.length > 1 ? "they are" : "it is") + " ignored.";
   const me = $("#sMe").value, meBad = unknown(me), groupBad = unknown($("#sGroup").value);
+  const hasSi = regList($("#sSi").value).some((x) => /^\d+$/.test(x));
   let meMsg = "";
   if (meBad.length) {
     meMsg = notClub(meBad);
-    if (!regList(me).some(clubOf)) meMsg += " Some filters stay hidden until you add a club registration ID.";
+    if (!regList(me).some(clubOf) && !hasSi) meMsg += " Some filters stay hidden until you add a club registration ID or an SI ID.";
   }
   const groupMsg = groupBad.length ? notClub(groupBad) : "";
   $("#sMeWarn").textContent = meMsg; $("#sMeWarn").hidden = !meMsg;
@@ -1386,17 +1488,18 @@ function updateRegWarnings() {
 }
 $("#sMe").addEventListener("input", updateRegWarnings);
 $("#sGroup").addEventListener("input", updateRegWarnings);
+$("#sSi").addEventListener("input", updateRegWarnings);
 $("#settingsBtn").addEventListener("click", () => {
-  $("#sMe").value = settings.me; $("#sGroup").value = settings.group; $("#sNav").value = settings.nav || "auto";
+  $("#sMe").value = settings.me; $("#sGroup").value = settings.group; $("#sSi").value = settings.si || ""; $("#sNav").value = settings.nav || "auto";
   updateRegWarnings();
   $("#settings").showModal();
 });
 $("#settings").addEventListener("close", () => {
   if ($("#settings").returnValue !== "save") return;
-  settings = { me: $("#sMe").value.trim(), group: $("#sGroup").value.trim(), nav: $("#sNav").value };
+  settings = { me: $("#sMe").value.trim(), group: $("#sGroup").value.trim(), si: $("#sSi").value.trim(), nav: $("#sNav").value };
   saveSettings(settings);
   updateFreeChip();
-  load();   // entries are stored per club, so a new club is fetched and the rest comes from the store
+  load();   // entries are stored per club, so a new club (or the first SI ID) is fetched and the rest comes from the store
 });
 $("#refreshBtn").addEventListener("click", () => { clearStore(); load(); });   // settings (club, numbers) are stored separately and stay
 
