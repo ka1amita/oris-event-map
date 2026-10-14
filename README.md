@@ -53,11 +53,12 @@ A link with fixed dates keeps showing those dates.
 
 ## Settings
 
-Tap the gear and enter your club (abbreviation or ORIS ID), your registration numbers, and optionally your group's. They are stored only in your browser (localStorage), never in the repo.
+Tap the gear and enter your registration IDs (several are fine, e.g. if you enter for family) and optionally your group's (e.g. friends). The club comes from the letters at the start of each ID (ABC1234 → club ABC), so there is nothing else to set. With no group IDs, the group is everyone from the club(s) of your own IDs. Everything is stored only in your browser.
 
-- **Entered (orange marker, check)**: one of your registration numbers is entered.
-- **Group badge**: number of entries from your group, or from the whole club if the group is empty.
-- **Navigation app**: what "Open in Maps" on the detail card opens, with the race location as the destination. "Phone default" uses Apple Maps on iPhone, iPad and Mac, the system chooser (`geo:` link) on Android, and Google Maps on the web elsewhere. Google Maps, Mapy.com and Waze can be picked explicitly; their links open the app when it is installed.
+- **Entered (orange marker, check)**: one of your registration IDs is entered.
+- **Group badge**: number of entries from your group, or from your whole club if the group is empty.
+- **Entered** and **Free** filters appear once a registration ID is set. Entered shows only events you are entered in; Free hides other events on days you already have one (your own stay visible).
+- **Navigation app**: what "Open in Maps" on the detail card opens, with the event location as the destination. "Phone default" uses Apple Maps on iPhone, iPad and Mac, the system chooser (`geo:` link) on Android, and Google Maps on the web elsewhere. Google Maps, Mapy.com and Waze can be picked explicitly; their links open the app when it is installed.
 
 ## Marker encoding
 
@@ -66,7 +67,7 @@ Tap the gear and enter your club (abbreviation or ORIS ID), your registration nu
 | Disc color and letter | Format: S sprint (red), M middle (blue), L long (green), + other (gray) |
 | Badge, top right | Level code: NC national championship, NP national cup, AL A ladder, BL B ladder, RC regional championship, RL regional ladder, OP other public, NN non-competition. Fill from black (NC, NP) through dark gray (AL, BL) and light gray (RC, RL) to white (OP, NN) |
 | Badge, top left | Sport: shoe, bike, ski, trail |
-| Badges, top edge | Services (bed = accommodation, fork and knife = meals; orange = you ordered it), then a moon for night races |
+| Badges, top edge | Services (bed = accommodation, fork and knife = meals; orange = you ordered it), then a moon for night events |
 | Badge, bottom left | Relay or team |
 | Badge, bottom right | Entries from your group |
 | Dots | Current entry deadline (1–3). Clock and empty dots = not open yet. Lock = closed |
@@ -84,8 +85,8 @@ ORIS returns disciplines, levels and services as names. The patterns that map th
 |---|---|
 | `getEventList` | Events in the date range (with `all=1`; cancelled events are hidden) |
 | `getEvent` | Entry start and deadlines, services, start list and results counts, stages |
-| `getEventEntries` (with `clubid`) | Your and your group's entries; only when a club is set |
-| `getEventServiceEntries` (with `clubid`) | Services you ordered; only when a club and your registration numbers are set |
+| `getEventEntries` (with `clubid`) | Your and your group's entries, per club taken from the registration IDs |
+| `getEventServiceEntries` (with `clubid`) | Services you ordered, for your own club(s) |
 
 ## Caching
 
@@ -95,6 +96,6 @@ Data is kept in the browser (localStorage), so changing dates or filters is inst
 - **Event details** are refetched when ORIS reports a new version of the event (every list fetch carries the version), or after 7 days.
 - **Your club's entries and service orders** expire after 30 minutes, since they change most often.
 - **Filters** (open for entry, entered) never fetch anything; they filter what is already loaded.
-- **Refresh button** (circular arrow): forgets all saved ORIS data and loads the current dates fresh. Your settings (club, registration numbers) stay.
+- **Refresh button** (circular arrow): forgets all saved ORIS data and loads the current dates fresh. Your settings (registration IDs, navigation app) stay.
 
 Past days are dropped automatically. The durations are in `CONFIG.ttl`.

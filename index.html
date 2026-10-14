@@ -45,6 +45,7 @@ button { font: inherit; color: inherit; }
 .icon-btn:hover { background: #F1F3F3; }
 .filters { display: flex; flex-wrap: wrap; gap: 12px 8px; align-items: center; }
 .fchip { -webkit-appearance: none; appearance: none; margin: 0; line-height: 1; flex: 0 0 auto; height: 44px; padding: 0 16px; border-radius: 22px; border: 0; background: #fff; font-size: 15px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 8px rgba(20,24,31,.14); }
+.fchip[hidden] { display: none; }
 .fchip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
 .dates { display: flex; flex-direction: column; padding: 4px 4px 6px; border-top: 1px solid #E3E6E5; }
 .dates[hidden] { display: none; }
@@ -118,13 +119,13 @@ button { font: inherit; color: inherit; }
 .dotgroup.open .dot { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))); }
 .dg-count { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px; background: var(--ink); color: #fff; font: 700 11px/18px var(--sans); text-align: center; pointer-events: none; }
 .dotgroup.open .dg-count { display: none; }
-/* Races without a location: dots in the filter row. Up to 5 sit side by side; more stack into one dot
+/* Events without a location: dots in the filter row. Up to 5 sit side by side; more stack into one dot
    with a count and fan out into rows on tap (or mouse hover), on the same white-ish tray as map groups.
    Each row is 44px, so the tray lines up with the filter pills next to it. */
 .noloc { flex: 0 1 auto; max-width: 100%; display: flex; flex-wrap: wrap; align-items: center; padding: 0 4px 0 2px; border-radius: 22px;
   background: rgba(255,255,255,.6); box-shadow: 0 2px 10px rgba(20,24,31,.2); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
 .noloc[hidden] { display: none; }
-/* Up to 3 races without a location show as full markers right in the row: no tray, no pin icon.
+/* Up to 3 events without a location show as full markers right in the row: no tray, no pin icon.
    They slide out from under the last filter pill, and back under it when they go. */
 .noloc-chips { display: contents; }
 .filters > .fchip, .filters > .weeks { position: relative; z-index: 1; }
@@ -245,9 +246,10 @@ dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--mu
       <button class="fchip" type="button" data-word="end" aria-pressed="false" aria-label="Weekend only">end</button>
     </span>
     <button class="fchip" type="button" id="fOpen" aria-pressed="false" aria-label="Open for entry">Open</button>
-    <button class="fchip" type="button" id="fMine" aria-pressed="false">Entered</button>
-    <span class="noloc-chips" id="nolocChips" role="group" aria-label="Races without a location"></span>
-    <div class="noloc" id="noloc" hidden role="group" aria-label="Races without a location"></div>
+    <button class="fchip" type="button" id="fMine" aria-pressed="false" hidden>Entered</button>
+    <button class="fchip" type="button" id="fFree" aria-pressed="false" aria-label="Hide events on days I already have an event" title="Hide events on days I already have an event" hidden>Free</button>
+    <span class="noloc-chips" id="nolocChips" role="group" aria-label="Events without a location"></span>
+    <div class="noloc" id="noloc" hidden role="group" aria-label="Events without a location"></div>
   </div>
 </header>
 
@@ -256,21 +258,17 @@ dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--mu
 
 <dialog id="settings">
   <form method="dialog" id="settingsForm">
-    <h2 tabindex="-1" autofocus style="outline: none">Your club and group</h2>
-    <p>Used to mark races you and your group are entered in. Saved only in this browser.</p>
+    <h2 tabindex="-1" autofocus style="outline: none">You and your group</h2>
+    <p>Used to mark events you and your group are entered in. Saved only in this browser.</p>
     <div class="field">
-      <label for="sClub">Club</label>
-      <input id="sClub" name="club" autocomplete="off" placeholder="Abbreviation or ORIS ID">
-      <small>Without a club, entries are not shown.</small>
+      <label for="sMe">Your registration IDs</label>
+      <input id="sMe" name="me" autocomplete="off" autocapitalize="characters" placeholder="ABC1234, XYZ5678">
+      <small>Separate several with commas, for example if you enter for family too. The club comes from the letters at the start.</small>
     </div>
     <div class="field">
-      <label for="sMe">Your registration numbers</label>
-      <input id="sMe" name="me" autocomplete="off" placeholder="ABC1234">
-      <small>Separate several with commas, for example if you enter for family too.</small>
-    </div>
-    <div class="field">
-      <label for="sGroup">Group registration numbers</label>
-      <input id="sGroup" name="group" autocomplete="off" placeholder="Leave empty to count the whole club">
+      <label for="sGroup">Group registration IDs</label>
+      <input id="sGroup" name="group" autocomplete="off" autocapitalize="characters" placeholder="ABC1234, XYZ5678">
+      <small>Separate several with commas, for example if you want to see your friends. Leave empty to count everyone from your club(s), taken from your registration IDs above.</small>
     </div>
     <div class="field">
       <label for="sNav">Navigation app</label>
@@ -342,7 +340,7 @@ const CONFIG = {
     ["AL", /žebříček a|zebricek a|ladder a/i],
     ["BL", /žebříček b|zebricek b|ladder b/i]
   ],
-  levelFallback: "OP",   // other public race
+  levelFallback: "OP",   // other public event
   services: {
     bed: /ubytov|nocleh|spaní|spani|tělocvič|telocvic|kemp|camp|accommod|hostel|hotel/i,
     meals: /strav|večeř|vecer|oběd|obed|snídan|snidan|jídl|jidl|meal|dinner|lunch|breakfast|penz|pension/i
@@ -531,7 +529,7 @@ const oris = orisRaw;   // every ORIS call goes through the store below, not a p
      days[YYYY-MM-DD]   when that day's event list was fetched
      list[id]           event as returned by getEventList (small)
      details[id]        the few getEvent fields we use, with ORIS version
-     entries[club|id]   registration numbers entered for the club
+     entries[club|id]   registration IDs entered for the club
      orders[club|id]    service orders for the club
 */
 const STORE_KEY = "omap.store.v2";
@@ -593,8 +591,15 @@ async function pool(items, n, fn) {
 
 /* ---------------- settings ---------------- */
 function loadSettings() {
-  try { return Object.assign({ club: "", me: "", group: "", nav: "auto" }, JSON.parse(localStorage.getItem("omap.settings") || "{}")); }
-  catch (e) { return { club: "", me: "", group: "", nav: "auto" }; }
+  try { return Object.assign({ me: "", group: "", nav: "auto" }, JSON.parse(localStorage.getItem("omap.settings") || "{}")); }
+  catch (e) { return { me: "", group: "", nav: "auto" }; }
+}
+// Czech registration IDs start with the club code: ABC1234 belongs to club ABC
+const clubOf = (reg) => { const m = /^([^\d\s]+)\d+$/.exec(reg); return m ? m[1] : null; };
+const homeClubs = () => [...new Set(regList(settings.me).map(clubOf).filter(Boolean))];
+// clubs whose entries we need: yours, plus those of anyone in your group
+function entryClubs() {
+  return [...new Set(regList(settings.me).concat(regList(settings.group)).map(clubOf).filter(Boolean))];
 }
 function saveSettings(s) { try { localStorage.setItem("omap.settings", JSON.stringify(s)); } catch (e) {} }
 
@@ -754,7 +759,7 @@ function cardHtml(ev) {
   if (ev.meals) tags.push('<span class="tag' + (ev.ordered.meals ? " ordered" : "") + '">' + ICON.meals + (ev.ordered.meals ? "Meals ordered" : "Meals") + "</span>");
   if (ev.knockout) tags.push('<span class="tag">Knock-out sprint</span>');
   if (ev.freeOrder) tags.push('<span class="tag">Free order</span>');
-  if (ev.stages > 1) tags.push('<span class="tag">Multi-race, ' + ev.stages + " stages</span>");
+  if (ev.stages > 1) tags.push('<span class="tag">Multi-event, ' + ev.stages + " stages</span>");
 
   let steps = "";
   if (ev.deadlines.length) {
@@ -780,7 +785,7 @@ function cardHtml(ev) {
   }
 
   const pills = [];
-  if (settings.club) pills.push(ev.entered ? '<span class="pill entered">' + ICON.check.replace('width="9" height="9"', 'width="14" height="14"') + "You are entered</span>" : '<span class="pill">Not entered</span>');
+  if (homeClubs().length) pills.push(ev.entered ? '<span class="pill entered">' + ICON.check.replace('width="9" height="9"', 'width="14" height="14"') + "You are entered</span>" : '<span class="pill">Not entered</span>');
   if (ev.group > 0) pills.push('<span class="pill group">' + ICON.person + ev.group + " from your group</span>");
   if (ev.startList) pills.push('<span class="pill"><span class="letter" style="background:#D42A7C">S</span>Start list</span>');
   if (ev.results) pills.push('<span class="pill"><span class="letter" style="background:#7B2CBF">V</span>Results</span>');
@@ -815,7 +820,8 @@ const allDays = () => ranges.flatMap((r) => rangeDays(r)).map(ymd);
 let settings = loadSettings();
 let events = new Map();     // id -> event
 let selectedId = null;
-let filters = { open: false, mine: false };
+let filters = { open: false, mine: false, free: false };
+let busyDays = new Set();   // days with an event you are entered in (recomputed on every draw)
 let loadToken = 0;
 
 const map = L.map("map", { zoomControl: false, attributionControl: true }).setView([49.8, 15.5], 7);
@@ -825,6 +831,8 @@ const layer = L.layerGroup().addTo(map);
 function compact() { return map.getZoom() < CONFIG.compactBelowZoom; }
 function passesFilters(ev) {
   if (ev.cancelled) return false;
+  // "Free": hide other events on days you already have an event; your own events stay visible
+  if (filters.free && !ev.entered && ev.date && busyDays.has(ymd(ev.date))) return false;
   if (filters.open && ev.phase !== "tier") return false;
   if (filters.mine && !ev.entered) return false;
   return true;
@@ -901,6 +909,7 @@ let popping = new Map();   // id -> delay in ms
 const popClass = (ev) => popping.has(ev.id) ? " pop" : "";
 const popDelay = (ev) => popping.has(ev.id) ? "--delay:" + popping.get(ev.id) + "ms;" : "";
 function drawAll() {
+  busyDays = new Set([...events.values()].filter((e) => e.entered && e.date && !e.cancelled).map((e) => ymd(e.date)));
   layer.clearLayers();
   const list = [...events.values()].filter(visible).sort((a, b) => (a.date || 0) - (b.date || 0));
   popping = new Map();
@@ -972,7 +981,7 @@ function leaveForm(mode) {
   }
   return 0;
 }
-// Full markers, keyed by race so only the ones that come or go are animated
+// Full markers, keyed by event so only the ones that come or go are animated
 function updateChips() {
   const box = $("#nolocChips");
   const live = new Map([...box.children].filter((el) => !el.classList.contains("leaving")).map((el) => [el.dataset.key, el]));
@@ -1005,11 +1014,11 @@ function renderTray() {
   const pin = '<span class="pinoff" title="Without location">' + PINOFF_ICON + "</span>";
   if (folded) {
     // all dots on one spot, the earliest on top, with a count: same as an overlapping group on the map
-    el.setAttribute("aria-label", list.length + " races without a location, tap to show");
+    el.setAttribute("aria-label", list.length + " events without a location, tap to show");
     el.innerHTML = pin + '<span class="cell">' + list.slice().reverse().map((ev) => dotHtml(ev, false, 0, 0)).join("") +
       '<span class="dg-count">' + list.length + "</span></span>";
   } else {
-    el.setAttribute("aria-label", "Races without a location");
+    el.setAttribute("aria-label", "Events without a location");
     el.innerHTML = pin + list.map((ev) => '<span class="cell">' + dotHtml(ev, ev.id === selectedId, 0, 0) + "</span>").join("");
   }
 }
@@ -1070,15 +1079,16 @@ function buildEvent(id) {
   const ev = normalize(Object.assign({}, base, det ? det.d : {}));
   ev.hasDetails = !!det;
   ev.entered = false; ev.group = 0; ev.ordered = { bed: false, meals: false, ids: [] };
-  if (settings.club) {
+  const clubs = entryClubs();
+  if (clubs.length) {
     const me = new Set(regList(settings.me)), group = new Set(regList(settings.group));
-    const en = store.entries[settings.club + "|" + id];
-    if (en) {
-      ev.entered = en.regs.some((r) => me.has(r));
-      ev.group = group.size ? en.regs.filter((r) => group.has(r)).length : en.regs.length;
-    }
-    const or = store.orders[settings.club + "|" + id];
-    if (or) {
+    const home = new Set(homeClubs());
+    const regsOf = (cs) => cs.flatMap((c) => (store.entries[c + "|" + id] || { regs: [] }).regs);
+    const all = regsOf(clubs);
+    ev.entered = all.some((r) => me.has(r));
+    // group: the listed group IDs, or everyone from the clubs of your own IDs when no group is set
+    ev.group = group.size ? all.filter((r) => group.has(r)).length : regsOf([...home]).length;
+    homeClubs().map((c) => store.orders[c + "|" + id]).filter(Boolean).forEach((or) => {
       or.items.forEach((o) => {
         if (!me.has(o.reg)) return;
         const svc = ev.services.find((x) => x.id === o.sid);
@@ -1086,7 +1096,7 @@ function buildEvent(id) {
         if (o.sid) ev.ordered.ids.push(o.sid);
         if (kind) ev.ordered[kind] = true;
       });
-    }
+    });
   }
   return ev;
 }
@@ -1161,12 +1171,14 @@ async function load() {
     });
     if (token !== loadToken) return;
 
-    // 4. Your club's entries and service orders: these change most often, so they expire soonest
-    if (settings.club) {
-      const club = settings.club;
-      const needEntries = ids.filter((id) => !fresh((store.entries[club + "|" + id] || {}).t, CONFIG.ttl.entries));
-      if (needEntries.length) setStatus("Checking your entries");
-      await pool(needEntries, CONFIG.concurrency, async (id) => {
+    // 4. Entries (for the clubs of your IDs and your group IDs) and service orders (clubs of your IDs only):
+    //    these change most often, so they expire soonest
+    const clubs = entryClubs();
+    if (clubs.length) {
+      const pairs = [];
+      clubs.forEach((club) => ids.forEach((id) => { if (!fresh((store.entries[club + "|" + id] || {}).t, CONFIG.ttl.entries)) pairs.push([club, id]); }));
+      if (pairs.length) setStatus("Checking your entries");
+      await pool(pairs, CONFIG.concurrency, async ([club, id]) => {
         const data = await oris("getEventEntries", { eventid: id, clubid: club });
         if (token !== loadToken) return;
         store.entries[club + "|" + id] = { t: nowMs(), regs: values(data).map((e) => String(e.RegNo || e.RegNum || "").toUpperCase()).filter(Boolean) };
@@ -1175,29 +1187,29 @@ async function load() {
       });
       if (token !== loadToken) return;
 
-      if (regList(settings.me).length) {
-        const needOrders = ids.filter((id) => {
-          const det = store.details[id];
-          return det && det.d.Services.length && !fresh((store.orders[club + "|" + id] || {}).t, CONFIG.ttl.entries);
-        });
-        if (needOrders.length) setStatus("Checking your service orders");
-        let logged = false;
-        await pool(needOrders, CONFIG.concurrency, async (id) => {
-          const data = await oris("getEventServiceEntries", { eventid: id, clubid: club });
-          if (token !== loadToken) return;
-          store.orders[club + "|" + id] = { t: nowMs(), items: values(data).map((o) => {
-            if (DEBUG && !logged) { console.log("service order sample", o); logged = true; }
-            return {
-              reg: String(o.RegNo || o.RegNum || (o.ClubUser && o.ClubUser.RegNo) || "").toUpperCase(),
-              sid: String(o.ServiceID || (o.Service && o.Service.ID) || ""),
-              name: o.ServiceNameCZ || (o.Service && (o.Service.NameCZ || o.Service.NameEN)) || ""
-            };
-          }) };
-          saveStore();
-          refreshEvent(id);
-        });
+      // only services ordered under your own IDs count, so only the clubs of your own IDs are asked
+      const orderPairs = [];
+      homeClubs().forEach((club) => ids.forEach((id) => {
+        const det = store.details[id];
+        if (det && det.d.Services.length && !fresh((store.orders[club + "|" + id] || {}).t, CONFIG.ttl.entries)) orderPairs.push([club, id]);
+      }));
+      if (orderPairs.length) setStatus("Checking your service orders");
+      let logged = false;
+      await pool(orderPairs, CONFIG.concurrency, async ([club, id]) => {
+        const data = await oris("getEventServiceEntries", { eventid: id, clubid: club });
         if (token !== loadToken) return;
-      }
+        store.orders[club + "|" + id] = { t: nowMs(), items: values(data).map((o) => {
+          if (DEBUG && !logged) { console.log("service order sample", o); logged = true; }
+          return {
+            reg: String(o.RegNo || o.RegNum || (o.ClubUser && o.ClubUser.RegNo) || "").toUpperCase(),
+            sid: String(o.ServiceID || (o.Service && o.Service.ID) || ""),
+            name: o.ServiceNameCZ || (o.Service && (o.Service.NameCZ || o.Service.NameEN)) || ""
+          };
+        }) };
+        saveStore();
+        refreshEvent(id);
+      });
+      if (token !== loadToken) return;
     }
     drawAll();
     setStatus("");
@@ -1341,14 +1353,28 @@ $("#addRange").addEventListener("click", () => {
 });
 $("#fOpen").addEventListener("click", (e) => { filters.open = !filters.open; e.currentTarget.setAttribute("aria-pressed", String(filters.open)); drawAll(); });
 $("#fMine").addEventListener("click", (e) => { filters.mine = !filters.mine; e.currentTarget.setAttribute("aria-pressed", String(filters.mine)); drawAll(); });
+$("#fFree").addEventListener("click", (e) => { filters.free = !filters.free; e.currentTarget.setAttribute("aria-pressed", String(filters.free)); drawAll(); });
+// "Entered" and "Free" need to know your entries, so they only show once your registration ID is set
+function updateFreeChip() {
+  const ok = homeClubs().length > 0;
+  $("#fMine").hidden = !ok;
+  $("#fFree").hidden = !ok;
+  if (!ok) {
+    filters.mine = false; filters.free = false;
+    $("#fMine").setAttribute("aria-pressed", "false");
+    $("#fFree").setAttribute("aria-pressed", "false");
+  }
+}
+updateFreeChip();
 $("#settingsBtn").addEventListener("click", () => {
-  $("#sClub").value = settings.club; $("#sMe").value = settings.me; $("#sGroup").value = settings.group; $("#sNav").value = settings.nav || "auto";
+  $("#sMe").value = settings.me; $("#sGroup").value = settings.group; $("#sNav").value = settings.nav || "auto";
   $("#settings").showModal();
 });
 $("#settings").addEventListener("close", () => {
   if ($("#settings").returnValue !== "save") return;
-  settings = { club: $("#sClub").value.trim(), me: $("#sMe").value.trim(), group: $("#sGroup").value.trim(), nav: $("#sNav").value };
+  settings = { me: $("#sMe").value.trim(), group: $("#sGroup").value.trim(), nav: $("#sNav").value };
   saveSettings(settings);
+  updateFreeChip();
   load();   // entries are stored per club, so a new club is fetched and the rest comes from the store
 });
 $("#refreshBtn").addEventListener("click", () => { clearStore(); load(); });   // settings (club, numbers) are stored separately and stay
