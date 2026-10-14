@@ -45,7 +45,7 @@ One parameter, `days`:
 - Words, relative to today: `?days=next-week`, `?days=this-next-work-week`, `?days=this-next-week-end`. No parameter means this week.
 - Fixed dates, `from..to`, ranges separated by commas: `?days=2026-10-12..2026-10-18` or `?days=2026-10-17..2026-10-18,2026-10-24..2026-10-25`. A single day is `2026-10-17..2026-10-17`.
 
-Picking with the pill writes words; editing ranges writes dates. Older links with `?range=` or `?from=&to=` still work.
+Picking with the pill writes words; editing ranges writes dates.
 
 `#calendars` (the link in every entry of the calendar feeds) opens the entry deadline reminders dialog; it's a fragment, not a parameter, as it opens a part of the page rather than setting the map view. The app then drops it from the URL.
 

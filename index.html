@@ -1638,7 +1638,7 @@ function applyRanges(list, mode, sel) {
   renderDates();
   const cur = currentSel();
   const url = new URL(location.href);
-  ["days", "range", "from", "to"].forEach((k) => url.searchParams.delete(k));
+  url.searchParams.delete("days");
   if (mode === "words" && cur) {
     const w = selWords(cur).join("-");
     if (w !== "this-week") url.searchParams.set("days", w);   // no parameter = this week
@@ -1873,10 +1873,6 @@ window.addEventListener("hashchange", openCalendarsFromUrl);
 (function init() {
   setTimeout(openCalendarsFromUrl, 0);
   let parsed = parseDaysParam(params.get("days"));
-  // links saved by earlier versions: ?range=next|both, ?from=&to=
-  if (!parsed && params.get("range") === "next") parsed = parseDaysParam("next-week");
-  if (!parsed && params.get("range") === "both") parsed = parseDaysParam("this-next-week");
-  if (!parsed && params.get("from") && params.get("to")) parsed = parseDaysParam(params.get("from") + ".." + params.get("to"));
   // words that give no days today (e.g. "this-work-week" on a Saturday) fall back to this week
   if (!parsed || (parsed.mode === "words" && !presetRanges(parsed.sel).length)) parsed = parseDaysParam("this-week");
   if (parsed.mode === "words") applyRanges(presetRanges(parsed.sel), "words", parsed.sel);
