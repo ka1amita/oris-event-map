@@ -1446,7 +1446,21 @@ function refreshStagesOf(id) {
 }
 
 let firstLoad = true;
-async function load() {
+// More days than MAX_DAYS are kept as picked (the other end is often changed next), but not loaded:
+// the map keeps what it shows until the dates are shortened
+function load() {
+  const n = allDays().length;
+  let done;
+  if (n > MAX_DAYS) {
+    loadToken++;   // stops a load still running for the previous dates
+    setStatus("These dates cover " + n + " days. Shorten them to " + MAX_DAYS + " or fewer to load events");
+    done = Promise.resolve();
+  } else {
+    done = loadDays();
+  }
+  return done;
+}
+async function loadDays() {
   const token = ++loadToken;
   const days = allDays();
 
@@ -1619,18 +1633,8 @@ const fmtRange = (r) => ymd(r.from) === ymd(r.to) ? fmtDay(r.from) : fmtDay(r.fr
 // Apply a new selection: update the pill, header, editor and URL, then load
 function applyRanges(list, mode, sel) {
   chosenSel = sel || null;
-  let note = "";
   list = normalizeRanges(list);
   if (!list.length) return;
-  // keep the total number of days reasonable for ORIS
-  let total = 0;
-  list = list.reduce((acc, r) => {
-    if (total >= MAX_DAYS) return acc;
-    const n = dayDiff(r.from, r.to) + 1;
-    if (total + n > MAX_DAYS) { note = "Dates shortened to " + MAX_DAYS + " days"; acc.push({ from: r.from, to: addDays(r.from, MAX_DAYS - total - 1) }); total = MAX_DAYS; }
-    else { acc.push(r); total += n; }
-    return acc;
-  }, []);
   ranges = list;
   rangesMode = mode;
   renderDates();
@@ -1644,7 +1648,7 @@ function applyRanges(list, mode, sel) {
     url.searchParams.set("days", rangesKey(ranges));
   }
   history.replaceState(null, "", url.toString().replace(/%2C/g, ","));
-  load().then(() => { if (note) setStatus(note); });
+  load();
 }
 function renderDates() {
   const sel = currentSel();
@@ -1704,24 +1708,47 @@ $("#rangeBtn").addEventListener("click", (e) => {
   e.currentTarget.setAttribute("aria-expanded", String(open));
   $("#dates").hidden = !open;
 });
-// Editing ranges by hand switches the URL to fixed dates
+// Editing ranges by hand switches the URL to fixed dates.
+// A row's edits apply only once focus leaves the row: applying mid-edit re-renders the rows, which closes
+// the picker, and would take half-made dates (a year typed digit by digit, the date iOS pre-fills on tap).
+function settleRow(row) {
+  if (row.isConnected && !row.contains(document.activeElement)) {
+    const val = (edge) => parseDT(row.querySelector('input[data-edge="' + edge + '"]').value, false);
+    let from = val("from"), to = val("to");
+    if (row.dataset.draft) {
+      draft = { from, to };
+      if (from && to) { draft = null; applyRanges(ranges.concat([{ from, to }]), "dates"); }
+    } else if (from && to) {
+      const r = ranges[+row.dataset.i];
+      // moving one end past the other carries the range along, keeping its length
+      if (from > to) {
+        const len = dayDiff(r.from, r.to);
+        if (ymd(from) !== ymd(r.from)) to = addDays(from, len); else from = addDays(to, -len);
+      }
+      if (ymd(from) !== ymd(r.from) || ymd(to) !== ymd(r.to)) {
+        const list = ranges.map((x) => ({ from: x.from, to: x.to }));
+        list[+row.dataset.i] = { from, to };
+        applyRanges(list, "dates");
+      }
+    } else {
+      renderRows();   // a cleared boundary of a range goes back to its date
+    }
+  }
+}
 $("#rangeRows").addEventListener("change", (e) => {
   const input = e.target.closest("input[data-edge]");
-  if (!input) return;
-  const d = parseDT(input.value, false);
-  const row = input.closest(".range-row");
-  input.closest(".date-field").classList.toggle("empty", !d);
-  if (row.dataset.draft) {
-    draft[input.dataset.edge] = d;
-    if (draft.from && draft.to) { const r = draft; draft = null; applyRanges(ranges.concat([r]), "dates"); }
-    return;   // incomplete: wait for the other boundary
+  if (input) {
+    input.closest(".date-field").classList.toggle("empty", !parseDT(input.value, false));
+    const row = input.closest(".range-row");
+    setTimeout(() => settleRow(row));   // a picker may report the change after focus has left
   }
-  if (!d) return;
-  const i = +row.dataset.i;
-  const list = ranges.map((r) => ({ from: r.from, to: r.to }));
-  list[i][input.dataset.edge] = d;
-  applyRanges(list, "dates");
 });
+$("#rangeRows").addEventListener("focusout", (e) => {
+  const row = e.target.closest(".range-row");
+  if (row) setTimeout(() => settleRow(row));   // by then focus has landed, possibly on the row's other field
+});
+// Keep focus in the date field while pressing remove, so leaving the field doesn't apply what's being removed
+$("#rangeRows").addEventListener("mousedown", (e) => { if (e.target.closest("[data-remove]")) e.preventDefault(); });
 $("#rangeRows").addEventListener("click", (e) => {
   const btn = e.target.closest("[data-remove]");
   if (!btn) return;
