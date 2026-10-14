@@ -666,8 +666,6 @@ let store = loadStore();
 function emptyStore() { return { days: {}, list: {}, details: {}, entries: {}, orders: {} }; }
 function loadStore() {
   try {
-    // drop the old per-request cache from earlier versions of the page
-    Object.keys(localStorage).filter((k) => k.startsWith("omap:")).forEach((k) => localStorage.removeItem(k));
     const st = Object.assign(emptyStore(), JSON.parse(localStorage.getItem(STORE_KEY) || "{}"));
     // forget days and events that are already behind us
     const today = ymd(new Date());
