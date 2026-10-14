@@ -209,6 +209,21 @@ dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--mu
 .field small { font-size: 12px; line-height: 16px; color: var(--muted); }
 .field small.warn { color: #A8430A; font-weight: 600; }
 .dlg-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.dlg-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-right: -10px; }
+#calendars h3 { margin: 16px 0 4px; font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+#calendars h3 span { font-weight: 400; letter-spacing: 0; text-transform: none; }
+.feeds { list-style: none; margin: 0; padding: 0; }
+.feeds li { display: flex; align-items: center; gap: 8px; padding: 4px 4px 4px 8px; border-radius: 12px; }
+.feeds li.home { background: #FFF1E6; }
+.feeds li.msg { font-size: 14px; color: var(--muted); padding: 8px; }
+.feeds .label { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.feeds .code { font: 600 14px/18px var(--disc); }
+.feeds .name { font-size: 13px; line-height: 16px; color: var(--muted); }
+.feeds .name em { font-style: normal; font-weight: 600; color: #A8430A; }
+.feeds .icon-btn { width: 36px; height: 36px; flex: none; }
+.feeds .btn { height: 36px; padding: 0 14px; display: inline-flex; align-items: center; flex: none; font-size: 14px; color: var(--ink); text-decoration: none; }
+.cal-notes { margin-top: 14px; }
+.cal-notes small { display: block; margin-top: 6px; font-size: 12px; line-height: 16px; color: var(--muted); }
 .btn { height: 44px; padding: 0 18px; border-radius: 22px; border: 1px solid #B9C0C4; background: #fff; font-weight: 600; cursor: pointer; }
 .btn.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
 
@@ -302,11 +317,34 @@ dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--mu
       </select>
       <small>Used by "Add to calendar". Phone default is Google Calendar on Android and a calendar file elsewhere.</small>
     </div>
+    <div class="field">
+      <label for="calendarsBtn">Entry deadline reminders</label>
+      <button class="btn" type="button" id="calendarsBtn">Subscribe in your calendar…</button>
+      <small>Calendar feeds of entry deadlines, by level or by region, with an alert a day before.</small>
+    </div>
     <div class="dlg-actions">
       <button class="btn" value="cancel" type="submit">Cancel</button>
       <button class="btn primary" value="save" type="submit">Save</button>
     </div>
   </form>
+</dialog>
+
+<dialog id="calendars" aria-labelledby="calTitle">
+  <div class="dlg-head">
+    <h2 id="calTitle" tabindex="-1" autofocus style="outline: none">Entry deadline reminders</h2>
+    <button class="icon-btn" type="button" id="calClose" aria-label="Close"></button>
+  </div>
+  <p>Subscribe to a feed in your calendar app: one calendar entry per entry deadline, with an alert a day before. The feeds are rebuilt from ORIS every 6 hours.</p>
+  <h3>Top levels</h3>
+  <ul class="feeds" id="calLevels"></ul>
+  <h3>Regions <span>· all events, including trainings</span></h3>
+  <ul class="feeds" id="calRegions"></ul>
+  <div class="cal-notes">
+    <small><b>iPhone:</b> when subscribing, keep the alerts on (iOS offers to remove them).</small>
+    <small><b>Google Calendar:</b> it refreshes a feed only every 12–24 hours and ignores its alerts; set notifications on the calendar.</small>
+    <small><b>Other apps:</b> copy a feed's address and add it as a subscribed (internet) calendar.</small>
+    <small><b>Unsubscribe:</b> on iPhone, Settings → Apps → Calendar → Calendar Accounts → Subscribed Calendars → the feed → Delete Account; in Google Calendar, the calendar's settings → Unsubscribe.</small>
+  </div>
 </dialog>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -474,7 +512,8 @@ const ICON = {
   lock: '<svg aria-hidden="true" width="8" height="8" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5.5 7V5.5a2.5 2.5 0 015 0V7"/></svg>',
   clock: '<svg aria-hidden="true" width="8" height="8" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/></svg>',
   check: '<svg aria-hidden="true" width="9" height="9" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 8.5l3.7 3.7L13.5 4.5"/></svg>',
-  close: '<svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l10 10M15 5L5 15"/></svg>'
+  close: '<svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l10 10M15 5L5 15"/></svg>',
+  copy: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>'
 };
 
 const DEBUG = new URLSearchParams(location.search).has("debug");
@@ -1731,6 +1770,77 @@ function updateRegWarnings() {
 $("#sMe").addEventListener("input", updateRegWarnings);
 $("#sGroup").addEventListener("input", updateRegWarnings);
 $("#sSi").addEventListener("input", updateRegWarnings);
+/* ---------------- Entry deadline reminders: subscribing to the calendar feeds ---------------- */
+// Feeds are published with the site by the Deploy workflow (scripts/build-feeds.mjs): feeds/(level|region)-<code>.ics,
+// the code in plain ASCII. Subscribing uses webcal: (iOS and macOS hand it to Calendar) or Google Calendar's "add by URL".
+const asciiCode = (code) => code.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+const feedUrl = (kind, code) => new URL("feeds/" + kind + "-" + asciiCode(code) + ".ics", location.href).href;
+function subscribeLink(url) {
+  const webcal = url.replace(/^https?:/, "webcal:");
+  let link = { href: webcal, attrs: "" };
+  if (calendarApp() === "google") link = { href: "https://calendar.google.com/calendar/r?cid=" + encodeURIComponent(webcal), attrs: ' target="_blank" rel="noopener"' };
+  return link;
+}
+function feedRow(kind, code, name, home) {
+  const url = feedUrl(kind, code), sub = subscribeLink(url);
+  return '<li' + (home ? ' class="home"' : "") + '><span class="label"><span class="code">' + esc(code) + '</span><span class="name">' + esc(name) +
+    (home ? " · <em>your club</em>" : "") + "</span></span>" +
+    '<button class="icon-btn copy" type="button" data-url="' + esc(url) + '" aria-label="Copy the address of the ' + esc(code) + ' feed">' + ICON.copy + "</button>" +
+    '<a class="btn" href="' + esc(sub.href) + '"' + sub.attrs + ">Subscribe</a></li>";
+}
+// ORIS regions with their names, and the regions of your clubs (from your registration IDs); loaded once
+let regionInfo = null;
+async function loadRegionInfo() {
+  const all = values(await oris("getList", { list: "region" }));
+  const regions = all.map((r) => ({ code: CONFIG.regionCode[r.ID] || r.ID, name: r.ID === "ČR" ? "National" : r.Description || r.ID }))
+    .sort((a, b) => a.code.localeCompare(b.code, "cs"));
+  const home = new Set();
+  if (homeClubs().length) {
+    // a club's region comes as the region's name (e.g. "Pražská")
+    const clubs = values(await oris("getCSOSClubList", {}));
+    homeClubs().forEach((abbr) => {
+      const club = clubs.find((c) => String(c.Abbr || "").toUpperCase() === abbr);
+      const region = club ? all.find((r) => r.Description === club.Region) : null;
+      if (region) home.add(CONFIG.regionCode[region.ID] || region.ID);
+    });
+  }
+  return { regions, home };
+}
+async function renderRegions() {
+  const ul = $("#calRegions");
+  if (!regionInfo) {
+    ul.innerHTML = '<li class="msg">Loading regions from ORIS…</li>';
+    try { regionInfo = await loadRegionInfo(); }
+    catch (e) {
+      if (DEBUG) console.warn(e);
+      ul.innerHTML = '<li class="msg">Couldn\'t load the regions from ORIS. <button class="btn" type="button" id="calRetry">Try again</button></li>';
+      $("#calRetry").addEventListener("click", renderRegions);
+    }
+  }
+  if (regionInfo) ul.innerHTML = regionInfo.regions.map((r) => feedRow("region", r.code, r.name, regionInfo.home.has(r.code))).join("");
+}
+function openCalendars() {
+  $("#calLevels").innerHTML = CONFIG.levelFeeds.map((f) => feedRow("level", f.code, f.name, false)).join("");
+  $("#calendars").showModal();
+  renderRegions();
+}
+$("#calClose").innerHTML = ICON.close;
+$("#calClose").addEventListener("click", () => $("#calendars").close());
+$("#calendarsBtn").addEventListener("click", openCalendars);
+$("#calendars").addEventListener("click", async (e) => {
+  const btn = e.target.closest ? e.target.closest("button.copy") : null;
+  if (btn) {
+    const url = btn.dataset.url;
+    try {
+      await navigator.clipboard.writeText(url);
+      btn.innerHTML = ICON.check.replace('width="9" height="9"', 'width="18" height="18"');
+      setTimeout(() => { btn.innerHTML = ICON.copy; }, 1500);
+    } catch (err) { window.prompt("Copy the feed's address:", url); }
+  }
+});
+// your clubs may change in Settings; their regions are looked up again next time
+$("#settings").addEventListener("close", () => { regionInfo = null; });
+
 $("#settingsBtn").addEventListener("click", () => {
   $("#sMe").value = settings.me; $("#sGroup").value = settings.group; $("#sSi").value = settings.si || ""; $("#sNav").value = settings.nav || "auto";
   $("#sCal").value = settings.cal || "auto";
@@ -1749,6 +1859,15 @@ $("#refreshBtn").addEventListener("click", () => { clearStore(); load(); });   /
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#card").hidden) closeCard(); });
 
 (function init() {
+  // ?calendars (the link in every feed entry) opens the reminders dialog; the parameter is dropped so that it doesn't
+  // end up in a Home Screen icon
+  const calendars = params.has("calendars");
+  if (calendars) {
+    const url = new URL(location.href);
+    url.searchParams.delete("calendars");
+    history.replaceState(null, "", url.toString().replace(/%2C/g, ","));
+    setTimeout(openCalendars, 0);
+  }
   let parsed = parseDaysParam(params.get("days"));
   // links saved by earlier versions: ?range=next|both, ?from=&to=
   if (!parsed && params.get("range") === "next") parsed = parseDaysParam("next-week");

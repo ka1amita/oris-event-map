@@ -47,6 +47,8 @@ One parameter, `days`:
 
 Picking with the pill writes words; editing ranges writes dates. Older links with `?range=` or `?from=&to=` still work.
 
+`?calendars` (the link in every entry of the calendar feeds) opens the entry deadline reminders dialog; the app then drops it from the URL.
+
 ## Home Screen
 
 Words stay relative, so use them for Home Screen icons (Safari → Share → **Add to Home Screen**):
@@ -67,7 +69,8 @@ Without a club, enter your SI IDs instead. Unregistered runners get a one-off re
 - **Group badge**: number of entries from your group, or from your whole club if the group is empty.
 - **Entered** and **Free** filters appear once a club registration ID or an SI ID is set. Entered shows only events you are entered in; Free hides other events on days you already have one (your own stay visible).
 - **Navigation app**: what "Open in Maps" on the detail card opens, with the event location as the destination. "Phone default" uses Apple Maps on iPhone, iPad and Mac, the system chooser (`geo:` link) on Android, and Google Maps on the web elsewhere. Google Maps, Mapy.com and Waze can be picked explicitly; their links open the app when it is installed.
-- **Calendar**: what "Add to calendar" on the detail card does. It adds the event as one all-day calendar event (name, place, ORIS link) and is a one-time import, not a subscription. A stage of a multi-day event (E1, E2, …) is its own day; the multi-day event itself spans from its first to its last stage (ORIS keeps no last day, so the app looks up the stages' dates). "Calendar file" opens an `.ics` file: on a desktop the page makes it, and it downloads and opens in Apple Calendar, Outlook or another calendar app. iPhone and iPad open a calendar file only from a real address, so there the button links to the event's file published with the feeds (`feeds/events/<ORIS event ID>.ics`, for events in the next 6 months, updated every 6 hours); for an event without one (further out, or added to ORIS in the last few hours) it offers Google Calendar instead. "Google Calendar" opens a prefilled Google Calendar event. "Phone default" is Google Calendar on Android, which can't open a calendar file into Google Calendar, and a calendar file elsewhere.
+- **Calendar**: what "Add to calendar" on the detail card does. It adds the event as one all-day calendar event (name, place, ORIS link) and is a one-time import, not a subscription. A stage of a multi-day event (E1, E2, …) is its own day; the multi-day event itself spans from its first to its last stage (ORIS keeps no last day, so the app looks up the stages' dates). "Calendar file" opens an `.ics` file: on a desktop the page makes it, and it downloads and opens in Apple Calendar, Outlook or another calendar app. iPhone and iPad open a calendar file only from a real address, so there the button links to the event's file published with the feeds (`feeds/events/<ORIS event ID>.ics`, for events in the next 6 months, updated every 6 hours); for an event without one (further out, or added to ORIS in the last few hours) it offers Google Calendar instead. "Google Calendar" opens a prefilled Google Calendar event. "Phone default" is Google Calendar on Android, which can't open a calendar file into Google Calendar, and a calendar file elsewhere. The same setting decides how "Subscribe" works in the entry deadline reminders.
+- **Entry deadline reminders** (*Subscribe in your calendar…*): lists the calendar feeds of entry deadlines (see below), the top levels and every region, sorted by code, with your club's region highlighted (found in ORIS from your registration IDs). *Subscribe* opens a `webcal://` link, which iPhone, iPad and Mac hand to Calendar, or with the Google setting Google Calendar's "add by URL"; the copy button copies the feed's address for other apps.
 
 ## Marker encoding
 
@@ -86,7 +89,7 @@ Zoomed out, markers shrink to dots: the ring is the format color (orange when yo
 
 ## Calendar feeds of entry deadlines
 
-`scripts/build-feeds.mjs` builds calendar feeds (`.ics`) that remind you of entry deadlines. Subscribe to the ones you want in your phone's calendar app.
+`scripts/build-feeds.mjs` builds calendar feeds (`.ics`) that remind you of entry deadlines. Subscribe to the ones you want in your phone's calendar app, from Settings → *Subscribe in your calendar…* in the app, or by their addresses, e.g. `https://www.matejkala.com/oris-event-map/feeds/level-NC-NP-AL.ics`.
 
 - **Feeds:** `(level|region)-<code>.ics`, the code in plain ASCII, e.g. `region-VY.ics` or `level-BL-CE.ics`.
   - One per ORIS region: `region-CR` (national), `region-CE` (Čechy), `region-MO` (Morava), and the regional areas (`region-PR`, `region-SC`, `region-HA`, …). An event filed under several regions is in each of their feeds. Region feeds hold every level, including trainings and other events.
