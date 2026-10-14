@@ -96,6 +96,7 @@ Zoomed out, markers shrink to dots: the ring is the format color (orange when yo
   - One per top level group: `level-NC-NP-AL` (national championship, national cup, A ladder), `level-BL-CE` and `level-BL-MO` (B ladder Čechy and Morava). No lower levels.
 - **Entries:** one per entry deadline (1, 2, 3) that is still ahead, in the next 6 months, at the deadline's time (ORIS times are Prague time), with an alert 1 day before. Title: `Entry deadline 2/3 · <feed> · <level> · <event> · <place>`, with the level codes of the markers; the description has the ORIS link and how to unsubscribe.
 - **Multi-day events** appear once: ORIS keeps the entry deadlines on the parent event, not on its stages.
+- **iPhone alerts:** a subscribed calendar has two switches. *Remove Alerts* (in the subscription's details) is on by default and drops the feed's alerts: turn it off. *Event Alerts* (under Notifications) must stay on.
 - **Unsubscribe:** on iPhone, Settings → Apps → Calendar → Calendar Accounts → Subscribed Calendars → the feed → Delete Account; in Google Calendar, the calendar's options → Settings → Unsubscribe.
 
 It also writes one calendar file per event in its range, `feeds/events/<ORIS event ID>.ics`, used by "Add to calendar" on iPhone and iPad (no feed: these come and go with the events).
