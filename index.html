@@ -894,13 +894,12 @@ function calendarButton(ev) {
   } else if (file === "yes") {
     // the Home Screen app hands the file to Safari's viewer; Safari opens it in place
     html = '<a class="open-btn secondary" href="' + eventFileUrl(ev.id) + '"' + (navigator.standalone ? ' target="_blank" rel="noopener"' : "") + ">" + icon + "Add to calendar</a>";
-  } else if (file === "no") {
-    // no published file yet (beyond the 6-month horizon, or added since the last feed run); the Google setting works anyway
-    html = '<button class="open-btn secondary" type="button" disabled>' + icon + "Not available yet for this event</button>";
   } else if (days) {
-    const label = (calendarApp() === "google" ? "Add to Google Calendar" : "Add to calendar") + (days.partial ? " (first day only)" : "");
+    // without a published file (beyond the 6-month horizon, or added since the last feed run) iOS gets Google Calendar
+    const google = calendarApp() === "google" || file === "no";
+    const label = (google ? "Add to Google Calendar" : "Add to calendar") + (days.partial ? " (first day only)" : "");
     let href = "", attrs = "";
-    if (calendarApp() === "google") {
+    if (google) {
       href = "https://calendar.google.com/calendar/render?" + new URLSearchParams({ action: "TEMPLATE", text: ev.name,
         dates: icsDate(days.first) + "/" + icsDate(isoPlusDays(days.last, 1)), details: CONFIG.eventUrl(ev.id), location: ev.place }).toString();
       attrs = ' target="_blank" rel="noopener"';
