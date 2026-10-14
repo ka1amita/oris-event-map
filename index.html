@@ -400,6 +400,23 @@ const ICS = {
     if (place) lines.push("LOCATION:" + ICS.esc(place));
     if (lat && lon) lines.push("GEO:" + lat + ";" + lon);
     return lines;
+  },
+  // an event as one all-day calendar event, for "Add to calendar": { id, name, place, lat, lon, url, first, last },
+  // the days as "YYYY-MM-DD". All-day dates have no time zone; the end is the day after the last day.
+  event(e) {
+    const day = (iso, plus) => { const p = iso.split("-").map(Number); return new Date(Date.UTC(p[0], p[1] - 1, p[2] + plus)).toISOString().slice(0, 10).replace(/-/g, ""); };
+    const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
+    return ICS.text(["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//oris-event-map//ORIS map//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
+      "BEGIN:VEVENT",
+      "UID:oris-event-map-" + e.id + "-event",
+      "DTSTAMP:" + stamp,
+      "DTSTART;VALUE=DATE:" + day(e.first, 0),
+      "DTEND;VALUE=DATE:" + day(e.last, 1),
+      "SUMMARY:" + ICS.esc(e.name),
+      ...ICS.location(e.place, e.lat, e.lon),
+      "DESCRIPTION:" + ICS.esc(e.url),
+      "URL:" + e.url,
+      "END:VEVENT", "END:VCALENDAR"]);
   }
 };
 
@@ -814,8 +831,8 @@ function navTarget(ev) {
 }
 /* "Add to calendar": the event as one all-day calendar event. A stage (E1, E2, …) or a single event is its own day;
    a multi-day event (the parent of stages) spans from its first to its last stage. It's a one-time import, not a
-   subscription. Apple Calendar, Outlook and others take a calendar file; Android can't open one into Google Calendar,
-   so there it is a Google Calendar link. */
+   subscription. Apple Calendar, Outlook and others take a calendar file (made in the page on desktop, the published
+   one on iPhone and iPad); Android can't open one into Google Calendar, so there it is a Google Calendar link. */
 function calendarApp() {
   let app = settings.cal || "auto";
   if (app === "auto") app = /Android/.test(navigator.userAgent) ? "google" : "file";
@@ -852,26 +869,35 @@ function eventDays(ev) {
   }
   return days;
 }
-function eventIcs(ev, days) {
-  const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
-  return ICS.text(["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//oris-event-map//ORIS map//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
-    "BEGIN:VEVENT",
-    "UID:oris-event-map-" + ev.id + "-event",
-    "DTSTAMP:" + stamp,
-    // all-day: plain dates without a time zone, the end is the day after the last day
-    "DTSTART;VALUE=DATE:" + icsDate(days.first),
-    "DTEND;VALUE=DATE:" + icsDate(isoPlusDays(days.last, 1)),
-    "SUMMARY:" + ICS.esc(ev.name),
-    ...ICS.location(ev.place, ev.lat, ev.lon),
-    "DESCRIPTION:" + ICS.esc(CONFIG.eventUrl(ev.id)),
-    "URL:" + CONFIG.eventUrl(ev.id),
-    "END:VEVENT", "END:VCALENDAR"]);
+const eventIcs = (ev, days) => ICS.event({ id: ev.id, name: ev.name, place: ev.place, lat: ev.lat, lon: ev.lon, url: CONFIG.eventUrl(ev.id),
+  first: days.first, last: days.last });
+// iPhone and iPad open a calendar file only from a real address, not one made in the page, so there the button links to
+// the event's file published with the feeds (events in the next 6 months); without one the button is disabled
+const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+const eventFileUrl = (id) => "feeds/events/" + id + ".ics";
+const eventFiles = new Map();   // event ID -> "checking" | "yes" | "no"
+async function checkEventFile(id) {
+  eventFiles.set(id, "checking");
+  let found = "no";
+  try { found = (await fetch(eventFileUrl(id), { method: "HEAD", cache: "no-cache" })).ok ? "yes" : "no"; }
+  catch (e) { if (DEBUG) console.warn(e); }
+  eventFiles.set(id, found);
+  refreshEvent(id);
 }
 function calendarButton(ev) {
   const icon = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>';
   const days = eventDays(ev);
+  const file = calendarApp() === "file" && isIos ? eventFiles.get(ev.id) : null;
   let html = '<button class="open-btn secondary" type="button" disabled>' + icon + "Finding the event's days…</button>";
-  if (days) {
+  if (file === "checking") {
+    html = '<button class="open-btn secondary" type="button" disabled>' + icon + "Checking…</button>";
+  } else if (file === "yes") {
+    // the Home Screen app hands the file to Safari's viewer; Safari opens it in place
+    html = '<a class="open-btn secondary" href="' + eventFileUrl(ev.id) + '"' + (navigator.standalone ? ' target="_blank" rel="noopener"' : "") + ">" + icon + "Add to calendar</a>";
+  } else if (file === "no") {
+    // no published file yet (beyond the 6-month horizon, or added since the last feed run); the Google setting works anyway
+    html = '<button class="open-btn secondary" type="button" disabled>' + icon + "Not available yet for this event</button>";
+  } else if (days) {
     const label = (calendarApp() === "google" ? "Add to Google Calendar" : "Add to calendar") + (days.partial ? " (first day only)" : "");
     let href = "", attrs = "";
     if (calendarApp() === "google") {
@@ -879,12 +905,10 @@ function calendarButton(ev) {
         dates: icsDate(days.first) + "/" + icsDate(isoPlusDays(days.last, 1)), details: CONFIG.eventUrl(ev.id), location: ev.place }).toString();
       attrs = ' target="_blank" rel="noopener"';
     } else {
+      // made in the page and downloaded, then opened in the calendar app (desktop browsers)
       href = "data:text/calendar;charset=utf-8," + encodeURIComponent(eventIcs(ev, days));
-      // iPhone and iPad open a calendar file into Calendar; elsewhere it is downloaded and opened from there
-      if (!/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-        const file = ev.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "") || "event";
-        attrs = ' download="' + esc(file) + '.ics"';
-      }
+      const name = ev.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "") || "event";
+      attrs = ' download="' + esc(name) + '.ics"';
     }
     html = '<a class="open-btn secondary" href="' + esc(href) + '"' + attrs + ">" + icon + label + "</a>";
   }
@@ -1206,6 +1230,7 @@ function renderCard(ev) {
   const check = $("#checkNow");
   if (check) check.addEventListener("click", () => checkNow(ev.id));
   if (isParent(ev) && !lastDays.has(ev.id) && !findingLastDay.has(ev.id)) findLastDay(ev);
+  if (calendarApp() === "file" && isIos && !eventFiles.has(ev.id)) checkEventFile(ev.id);
 }
 function closeCard() {
   const had = selectedId !== null;

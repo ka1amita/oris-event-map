@@ -148,7 +148,8 @@ jobs:
             rm -rf "$site/feeds"
           fi
           cp -a "$RUNNER_TEMP/feeds" "$site/feeds"
-          find "$site" -type f | sort
+          find "$site" -type f -not -path "*/feeds/events/*" | sort
+          echo "feeds/events: $(find "$site/feeds/events" -type f | wc -l) event files"
 
       - name: Push gh-pages
         env:

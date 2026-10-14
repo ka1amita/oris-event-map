@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /* Builds calendar feeds of entry deadlines: one per ORIS region (feeds/region-XX.ics) and one per top level
-   group (feeds/level-NC-NP-AL.ics, level-BL-CE.ics, level-BL-MO.ics; no lower levels).
+   group (feeds/level-NC-NP-AL.ics, level-BL-CE.ics, level-BL-MO.ics; no lower levels). Also writes one calendar file
+   per event (feeds/events/<ORIS event ID>.ics) for "Add to calendar" on iPhone and iPad.
    File names: (level|region)-<code>.ics, the code in plain ASCII, e.g. level-BL-CE.ics or region-VY.ics.
 
    Each entry deadline (1, 2, 3) of an event in the next CONFIG.months months becomes a calendar entry at the
@@ -213,6 +214,23 @@ async function main() {
     await writeFile(join(outDir, feedFile(feed)), ics);
     console.log(feedFile(feed) + ": " + (ics.match(/^BEGIN:VEVENT/gm) || []).length + " entry deadlines from " + feed.events.length + " events");
   }
+
+  // one calendar file per event, for "Add to calendar" on iPhone and iPad, which open a calendar file only from a real
+  // address: feeds/events/<ORIS event ID>.ics. A multi-day event spans to its last stage (stages carry its ParentID).
+  const lastStage = new Map();
+  live.forEach((ev) => {
+    const parent = String(ev.ParentID || "0"), day = String(ev.Date).slice(0, 10);
+    if (parent !== "0" && day > (lastStage.get(parent) || "")) lastStage.set(parent, day);
+  });
+  await mkdir(join(outDir, "events"), { recursive: true });
+  for (const ev of live) {
+    const first = String(ev.Date).slice(0, 10);
+    const last = lastStage.get(String(ev.ID)) > first ? lastStage.get(String(ev.ID)) : first;
+    await writeFile(join(outDir, "events", ev.ID + ".ics"), ICS.event({ id: String(ev.ID), name: ev.Name, place: String(ev.Place || "").trim(),
+      lat: +ev.GPSLat, lon: +ev.GPSLon, url: CONFIG.eventUrl(ev.ID), first, last }));
+  }
+  console.log("events/: " + live.length + " event files");
+
   const noRegion = live.filter((ev) => !eventRegions(ev).length);
   if (noRegion.length) console.log("Events without a region (in no feed): " + noRegion.map((ev) => ev.ID).join(", "));
 }
