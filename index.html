@@ -53,7 +53,7 @@ button { font: inherit; color: inherit; }
 .weeks .fchip { height: 44px; padding: 0 12px; border: 0; border-radius: 0; box-shadow: none; }
 .weeks .fchip:first-child { padding-left: 16px; }
 .weeks .fchip:last-child { padding-right: 16px; }
-.weeks .fchip + .fchip { border-left: 1px solid var(--ink); }
+.weeks .fchip + .fchip { border-left: 1px solid #DDE1E4; }
 .weeks .fchip[aria-pressed="true"] { background: var(--ink); color: #fff; }
 .weeks .fchip[aria-pressed="true"] + .fchip[aria-pressed="true"] { border-left-color: rgba(255,255,255,.35); }
 .weeks .fchip:disabled { color: #A3AAB0; cursor: default; }
@@ -109,7 +109,6 @@ button { font: inherit; color: inherit; }
 .b-svc.ordered { background: var(--orange); }
 /* Compact marker for zoomed-out views */
 .dot { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); width: 26px; height: 26px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font: 700 10px/1 var(--disc); cursor: pointer; box-shadow: 0 1px 4px rgba(20,24,31,.35); }
-.dot.entered::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 3px solid var(--orange); }
 .dot.sel { outline: 3px solid var(--select); outline-offset: 4px; }
 /* Several events at (nearly) the same spot when zoomed out: one dot with a count, fans out on hover or tap */
 .dotgroup { position: absolute; left: 0; top: 0; width: 30px; height: 30px; transform: translate(-50%, -50%); border-radius: 50%; }
@@ -706,7 +705,7 @@ function pinHtml(ev, selected, showTail) {
 }
 function dotHtml(ev, selected, dx, dy) {
   const F = FORMAT[ev.format], L = LEVEL[ev.level];
-  return '<div class="dot' + (ev.entered ? " entered" : "") + (selected ? " sel" : "") + popClass(ev) + '" data-id="' + esc(ev.id) + '" tabindex="0" role="button" aria-label="' + esc(ariaLabel(ev)) + '" style="' + popDelay(ev) + '--dx:' + (dx || 0) + "px;--dy:" + (dy || 0) + "px;background:" + L.bg + ";color:" + L.fg + ";border:5px solid " + F.bg + '">' + F.text + "</div>";
+  return '<div class="dot' + (ev.entered ? " entered" : "") + (selected ? " sel" : "") + popClass(ev) + '" data-id="' + esc(ev.id) + '" tabindex="0" role="button" aria-label="' + esc(ariaLabel(ev)) + '" style="' + popDelay(ev) + '--dx:' + (dx || 0) + "px;--dy:" + (dy || 0) + "px;background:" + L.bg + ";color:" + L.fg + ";border:5px solid " + (ev.entered ? "var(--orange)" : F.bg) + '">' + F.text + "</div>";
 }
 function ariaLabel(ev) {
   const parts = [ev.name, ev.date ? fmt.full(ev.date) : "", FORMAT[ev.format].name, LEVEL[ev.level].name, SPORT_NAME[ev.sport]];
