@@ -44,16 +44,23 @@ const CONFIG = {
   ],
 };
 
-/* ---------------- Levels: the same codes as the marker badges ---------------- */
-// The level patterns live in the app's CONFIG in index.html; read them from there so the two never drift apart
-async function appConfig() {
+/* ---------------- Code shared with the app ---------------- */
+// The level patterns (CONFIG) and the calendar file helpers (ICS) live in index.html; read them from there so the
+// feeds and the app never drift apart
+async function appBlocks() {
   const html = await readFile(join(dirname(fileURLToPath(import.meta.url)), "..", "index.html"), "utf8");
-  const start = html.indexOf("const CONFIG = {");
-  const end = html.indexOf("\n};\n", start);
-  if (start < 0 || end < 0) throw new Error("CONFIG not found in index.html");
+  const block = (name) => {
+    const start = html.indexOf("const " + name + " = {");
+    const end = html.indexOf("\n};\n", start);
+    if (start < 0 || end < 0) throw new Error(name + " not found in index.html");
+    return html.slice(start, end + 3);
+  };
   // CONFIG reads location.protocol (to pick map tiles); any value does here
-  return new Function("location", html.slice(start, end + 3) + "\nreturn CONFIG;")({ protocol: "https:" });
+  return new Function("location", block("CONFIG") + "\n" + block("ICS") + "\nreturn { app: CONFIG, ics: ICS };")({ protocol: "https:" });
 }
+let ICS = null;   // set from index.html in main()
+
+/* ---------------- Levels: the same codes as the marker badges ---------------- */
 // as classify() in index.html: the ORIS short name first, then patterns on the full names, then the fallback
 function levelCode(app, ev) {
   const lvl = ev.Level || {};
@@ -111,20 +118,7 @@ const icsLocal = (p) => "" + p[0] + pad(p[1]) + pad(p[2]) + "T" + pad(p[3]) + pa
 const icsUtc = (d) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
 const isoDay = (d) => d.toISOString().slice(0, 10);
 
-/* ---------------- iCalendar ---------------- */
-const esc = (s) => String(s).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
-// lines longer than 75 octets are folded (RFC 5545 3.1), without splitting a UTF-8 character
-function fold(line) {
-  const out = [];
-  let cur = "", bytes = 0;
-  for (const ch of line) {
-    const n = Buffer.byteLength(ch);
-    if (bytes + n > (out.length ? 74 : 75)) { out.push(cur); cur = ""; bytes = 0; }
-    cur += ch; bytes += n;
-  }
-  out.push(cur);
-  return out.join("\r\n ");
-}
+/* ---------------- iCalendar (escaping, folding and location come from ICS in index.html) ---------------- */
 const VTIMEZONE = [
   "BEGIN:VTIMEZONE", "TZID:Europe/Prague",
   "BEGIN:DAYLIGHT", "TZOFFSETFROM:+0100", "TZOFFSETTO:+0200", "TZNAME:CEST", "DTSTART:19700329T020000", "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU", "END:DAYLIGHT",
@@ -150,13 +144,12 @@ function entryDeadlineEntries(app, ev, feed, now, stamp) {
         "UID:" + CONFIG.uidPrefix + "-" + ev.ID + "-entry-deadline-" + t.n + "-" + feedId(feed),
         "DTSTAMP:" + stamp,
         "DTSTART;TZID=" + CONFIG.timeZone + ":" + icsLocal(t.p),
-        "SUMMARY:" + esc(title),
-        "DESCRIPTION:" + esc(desc),
+        "SUMMARY:" + ICS.esc(title),
+        "DESCRIPTION:" + ICS.esc(desc),
         "URL:" + CONFIG.eventUrl(ev.ID));
-      if (place) lines.push("LOCATION:" + esc(place));
-      if (ev.GPSLat && ev.GPSLon && +ev.GPSLat && +ev.GPSLon) lines.push("GEO:" + (+ev.GPSLat) + ";" + (+ev.GPSLon));
-      lines.push("TRANSP:TRANSPARENT",
-        "BEGIN:VALARM", "ACTION:DISPLAY", "TRIGGER:" + CONFIG.alert, "DESCRIPTION:" + esc(title), "END:VALARM",
+      lines.push(...ICS.location(place, +ev.GPSLat, +ev.GPSLon),
+        "TRANSP:TRANSPARENT",
+        "BEGIN:VALARM", "ACTION:DISPLAY", "TRIGGER:" + CONFIG.alert, "DESCRIPTION:" + ICS.esc(title), "END:VALARM",
         "END:VEVENT");
     }
   });
@@ -166,15 +159,15 @@ function entryDeadlineEntries(app, ev, feed, now, stamp) {
 function calendar(app, feed, now) {
   const stamp = icsUtc(now);
   const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//oris-event-map//ORIS map entry deadlines//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
-    "X-WR-CALNAME:" + esc("ORIS " + feed.code + " entry deadlines"),
-    "X-WR-CALDESC:" + esc(feedNote(feed)),
+    "X-WR-CALNAME:" + ICS.esc("ORIS " + feed.code + " entry deadlines"),
+    "X-WR-CALDESC:" + ICS.esc(feedNote(feed)),
     "X-WR-TIMEZONE:" + CONFIG.timeZone,
     "REFRESH-INTERVAL;VALUE=DURATION:" + CONFIG.refresh,
     "X-PUBLISHED-TTL:" + CONFIG.refresh,
     ...VTIMEZONE];
   feed.events.forEach((ev) => lines.push(...entryDeadlineEntries(app, ev, feed, now, stamp)));
   lines.push("END:VCALENDAR");
-  return lines.map(fold).join("\r\n") + "\r\n";
+  return ICS.text(lines);
 }
 
 /* ---------------- Main ---------------- */
@@ -182,7 +175,9 @@ async function main() {
   const args = process.argv.slice(2);
   const debug = args.includes("--debug");
   const outDir = args.find((a) => !a.startsWith("--")) || "feeds";
-  const app = await appConfig();
+  const shared = await appBlocks();
+  const app = shared.app;
+  ICS = shared.ics;
   const now = new Date();
   const to = new Date(now);
   to.setUTCMonth(to.getUTCMonth() + CONFIG.months);

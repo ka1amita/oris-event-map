@@ -362,6 +362,38 @@ const CONFIG = {
   }
 };
 
+/* ------------------------------------------------------------------
+   Calendar files (iCalendar, RFC 5545), shared by "Add to calendar" and
+   scripts/build-feeds.mjs, which reads this block from here. Keep it
+   self-contained: plain JavaScript that runs in browsers and in Node.
+------------------------------------------------------------------ */
+const ICS = {
+  // text values: backslashes, semicolons, commas and line breaks are escaped
+  esc: (s) => String(s).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n"),
+  // lines longer than 75 octets are folded, without splitting a UTF-8 character
+  fold(line) {
+    const utf8 = new TextEncoder();
+    const out = [];
+    let cur = "", bytes = 0;
+    for (const ch of line) {
+      const n = utf8.encode(ch).length;
+      if (bytes + n > (out.length ? 74 : 75)) { out.push(cur); cur = ""; bytes = 0; }
+      cur += ch; bytes += n;
+    }
+    out.push(cur);
+    return out.join("\r\n ");
+  },
+  // the file: folded lines ending in CRLF
+  text: (lines) => lines.map(ICS.fold).join("\r\n") + "\r\n",
+  // the place as text and, when known, its coordinates
+  location(place, lat, lon) {
+    const lines = [];
+    if (place) lines.push("LOCATION:" + ICS.esc(place));
+    if (lat && lon) lines.push("GEO:" + lat + ";" + lon);
+    return lines;
+  }
+};
+
 const FORMAT = {
   sprint: { bg: "#D0342C", fg: "#FFFFFF", text: "S", name: "Sprint" },
   middle: { bg: "#2A6FD1", fg: "#FFFFFF", text: "M", name: "Middle" },
