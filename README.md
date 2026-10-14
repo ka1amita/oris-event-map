@@ -7,8 +7,9 @@ Static page, no build step. Data comes live from the public ORIS API (JSONP, as 
 ## Files
 
 ```
-index.html   the whole app (HTML, CSS, JS)
-icon.png     Home Screen icon
+index.html               the whole app (HTML, CSS, JS)
+icon.png                 Home Screen icon
+scripts/build-feeds.mjs  builds the entry deadline calendar feeds (Node, no dependencies)
 README.md
 ```
 
@@ -76,6 +77,25 @@ Without a club, enter your SI IDs instead. Unregistered runners get a one-off re
 | Orange marker | You are entered |
 
 Zoomed out, markers shrink to dots: the ring is the format color (orange when you are entered; the letter still gives the format), the center the level fill. Zoom in to see the full markers.
+
+## Calendar feeds of entry deadlines
+
+`scripts/build-feeds.mjs` builds calendar feeds (`.ics`) that remind you of entry deadlines. Subscribe to the ones you want in your phone's calendar app.
+
+- **Feeds:** `(level|region)-<code>.ics`, the code in plain ASCII, e.g. `region-VY.ics` or `level-BL-CE.ics`.
+  - One per ORIS region: `region-CR` (national), `region-CE` (Čechy), `region-MO` (Morava), and the regional areas (`region-PR`, `region-SC`, `region-HA`, …). An event filed under several regions is in each of their feeds. Region feeds hold every level, including trainings and other events.
+  - One per top level group: `level-NC-NP-AL` (national championship, national cup, A ladder), `level-BL-CE` and `level-BL-MO` (B ladder Čechy and Morava). No lower levels.
+- **Entries:** one per entry deadline (1, 2, 3) that is still ahead, in the next 6 months, at the deadline's time (ORIS times are Prague time), with an alert 1 day before. Title: `Entry deadline 2/3 · <feed> · <level> · <event> · <place>`, with the level codes of the markers; the description has the ORIS link and how to unsubscribe.
+- **Multi-day events** appear once: ORIS keeps the entry deadlines on the parent event, not on its stages.
+- **Unsubscribe:** on iPhone, Settings → Apps → Calendar → Calendar Accounts → Subscribed Calendars → the feed → Delete Account; in Google Calendar, the calendar's options → Settings → Unsubscribe.
+
+Run it with `node scripts/build-feeds.mjs [output directory]` (default `feeds`).
+
+### Levels of combined races
+
+ORIS files every event under a single level, even a race that counts for several. "Kitl Český pohár, INOV-8 CUP - žebříček A, žebříček B-Morava" (ORIS ID 8948) has level ČP (Český pohár) only. The A ladder and the B ladder (Morava) appear only in its name, and ČP + ŽA in `RankingKoef` ("1,06 (pro ČP+ŽA)"). Its regions, "ČR, JM, M", do include M, the B ladder Morava region.
+
+ORIS doesn't keep these levels apart for now, and the feeds never parse event names. So the levels a combined race can be filed under share one feed (`level-NC-NP-AL`), and the B ladder feeds are split by region and also take the higher levels in it.
 
 ## Tuning the mapping
 
