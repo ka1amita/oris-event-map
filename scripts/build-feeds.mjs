@@ -110,7 +110,6 @@ function pragueToDate(p) {
 const icsLocal = (p) => "" + p[0] + pad(p[1]) + pad(p[2]) + "T" + pad(p[3]) + pad(p[4]) + pad(p[5]);
 const icsUtc = (d) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
 const isoDay = (d) => d.toISOString().slice(0, 10);
-const czDateTime = (p) => p[2] + ". " + p[1] + ". " + p[0] + " " + p[3] + ":" + pad(p[4]);
 
 /* ---------------- iCalendar ---------------- */
 const esc = (s) => String(s).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
@@ -136,14 +135,14 @@ const feedNote = (f) => "ORIS map · " + f.kind + " " + f.code + " entry deadlin
 
 // one calendar entry per entry deadline of the event that is still ahead
 function entryDeadlineEntries(app, ev, feed, now, stamp) {
-  const tiers = [1, 2, 3].map((n) => ({ n, p: parseOris(ev["EntryDate" + n]) })).filter((t) => t.p);
+  const tiers = [1, 2, 3].map((n) => ({ n, raw: String(ev["EntryDate" + n] || "").trim(), p: parseOris(ev["EntryDate" + n]) })).filter((t) => t.p);
   const level = levelCode(app, ev);
   const place = String(ev.Place || "").trim();
   const lines = [];
   tiers.forEach((t, i) => {
     if (pragueToDate(t.p) > now) {
       const title = ["Entry deadline " + (i + 1) + "/" + tiers.length, feed.code, level, ev.Name, place].filter(Boolean).join(" · ");
-      const about = [ev.Name, place, "Event day: " + ev.Date, "Entry deadline " + (i + 1) + " of " + tiers.length + " closes " + czDateTime(t.p),
+      const about = [ev.Name, place, "Event day: " + ev.Date, "Entry deadline " + (i + 1) + " of " + tiers.length + " closes " + t.raw,
         CONFIG.eventUrl(ev.ID)].filter(Boolean);
       // the feed note is set apart by a blank line
       const desc = about.join("\n") + "\n\n" + feedNote(feed);
