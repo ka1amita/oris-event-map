@@ -166,7 +166,7 @@ function entryDeadlineEntries(app, ev, feed, now, stamp) {
 
 function calendar(app, feed, now) {
   const stamp = icsUtc(now);
-  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//matejkala.com//ORIS map entry deadlines//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
+  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//oris-event-map//ORIS map entry deadlines//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
     "X-WR-CALNAME:" + esc("ORIS " + feed.code + " entry deadlines"),
     "X-WR-CALDESC:" + esc(feedNote(feed)),
     "X-WR-TIMEZONE:" + CONFIG.timeZone,
