@@ -1,0 +1,1911 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ORIS map">
+<meta name="theme-color" content="#FFFFFF">
+<title>ORIS map</title>
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@500;600;700&family=Lexend:wght@600;700&display=swap">
+<style>
+:root {
+  --ink: #14181F;
+  --muted: #4B5560;
+  --line: #C5CCCB;
+  --orange: #FF7A1A;
+  --orange-dark: #D9560A;
+  --select: #1F6FEB;
+  --sans: Figtree, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --disc: Lexend, Figtree, system-ui, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { font-family: var(--sans); color: var(--ink); background: #EAEEE4; -webkit-text-size-adjust: 100%; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--select); outline-offset: 2px; }
+#map { position: fixed; inset: 0; z-index: 0; background: #EAEEE4; }
+
+/* Top bar */
+.top { position: fixed; z-index: 1000; left: 12px; right: 12px; top: calc(env(safe-area-inset-top, 0px) + 12px); display: flex; flex-direction: column; gap: 8px; pointer-events: none; max-width: 640px; }
+.top > * { pointer-events: auto; }
+.head { background: #fff; border-radius: 18px; box-shadow: 0 4px 14px rgba(20,24,31,.16); }
+.bar { display: flex; align-items: center; gap: 4px; padding: 6px 4px 6px 6px; }
+.range-btn { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 0; padding: 4px 10px; border: 0; border-radius: 12px; background: transparent; text-align: left; cursor: pointer; }
+.range-btn:hover { background: #F1F3F3; }
+.range-line { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; line-height: 24px; white-space: nowrap; }
+.range-line .chev { flex: 0 0 auto; transition: transform .15s ease; }
+.range-btn[aria-expanded="true"] .range-line .chev { transform: rotate(180deg); }
+.count { font-size: 13px; line-height: 18px; color: var(--muted); min-height: 18px; }
+.icon-btn { width: 44px; height: 44px; border: 0; border-radius: 22px; background: transparent; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ink); }
+.icon-btn:hover { background: #F1F3F3; }
+.filters { display: flex; flex-wrap: wrap; gap: 12px 8px; align-items: center; }
+.fchip { -webkit-appearance: none; appearance: none; margin: 0; line-height: 1; flex: 0 0 auto; height: 44px; padding: 0 16px; border-radius: 22px; border: 0; background: #fff; font-size: 15px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 8px rgba(20,24,31,.14); }
+.fchip[hidden] { display: none; }
+.fchip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.dates { display: flex; flex-direction: column; padding: 4px 4px 6px; border-top: 1px solid #E3E6E5; }
+.dates[hidden] { display: none; }
+/* Week presets as one split pill: "This | Next week". Each half toggles; both on = one solid pill */
+/* Weeks and days as one phrase pill: This | Next | work | week | end. The lit words read as the selection */
+.weeks { flex: 0 0 auto; display: inline-flex; height: 44px; border: 0; border-radius: 22px; background: #fff; box-shadow: 0 2px 8px rgba(20,24,31,.14); overflow: hidden; }
+.weeks .fchip { height: 44px; padding: 0 12px; border: 0; border-radius: 0; box-shadow: none; }
+.weeks .fchip:first-child { padding-left: 16px; }
+.weeks .fchip:last-child { padding-right: 16px; }
+.weeks .fchip + .fchip { border-left: 1px solid #DDE1E4; }
+.weeks .fchip[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.weeks .fchip[aria-pressed="true"] + .fchip[aria-pressed="true"] { border-left-color: rgba(255,255,255,.35); }
+.weeks .fchip:disabled { color: #A3AAB0; cursor: default; }
+.more { flex: 0 0 auto; display: inline-flex; align-items: center; height: 22px; padding: 0 7px; border-radius: 11px; border: 1.5px solid var(--ink); font-size: 12px; font-weight: 700; line-height: 1; }
+.more[hidden] { display: none; }
+.range-row { display: flex; align-items: center; gap: 2px; }
+.add-range { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px; margin-top: 2px; border: 0; border-radius: 12px; background: transparent; font-size: 15px; font-weight: 600; cursor: pointer; }
+.add-range:hover { background: #F1F3F3; }
+.add-range .plus { width: 24px; height: 24px; border-radius: 12px; border: 1.5px solid var(--ink); display: flex; align-items: center; justify-content: center; }
+.date-field { flex: 1 1 0; min-width: 0; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px; border-radius: 12px; }
+.date-field:focus-within { background: #F1F3F3; }
+.date-field span { flex: 0 0 auto; font-size: 13px; font-weight: 600; color: var(--muted); }
+.date-field input { flex: 1 1 auto; width: 100%; min-width: 0; border: 0; padding: 0; background: transparent; font: 700 16px/22px var(--sans); color: var(--ink); }
+.date-field input:focus { outline: none; }
+.date-field { position: relative; }
+.date-field .inp { position: relative; flex: 1 1 auto; min-width: 0; display: flex; align-items: center; }
+.date-field .hint { display: none; position: absolute; left: 0; top: 50%; transform: translateY(-50%); font-size: 15px; font-weight: 600; color: #8A949B; pointer-events: none; white-space: nowrap; }
+.date-field.empty .hint { display: block; }
+.date-field.empty input { color: transparent; }
+.add-range[hidden] { display: none; }
+
+/* Status line */
+.status { position: fixed; z-index: 1000; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); max-width: calc(100% - 24px); padding: 10px 16px; border-radius: 20px; background: var(--ink); color: #fff; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
+.status[hidden] { display: none; }
+.status button { border: 0; background: #fff; color: var(--ink); border-radius: 14px; height: 28px; padding: 0 12px; font-weight: 700; cursor: pointer; }
+
+/* Markers */
+.leaflet-div-icon, .omark { background: transparent; border: 0; }
+.stack { position: absolute; left: 0; top: 0; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.pin { position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; border-radius: 22px; }
+.chip { position: relative; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px 0 7px; border-radius: 22px; background: #fff; color: var(--ink); border: 0; box-shadow: 0 2px 6px rgba(20,24,31,.22); font-family: var(--sans); }
+.chip.closed { background: #F1F3F3; color: #5A636B; }
+.chip.entered { background: var(--orange); color: var(--ink); }
+.pin.sel .chip { box-shadow: 0 0 0 3px var(--select), 0 8px 18px rgba(20,24,31,.3); }
+.tail { width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 8px solid #fff; }
+.tail.closed { border-top-color: #F1F3F3; }
+.tail.entered { border-top-color: var(--orange); }
+.disc { flex: 0 0 auto; width: 30px; height: 30px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font: 700 12px/1 var(--disc); }
+.lines { display: flex; flex-direction: column; gap: 3px; }
+.day { font-size: 15px; font-weight: 500; line-height: 18px; white-space: nowrap; }
+.state { display: flex; align-items: center; gap: 4px; height: 8px; }
+.pips { display: flex; gap: 3px; }
+.pip { width: 7px; height: 7px; border-radius: 4px; border: 1px solid currentColor; }
+.pip.on { background: currentColor; }
+.badge { position: absolute; width: 22px; height: 22px; border-radius: 11px; display: flex; align-items: center; justify-content: center; }
+.b-sport { top: -9px; left: -7px; border: 2px solid var(--orange-dark); background: #fff; color: var(--orange-dark); }
+.b-level { top: -9px; right: -7px; border: 1.5px solid var(--ink); font: 700 8.5px/1 var(--disc); letter-spacing: -.02em; }
+.b-night { position: static; width: 20px; height: 20px; border-radius: 10px; border: 0; background: #24307A; color: #fff; }
+.b-relay { bottom: -9px; left: -7px; border: 2px solid #fff; background: #5A636B; color: #fff; }
+.b-group { bottom: -9px; right: -9px; width: auto; padding: 0 6px 0 5px; gap: 3px; border: 1.5px solid var(--ink); background: #fff; color: var(--ink); font: 700 11px/1 var(--sans); }
+.svcs { position: absolute; top: -8px; left: 19px; display: flex; gap: 2px; }
+.b-svc { width: 20px; height: 20px; border-radius: 10px; border: 1.5px solid var(--ink); background: #fff; color: var(--ink); display: flex; align-items: center; justify-content: center; }
+.b-svc.ordered { background: var(--orange); }
+/* Compact marker for zoomed-out views */
+.dot { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); width: 26px; height: 26px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font: 700 10px/1 var(--disc); cursor: pointer; box-shadow: 0 1px 4px rgba(20,24,31,.35); }
+.dot.sel { outline: 3px solid var(--select); outline-offset: 4px; }
+/* Several events at (nearly) the same spot when zoomed out: one dot with a count, fans out on hover or tap */
+.dotgroup { position: absolute; left: 0; top: 0; width: 30px; height: 30px; transform: translate(-50%, -50%); border-radius: 50%; }
+.dotgroup .dot { left: 50%; top: 50%; transition: transform .15s ease; }
+.dotgroup.open { width: var(--size); height: var(--size); background: rgba(255,255,255,.6); box-shadow: 0 2px 10px rgba(20,24,31,.2); }
+.dotgroup.open .dot { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))); }
+.dg-count { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px; background: var(--ink); color: #fff; font: 700 11px/18px var(--sans); text-align: center; pointer-events: none; }
+.dotgroup.open .dg-count { display: none; }
+/* Events without a location: dots in the filter row. Up to 5 sit side by side; more stack into one dot
+   with a count and fan out into rows on tap (or mouse hover), on the same white-ish tray as map groups.
+   Each row is 44px, so the tray lines up with the filter pills next to it. */
+.noloc { flex: 0 1 auto; max-width: 100%; display: flex; flex-wrap: wrap; align-items: center; padding: 0 4px 0 2px; border-radius: 22px;
+  background: rgba(255,255,255,.6); box-shadow: 0 2px 10px rgba(20,24,31,.2); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+.noloc[hidden] { display: none; }
+/* Up to 3 events without a location show as full markers right in the row: no tray, no pin icon.
+   They slide out from under the last filter pill, and back under it when they go. */
+.noloc-chips { display: contents; }
+.filters > .fchip, .filters > .weeks { position: relative; z-index: 1; }
+.nchip { position: relative; z-index: 0; flex: 0 0 auto; display: flex; }
+@keyframes slide-in { from { translate: -48px 0; opacity: 0; } to { translate: 0 0; opacity: 1; } }
+@keyframes slide-out { from { translate: 0 0; opacity: 1; } to { translate: -48px 0; opacity: 0; } }
+.nchip.entering, .noloc.entering { animation: slide-in .26s ease-out both; animation-delay: var(--delay, 0ms); }
+.nchip.leaving, .noloc.leaving { animation: slide-out .2s ease-in both; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .nchip.entering, .noloc.entering, .nchip.leaving, .noloc.leaving { animation: none; } }
+.noloc.folded { cursor: pointer; }
+.noloc .pinoff { flex: 0 0 auto; width: 30px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--muted); }
+.noloc.unfolded .pinoff { cursor: pointer; }
+.noloc .cell { flex: 0 0 auto; position: relative; width: 40px; height: 44px; display: flex; align-items: center; justify-content: center; }
+.noloc .dot { position: relative; left: auto; top: auto; transform: none; }
+.noloc .dot.sel { outline-offset: 3px; }
+.noloc .dg-count { top: 1px; right: -1px; }
+.noloc.folded .cell .dot { position: absolute; left: 7px; top: 9px; }   /* stacked on one spot */
+@media (prefers-reduced-motion: reduce) { .dotgroup .dot { transition: none; } }
+/* New markers rise out of the ground: the marker slides up while everything below its
+   bottom edge (the "ground" at the map point) stays clipped, so it emerges rather than slides.
+   Moving down by 100% and clipping 100% from the bottom cancel out, keeping the ground line still. */
+@keyframes rise {
+  from { translate: 0 100%; clip-path: inset(-14px -14px 100% -14px); }
+  to   { translate: 0 0;    clip-path: inset(-14px -14px -14px -14px); }
+}
+.pin.pop, .dot.pop { animation: rise .45s cubic-bezier(.2, .7, .2, 1) both; animation-delay: var(--delay, 0ms); }
+/* A small puff of dust where the marker breaks through */
+@keyframes puff {
+  0%   { opacity: 0; scale: .2 1; }
+  30%  { opacity: 1; }
+  100% { opacity: 0; scale: 1.5 1; }
+}
+.puff { position: absolute; left: 50%; bottom: -5px; width: 44px; height: 10px; margin-left: -22px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(90,70,40,.45), rgba(90,70,40,0)); animation: puff .6s ease-out both; animation-delay: var(--delay, 0ms); }
+@media (prefers-reduced-motion: reduce) { .pin.pop, .dot.pop { animation: none; } .puff { display: none; } }
+
+/* Detail card */
+.card { position: fixed; z-index: 1000; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); max-width: 520px; max-height: calc(100vh - 320px); max-height: calc(100dvh - 320px); overflow-y: auto; padding: 16px; background: #fff; border-radius: 22px; box-shadow: 0 10px 30px rgba(20,24,31,.24); display: flex; flex-direction: column; gap: 12px; }
+.card[hidden] { display: none; }
+.card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.card h2 { margin: 0; font-size: 20px; line-height: 26px; }
+.card .meta { font-size: 14px; line-height: 20px; color: var(--muted); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 14px; background: #F1F3F3; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.sw { width: 12px; height: 12px; border-radius: 6px; }
+.lvl { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 10px; border: 1.5px solid var(--ink); font: 700 8px/1 var(--disc); letter-spacing: -.02em; }
+.tag.ordered { background: var(--orange); }
+.svc-names { font-size: 13px; line-height: 18px; color: var(--muted); }
+.steps { position: relative; display: grid; gap: 8px; }
+.steps::before { content: ""; position: absolute; left: calc(50% / var(--n)); right: calc(50% / var(--n)); top: 15px; height: 2px; background: #DDE1E4; }
+.step { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.step .num { width: 32px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font: 700 15px/1 var(--disc); }
+.step.now .num { box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--ink); }
+.step .date { font-size: 13px; line-height: 18px; }
+.step.past .date { color: #5A636B; text-decoration: line-through; }
+.step.now .date { font-weight: 700; }
+.step .now-label { font-size: 12px; line-height: 14px; min-height: 14px; font-weight: 700; }
+.closes { font-size: 14px; font-weight: 600; line-height: 20px; }
+.closes.muted { color: #5A636B; }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border-radius: 17px; font-size: 14px; font-weight: 600; border: 1px solid #B9C0C4; }
+.pill.entered { background: var(--orange); border-color: var(--orange); }
+.pill.group { border: 1.5px solid var(--ink); }
+.pill .letter { width: 22px; height: 22px; border-radius: 11px; color: #fff; display: inline-flex; align-items: center; justify-content: center; font: 700 11px/1 var(--disc); margin-left: -6px; }
+.open-btn { display: flex; align-items: center; justify-content: center; gap: 8px; height: 48px; border-radius: 24px; background: var(--ink); color: #fff; font-size: 16px; font-weight: 600; text-decoration: none; }
+.open-btn.secondary { background: #fff; color: var(--ink); border: 1.5px solid var(--ink); margin-top: -4px; }
+button.open-btn { width: 100%; font-family: inherit; cursor: pointer; }
+button.open-btn:disabled { color: var(--muted); border-color: var(--muted); cursor: default; }
+.open-btn.refresh { margin-top: 0; }
+.open-btn.refresh + .open-btn { margin-top: -4px; }
+.field select { height: 44px; padding: 0 10px; border-radius: 12px; border: 1px solid #B9C0C4; background: #fff; font: inherit; color: var(--ink); }
+
+/* Settings */
+dialog { border: 0; border-radius: 22px; padding: 20px; width: min(440px, calc(100% - 24px)); box-shadow: 0 10px 40px rgba(20,24,31,.3); }
+dialog::backdrop { background: rgba(20,24,31,.35); }
+dialog h2 { margin: 0 0 4px; font-size: 20px; }
+dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--muted); }
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.field label { font-size: 14px; font-weight: 600; }
+.field input { height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid #B9C0C4; font: inherit; }
+.field small { font-size: 12px; line-height: 16px; color: var(--muted); }
+.field small.warn { color: #A8430A; font-weight: 600; }
+.dlg-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.dlg-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-right: -10px; }
+#calendars h3 { margin: 16px 0 4px; font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+#calendars h3 span { font-weight: 400; letter-spacing: 0; text-transform: none; }
+.feeds { list-style: none; margin: 0; padding: 0; }
+.feeds li { display: flex; align-items: center; gap: 8px; padding: 4px 4px 4px 8px; border-radius: 12px; }
+.feeds li.home { background: #FFF1E6; }
+.feeds li.msg { font-size: 14px; color: var(--muted); padding: 8px; }
+.feeds .label { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.feeds .code { font: 600 14px/18px var(--disc); }
+.feeds .name { font-size: 13px; line-height: 16px; color: var(--muted); }
+.feeds .name em { font-style: normal; font-weight: 600; color: #A8430A; }
+.feeds .icon-btn { width: 36px; height: 36px; flex: none; }
+.feeds .btn { height: 36px; padding: 0 14px; display: inline-flex; align-items: center; flex: none; font-size: 14px; color: var(--ink); text-decoration: none; }
+.cal-notes { margin-top: 14px; }
+.cal-notes small { display: block; margin-top: 6px; font-size: 12px; line-height: 16px; color: var(--muted); }
+.btn { height: 44px; padding: 0 18px; border-radius: 22px; border: 1px solid #B9C0C4; background: #fff; font-weight: 600; cursor: pointer; }
+.btn.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+.leaflet-control-attribution { font-size: 10px; }
+@media (min-width: 700px) {
+  .top { left: auto; right: 16px; top: 16px; width: 460px; max-width: none; }
+  .card { left: auto; right: 16px; bottom: 16px; width: 460px; max-width: none; max-height: calc(100vh - 260px); max-height: calc(100dvh - 260px); }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } .range-line .chev { transition: none; } }
+</style>
+</head>
+<body>
+<div id="map" aria-label="Map of orienteering events"></div>
+
+<header class="top">
+  <div class="head">
+    <div class="bar">
+      <button class="range-btn" id="rangeBtn" type="button" aria-expanded="false" aria-controls="dates">
+        <span class="range-line"><span id="rangeLabel"></span><span class="more" id="moreRanges" hidden></span><svg class="chev" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="count" id="count" aria-live="polite"></span>
+      </button>
+      <a class="icon-btn" id="bugLink" href="https://github.com/ka1amita/oris-event-map/issues/new" target="_blank" rel="noopener" aria-label="Report a bug" title="Report a bug">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 2 1.88 1.88M14.12 3.88 16 2M9 7.13v-1a3 3 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6M12 20v-9"/><path d="M6.53 9C4.6 8.8 3 7.1 3 5M6 13H2M3 21c0-2.1 1.7-3.9 3.8-4M20.97 5c0 2.1-1.6 3.8-3.5 4M22 13h-4M17.2 17c2.1.1 3.8 1.9 3.8 4"/></svg>
+      </a>
+      <button class="icon-btn" id="refreshBtn" type="button" aria-label="Refresh from ORIS">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+      </button>
+      <button class="icon-btn" id="settingsBtn" type="button" aria-label="Settings">
+        <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"></circle><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z" stroke="currentColor" stroke-width="1.6"></path></svg>
+      </button>
+    </div>
+    <div class="dates" id="dates" hidden>
+      <div id="rangeRows"></div>
+      <button class="add-range" type="button" id="addRange"><span class="plus"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 1.5v9M1.5 6h9"/></svg></span>Add range</button>
+    </div>
+  </div>
+  <div class="filters" role="toolbar" aria-label="Filters">
+    <span class="weeks" role="group" aria-label="Weeks and days">
+      <button class="fchip" type="button" data-word="this" aria-pressed="false" aria-label="This week">This</button>
+      <button class="fchip" type="button" data-word="next" aria-pressed="false" aria-label="Next week">Next</button>
+      <button class="fchip" type="button" data-word="work" aria-pressed="false" aria-label="Weekdays only">work</button>
+      <button class="fchip" type="button" data-word="week" aria-pressed="false" aria-label="Whole week">week</button>
+      <button class="fchip" type="button" data-word="end" aria-pressed="false" aria-label="Weekend only">end</button>
+    </span>
+    <button class="fchip" type="button" id="fOpen" aria-pressed="false" aria-label="Open for entry">Open</button>
+    <button class="fchip" type="button" id="fMine" aria-pressed="false" hidden>Entered</button>
+    <button class="fchip" type="button" id="fFree" aria-pressed="false" aria-label="Hide events on days I already have an event" title="Hide events on days I already have an event" hidden>Free</button>
+    <span class="noloc-chips" id="nolocChips" role="group" aria-label="Events without a location"></span>
+    <div class="noloc" id="noloc" hidden role="group" aria-label="Events without a location"></div>
+  </div>
+</header>
+
+<section class="card" id="card" hidden aria-live="polite"></section>
+<div class="status" id="status" hidden role="status"></div>
+
+<dialog id="settings">
+  <form method="dialog" id="settingsForm">
+    <h2 tabindex="-1" autofocus style="outline: none">You and your group</h2>
+    <p>Used to mark events you and your group are entered in. Saved only in this browser.</p>
+    <div class="field">
+      <label for="sMe">Your registration IDs</label>
+      <input id="sMe" name="me" autocomplete="off" autocapitalize="characters" placeholder="ABC1234, XYZ5678">
+      <small>Separate several with commas, for example if you enter for family too. The club comes from the letters at the start.</small>
+      <small class="warn" id="sMeWarn" hidden role="status"></small>
+    </div>
+    <div class="field">
+      <label for="sSi">Your SI IDs</label>
+      <input id="sSi" name="si" autocomplete="off" inputmode="numeric" placeholder="1234567, 7654321">
+      <small>For entries without a club, whose registration ID changes with every event. Separate several with commas.</small>
+    </div>
+    <div class="field">
+      <label for="sGroup">Group registration IDs</label>
+      <input id="sGroup" name="group" autocomplete="off" autocapitalize="characters" placeholder="ABC1234, XYZ5678">
+      <small>Separate several with commas, for example if you want to see your friends. Leave empty to count everyone from your club(s), taken from your registration IDs above.</small>
+      <small class="warn" id="sGroupWarn" hidden role="status"></small>
+    </div>
+    <div class="field">
+      <label for="sNav">Navigation app</label>
+      <select id="sNav" name="nav">
+        <option value="auto">Phone default</option>
+        <option value="apple">Apple Maps</option>
+        <option value="google">Google Maps</option>
+        <option value="mapy">Mapy.com</option>
+        <option value="waze">Waze</option>
+      </select>
+      <small>Used by "Open in Maps". Phone default is Apple Maps on iPhone and the chooser on Android.</small>
+    </div>
+    <div class="field">
+      <label for="sCal">Calendar</label>
+      <select id="sCal" name="cal">
+        <option value="auto">Phone default</option>
+        <option value="file">Calendar file (Apple Calendar, Outlook, …)</option>
+        <option value="google">Google Calendar</option>
+      </select>
+      <small>Used by "Add to calendar". Phone default is Google Calendar on Android and a calendar file elsewhere.</small>
+    </div>
+    <div class="field">
+      <label for="calendarsBtn">Entry deadline reminders</label>
+      <button class="btn" type="button" id="calendarsBtn">Subscribe in your calendar…</button>
+      <small>Calendar feeds of entry deadlines, by level or by region, with an alert a day before.</small>
+    </div>
+    <div class="dlg-actions">
+      <button class="btn" value="cancel" type="submit">Cancel</button>
+      <button class="btn primary" value="save" type="submit">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="calendars" aria-labelledby="calTitle">
+  <div class="dlg-head">
+    <h2 id="calTitle" tabindex="-1" autofocus style="outline: none">Entry deadline reminders</h2>
+    <button class="icon-btn" type="button" id="calClose" aria-label="Close"></button>
+  </div>
+  <p>Subscribe to a feed in your calendar app: one calendar entry per entry deadline, with an alert a day before. The feeds are rebuilt from ORIS every 6 hours.</p>
+  <h3>Top levels</h3>
+  <ul class="feeds" id="calLevels"></ul>
+  <h3>Regions <span>· all events, including trainings</span></h3>
+  <ul class="feeds" id="calRegions"></ul>
+  <div class="cal-notes">
+    <small><b>iPhone:</b> in the Subscription's Details, turn <i>Remove Alerts</i> off, and keep <i>Event Alerts</i> on.</small>
+    <small><b>Google Calendar:</b> it refreshes a feed only every 12–24 hours and ignores its alerts; set notifications on the calendar.</small>
+    <small><b>Other apps:</b> copy a feed's address and add it as a subscribed (internet) calendar.</small>
+    <small><b>Unsubscribe:</b> on iPhone, Settings → Apps → Calendar → Calendar Accounts → Subscribed Calendars → the feed → Delete Account; in Google Calendar, the calendar's settings → Unsubscribe.</small>
+  </div>
+</dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+"use strict";
+
+/* ------------------------------------------------------------------
+   Configuration. The patterns below map ORIS names (Czech and English)
+   to the marker encoding. Open the page with ?debug=1 to log the
+   discipline, level and service names ORIS returns, then adjust here.
+------------------------------------------------------------------ */
+const CONFIG = {
+  api: "https://oris.ceskyorientak.cz/API/",
+  eventUrl: (id) => "https://oris.ceskyorientak.cz/Zavod?id=" + id,
+  listParams: { all: 1 },            // include events outside the official calendar
+  // OpenStreetMap's tile servers refuse requests without a Referer, which is what
+  // a page opened straight from disk (file://) sends. There, fall back to CARTO.
+  tiles: location.protocol === "file:" ? {
+    url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+    subdomains: "abcd",
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+  } : {
+    url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    subdomains: "abc",
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  },
+  compactBelowZoom: 9,               // below this zoom, markers shrink to dots
+  concurrency: 4,                    // parallel ORIS requests
+  // How long cached ORIS data counts as fresh (minutes). Event details are also
+  // refetched whenever ORIS reports a new version of the event.
+  ttl: { list: 6 * 60, details: 7 * 24 * 60, entries: 30 },
+  // Full entry lists (to find entries without a club by SI ID) are heavy for ORIS, so they are fetched one at a
+  // time, spaced out, capped per hour, and kept longer for events further away
+  fullEntries: { gapMs: 1500, perHour: 120, soonDays: 14, ttlLater: 12 * 60 },
+  sport: { 1: "foot", 2: "ski", 3: "mtb", 4: "trail" },
+  format: [
+    ["sprint", /sprint|^SP\b|^KO\b/i],
+    ["middle", /middle|krátk|kratk|střed|stred|^MD\b/i],
+    ["long", /long|klasick|dlouh|^LD\b/i]
+  ],
+  night: /night|noční|nocni/i,
+  relay: /relay|štafet|stafet/i,
+  team: /team|družst|druzst/i,
+  knockout: /knock|vyřazov|vyrazov/i,
+  freeOrder: /score|volné pořadí|volne poradi|rogain|free order/i,
+  // Level: first the ORIS short name, exactly; then patterns on the full names (order matters: regional before national)
+  levelShort: { "MČR": "NC", "MCR": "NC", "ČP": "NP", "CP": "NP", "ŽA": "AL", "ZA": "AL", "ŽB": "BL", "ZB": "BL",
+                "OM": "RC", "KM": "RC", "OŽ": "RL", "OZ": "RL", "ŽC": "RL", "ZC": "RL" },
+  level: [
+    ["NN", /neveřejn|neverejn|trénink|trenink|training|soustřed|soustred|školení|skoleni|non-competition|nesoutěž|nesoutez/i],
+    ["RC", /oblastní mistrovství|oblastni mistrovstvi|mistrovství oblast|mistrovstvi oblast|krajské mistrovství|krajske mistrovstvi|regional championship/i],
+    ["RL", /oblastní žebříček|oblastni zebricek|krajský žebříček|krajsky zebricek|žebříček c|zebricek c|regional ladder/i],
+    ["NC", /mistrovství čr|mistrovstvi cr|mistrovství české|mistrovstvi ceske|national championship|czech championship/i],
+    ["NP", /český pohár|cesky pohar|czech cup|national cup/i],
+    ["AL", /žebříček a|zebricek a|ladder a/i],
+    ["BL", /žebříček b|zebricek b|ladder b/i]
+  ],
+  levelFallback: "OP",   // other public event
+  // ORIS region ID -> two-letter code (feeds, calendar dialog); IDs not listed are already two letters
+  regionCode: { "Č": "ČE", "M": "MO", "P": "PR", "StČ": "SČ", "MSK": "MS" },
+  // Level feeds of entry deadlines (built by scripts/build-feeds.mjs, listed in the calendar dialog), by the one level
+  // ORIS files an event under (as the badge codes), never by its name. ORIS gives an event a single level, even when
+  // the event counts for several. "Kitl Český pohár, INOV-8 CUP - žebříček A, žebříček B-Morava" (ID 8948) has Level
+  // ČP (Český pohár) only; žebříček A and žebříček B-Morava appear just in its name, and ČP + ŽA in RankingKoef
+  // ("1,06 (pro ČP+ŽA)"). Its regions "ČR, JM, M" do list the B ladder region (M). ORIS doesn't separate these levels
+  // properly for now; until it does, the levels a combined event is filed under (the highest) share a feed, so NC, NP
+  // and AL are one feed, and the B ladder is split by region and also takes the higher levels there.
+  levelFeeds: [
+    { code: "NC-NP-AL", name: "National championship, national cup, A ladder", levels: ["NC", "NP", "AL"] },
+    { code: "BL-ČE", name: "B ladder Čechy", region: "ČE", levels: ["NC", "NP", "AL", "BL"] },
+    { code: "BL-MO", name: "B ladder Morava", region: "MO", levels: ["NC", "NP", "AL", "BL"] }
+  ],
+  services: {
+    bed: /ubytov|nocleh|spaní|spani|tělocvič|telocvic|kemp|camp|accommod|hostel|hotel/i,
+    meals: /strav|večeř|vecer|oběd|obed|snídan|snidan|jídl|jidl|meal|dinner|lunch|breakfast|penz|pension/i
+  }
+};
+
+/* ------------------------------------------------------------------
+   Calendar files (iCalendar, RFC 5545), shared by "Add to calendar" and
+   scripts/build-feeds.mjs, which reads this block from here. Keep it
+   self-contained: plain JavaScript that runs in browsers and in Node.
+------------------------------------------------------------------ */
+const ICS = {
+  // text values: backslashes, semicolons, commas and line breaks are escaped
+  esc: (s) => String(s).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n"),
+  // lines longer than 75 octets are folded, without splitting a UTF-8 character
+  fold(line) {
+    const utf8 = new TextEncoder();
+    const out = [];
+    let cur = "", bytes = 0;
+    for (const ch of line) {
+      const n = utf8.encode(ch).length;
+      if (bytes + n > (out.length ? 74 : 75)) { out.push(cur); cur = ""; bytes = 0; }
+      cur += ch; bytes += n;
+    }
+    out.push(cur);
+    return out.join("\r\n ");
+  },
+  // the file: folded lines ending in CRLF
+  text: (lines) => lines.map(ICS.fold).join("\r\n") + "\r\n",
+  // the place as text and, when known, its coordinates
+  location(place, lat, lon) {
+    const lines = [];
+    if (place) lines.push("LOCATION:" + ICS.esc(place));
+    if (lat && lon) lines.push("GEO:" + lat + ";" + lon);
+    return lines;
+  },
+  // an event as one all-day calendar event, for "Add to calendar": { id, name, place, lat, lon, url, first, last },
+  // the days as "YYYY-MM-DD". All-day dates have no time zone; the end is the day after the last day.
+  event(e) {
+    const day = (iso, plus) => { const p = iso.split("-").map(Number); return new Date(Date.UTC(p[0], p[1] - 1, p[2] + plus)).toISOString().slice(0, 10).replace(/-/g, ""); };
+    const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
+    return ICS.text(["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//oris-event-map//ORIS map//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
+      "BEGIN:VEVENT",
+      "UID:oris-event-map-" + e.id + "-event",
+      "DTSTAMP:" + stamp,
+      "DTSTART;VALUE=DATE:" + day(e.first, 0),
+      "DTEND;VALUE=DATE:" + day(e.last, 1),
+      "SUMMARY:" + ICS.esc(e.name),
+      ...ICS.location(e.place, e.lat, e.lon),
+      "DESCRIPTION:" + ICS.esc(e.url),
+      "URL:" + e.url,
+      "END:VEVENT", "END:VCALENDAR"]);
+  }
+};
+
+const FORMAT = {
+  sprint: { bg: "#D0342C", fg: "#FFFFFF", text: "S", name: "Sprint" },
+  middle: { bg: "#2A6FD1", fg: "#FFFFFF", text: "M", name: "Middle" },
+  long:   { bg: "#1B7F43", fg: "#FFFFFF", text: "L", name: "Long" },
+  other:  { bg: "#C9CED2", fg: "#2B323A", text: "+", name: "Other" }
+};
+// Level: a two-letter code in a corner badge; the fill groups levels from white (lowest) to black (highest).
+// Compact dots show the same fill as their centre.
+const LEVEL_FILL = { top: ["#14181F", "#FFFFFF"], ladder: ["#6B747C", "#FFFFFF"], regional: ["#BFC5CA", "#14181F"], other: ["#FFFFFF", "#14181F"] };
+const LEVEL = {
+  NC: { name: "National championship", group: "top" },
+  NP: { name: "National cup", group: "top" },
+  AL: { name: "A ladder", group: "ladder" },
+  BL: { name: "B ladder", group: "ladder" },
+  RC: { name: "Regional championship", group: "regional" },
+  RL: { name: "Regional ladder", group: "regional" },
+  OP: { name: "Other public", group: "other" },
+  NN: { name: "Non-competition", group: "other" }
+};
+Object.keys(LEVEL).forEach((k) => { const f = LEVEL_FILL[LEVEL[k].group]; LEVEL[k].code = k; LEVEL[k].bg = f[0]; LEVEL[k].fg = f[1]; });
+const SPORT_NAME = { foot: "Foot-O", ski: "Ski-O", mtb: "MTBO", trail: "Trail-O" };
+const TIER = {
+  1: { bg: "#5BC44A", fg: "#0C2A08" },
+  2: { bg: "#F5A524", fg: "#3A2000" },
+  3: { bg: "#D7324A", fg: "#FFFFFF" }
+};
+
+const ICON = {
+  foot: '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16"><path d="M2 12.5V8.5l3-1.2 1.2-3.3 1.8 1c.8.5 1.7.8 2.6 1l1.5.3c1 .2 1.7 1 1.9 2l.2 2.2z" fill="currentColor"/></svg>',
+  mtb: '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="4" cy="11" r="2.6"/><circle cx="12" cy="11" r="2.6"/><path d="M4 11l3-5.5h4M7 5.5l2 5.5h3M10.5 4h2"/></svg>',
+  ski: '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 11.5L13.5 8M3 14.2l11.5-3.5M10.5 2.5l-2 8"/></svg>',
+  trail: '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="8" r="1.8" fill="currentColor"/></svg>',
+  night: '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16"><path d="M12.8 9.6A5.6 5.6 0 016.4 3.2a5.6 5.6 0 106.4 6.4z" fill="currentColor"/></svg>',
+  relay: '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4l4 4-4 4M9 4l4 4-4 4"/></svg>',
+  person: '<svg aria-hidden="true" width="10" height="10" viewBox="0 0 16 16"><circle cx="8" cy="5" r="2.8" fill="currentColor"/><path d="M2.5 14c0-3 2.4-4.8 5.5-4.8s5.5 1.8 5.5 4.8z" fill="currentColor"/></svg>',
+  bed: '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 3.5v9M2.5 10h11v2.5M2.5 7.5h5.5a2.5 2.5 0 012.5 2.5"/></svg>',
+  meals: '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 2.5v4a1.7 1.7 0 003.4 0v-4M6.2 2.5v11M12 2.5c-1.5 1-2.2 2.7-2.2 4.7h2.2v6.3"/></svg>',
+  lock: '<svg aria-hidden="true" width="8" height="8" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5.5 7V5.5a2.5 2.5 0 015 0V7"/></svg>',
+  clock: '<svg aria-hidden="true" width="8" height="8" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/></svg>',
+  check: '<svg aria-hidden="true" width="9" height="9" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 8.5l3.7 3.7L13.5 4.5"/></svg>',
+  close: '<svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l10 10M15 5L5 15"/></svg>',
+  copy: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>'
+};
+
+const DEBUG = new URLSearchParams(location.search).has("debug");
+
+/* ---------------- helpers ---------------- */
+const $ = (sel) => document.querySelector(sel);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const values = (o) => Array.isArray(o) ? o : (o && typeof o === "object" ? Object.values(o) : []);
+const pad = (n) => String(n).padStart(2, "0");
+const ymd = (d) => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+const text = (...parts) => parts.filter(Boolean).join(" ");
+const regList = (s) => String(s || "").split(/[\s,;]+/).map((x) => x.trim().toUpperCase()).filter(Boolean);
+
+function parseDT(s, endOfDay) {
+  if (!s) return null;
+  const m = /^(\d{4})-(\d\d)-(\d\d)(?:[ T](\d\d):(\d\d)(?::(\d\d))?)?/.exec(String(s));
+  if (!m || m[1] === "0000") return null;
+  if (m[4] === undefined) return new Date(+m[1], +m[2] - 1, +m[3], endOfDay ? 23 : 0, endOfDay ? 59 : 0, endOfDay ? 59 : 0);
+  return new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +(m[6] || 0));
+}
+const fmt = {
+  short: (d) => d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric" }),
+  full: (d) => d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short" }),
+  mid: (d) => d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" }),
+  range: (a, b) => a.toLocaleDateString("en-GB", { weekday: "short", day: "numeric" }) + " – " + b.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })
+};
+function daysUntil(d) {
+  const a = new Date(); a.setHours(0, 0, 0, 0);
+  const b = new Date(d); b.setHours(0, 0, 0, 0);
+  const n = Math.round((b - a) / 86400000);
+  return n <= 0 ? "today" : n === 1 ? "tomorrow" : "in " + n + " days";
+}
+function rangeFor(kind) {
+  const t = new Date(); t.setHours(0, 0, 0, 0);
+  const toSunday = (7 - t.getDay()) % 7;
+  if (kind === "next") {
+    const from = new Date(t); from.setDate(t.getDate() + toSunday + 1);
+    const to = new Date(from); to.setDate(from.getDate() + 6);
+    return { from, to };
+  }
+  const to = new Date(t); to.setDate(t.getDate() + toSunday);
+  return { from: t, to };
+}
+
+/* ---------------- date ranges ----------------
+   The selection is a list of day ranges. The pill (This | Next | work | week | end) produces them,
+   the editor lets you change them by hand, and the URL carries them in one parameter:
+     ?days=this-next-week-end                      words, relative to today (good for Home Screen icons)
+     ?days=2026-10-17..2026-10-18,2026-10-24..2026-10-25   fixed dates
+*/
+const WORDS = ["this", "next", "work", "week", "end"];
+const dayDiff = (a, b) => Math.round((new Date(b).setHours(0, 0, 0, 0) - new Date(a).setHours(0, 0, 0, 0)) / 86400000);
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const isWeekend = (d) => d.getDay() === 0 || d.getDay() === 6;
+function rangeDays(r) { const out = []; for (let d = new Date(r.from); d <= r.to; d = addDays(d, 1)) out.push(new Date(d)); return out; }
+// Sort, then merge ranges that overlap or touch
+function normalizeRanges(list) {
+  const sorted = list.filter((r) => r.from && r.to).map((r) => (r.to < r.from ? { from: r.to, to: r.from } : r)).sort((a, b) => a.from - b.from);
+  const out = [];
+  sorted.forEach((r) => {
+    const last = out[out.length - 1];
+    if (last && r.from <= addDays(last.to, 1)) { if (r.to > last.to) last.to = new Date(r.to); }
+    else out.push({ from: new Date(r.from), to: new Date(r.to) });
+  });
+  return out;
+}
+// Days of a list of dates grouped into contiguous ranges
+function toRanges(days) {
+  const out = [];
+  days.forEach((d) => {
+    const last = out[out.length - 1];
+    if (last && ymd(addDays(last.to, 1)) === ymd(d)) last.to = d; else out.push({ from: d, to: d });
+  });
+  return out;
+}
+// sel: { weeks: Set("this","next"), part: "all" | "work" | "end" }
+function presetRanges(sel) {
+  let days = [];
+  ["this", "next"].forEach((w) => { if (sel.weeks.has(w)) days = days.concat(rangeDays(rangeFor(w))); });
+  if (sel.part === "work") days = days.filter((d) => !isWeekend(d));
+  if (sel.part === "end") days = days.filter(isWeekend);
+  return normalizeRanges(toRanges(days));
+}
+const rangesKey = (list) => list.map((r) => ymd(r.from) + ".." + ymd(r.to)).join(",");
+const ALL_SELS = [];
+[["this"], ["next"], ["this", "next"]].forEach((w) => ["all", "work", "end"].forEach((part) => ALL_SELS.push({ weeks: new Set(w), part })));
+// Which pill combination (if any) produces exactly these ranges
+function matchingSel(list) {
+  const key = rangesKey(list);
+  return ALL_SELS.find((sel) => { const r = presetRanges(sel); return r.length && rangesKey(r) === key; }) || null;
+}
+function selWords(sel) {
+  const w = [];
+  if (sel.weeks.has("this")) w.push("this");
+  if (sel.weeks.has("next")) w.push("next");
+  if (sel.part === "work") w.push("work");
+  w.push("week");
+  if (sel.part === "end") w.push("end");
+  return w;
+}
+function parseDaysParam(v) {
+  if (!v) return null;
+  const words = v.toLowerCase().split("-");
+  if (words.every((w) => WORDS.includes(w)) && words.includes("week") && (words.includes("this") || words.includes("next"))) {
+    const sel = { weeks: new Set(words.filter((w) => w === "this" || w === "next")), part: words.includes("work") ? "work" : words.includes("end") ? "end" : "all" };
+    return { mode: "words", sel };
+  }
+  const list = v.split(",").map((part) => {
+    const m = /^(\d{4}-\d\d-\d\d)\.\.(\d{4}-\d\d-\d\d)$/.exec(part.trim());
+    return m ? { from: parseDT(m[1], false), to: parseDT(m[2], false) } : null;
+  }).filter(Boolean);
+  return list.length ? { mode: "dates", ranges: normalizeRanges(list) } : null;
+}
+/* ---------------- ORIS access (JSONP, as the ORIS API documents for cross-domain use) ---------------- */
+let seq = 0;
+function orisRaw(method, params) {
+  return new Promise((resolve, reject) => {
+    const cb = "__oris_" + Date.now().toString(36) + "_" + (seq++);
+    const q = new URLSearchParams(Object.assign({ format: "json", method }, params, { callback: cb }));
+    const s = document.createElement("script");
+    const timer = setTimeout(() => { done(); reject(new Error("ORIS did not answer (" + method + ")")); }, 20000);
+    function done() { clearTimeout(timer); delete window[cb]; s.remove(); }
+    window[cb] = (res) => {
+      done();
+      if (res && res.Status && res.Status !== "OK") reject(new Error("ORIS: " + res.Status));
+      else resolve(res ? res.Data : null);
+    };
+    s.onerror = () => { done(); reject(new Error("Could not reach ORIS (" + method + ")")); };
+    s.src = CONFIG.api + "?" + q.toString();
+    document.head.appendChild(s);
+  });
+}
+const oris = orisRaw;   // every ORIS call goes through the store below, not a per-request cache
+
+/* ---------------- local store ----------------
+   Events are kept per day, so a new date range only fetches the days not yet
+   covered (or gone stale). Everything is saved in localStorage, so it also
+   survives closing the Home Screen app.
+     days[YYYY-MM-DD]   when that day's event list was fetched
+     list[id]           event as returned by getEventList (small)
+     details[id]        the few getEvent fields we use, with ORIS version (also for the parent of a stage)
+     entries[club|id]   registration IDs entered for the club
+     entries[*|id]      entries without a club (SI ID, one-off registration ID and club), matched by SI ID
+     orders[club|id]    service orders for the club (or for the one-off club of an entry without a club)
+*/
+const STORE_KEY = "omap.store.v2";
+const nowMs = () => Date.now();
+const fresh = (t, minutes) => t && nowMs() - t < minutes * 60000;
+let store = loadStore();
+function emptyStore() { return { days: {}, list: {}, details: {}, entries: {}, orders: {} }; }
+function loadStore() {
+  try {
+    const st = Object.assign(emptyStore(), JSON.parse(localStorage.getItem(STORE_KEY) || "{}"));
+    // forget days and events that are already behind us
+    const today = ymd(new Date());
+    Object.keys(st.days).forEach((d) => { if (d < today) delete st.days[d]; });
+    Object.keys(st.list).forEach((id) => {
+      if (String(st.list[id].Date || "").slice(0, 10) < today) {
+        delete st.list[id]; delete st.details[id];
+      }
+    });
+    const live = new Set(Object.keys(st.list));
+    // details of a stage's parent are kept while one of its stages is
+    const parents = new Set(Object.values(st.list).map((raw) => String(raw.ParentID || "0")));
+    Object.keys(st.details).forEach((id) => { if (!live.has(id) && !parents.has(id)) delete st.details[id]; });
+    ["entries", "orders"].forEach((k) => Object.keys(st[k]).forEach((key) => { if (!live.has(key.split("|")[1])) delete st[k][key]; }));
+    return st;
+  } catch (e) { return emptyStore(); }
+}
+let saveTimer = null;
+function saveStore() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); }
+    catch (e) {
+      // storage full: keep what's needed for the event list, drop the rest (it can be refetched)
+      store.entries = {}; store.orders = {};
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch (e2) { /* run from memory */ }
+    }
+  }, 300);
+}
+function clearStore() { store = emptyStore(); try { localStorage.removeItem(STORE_KEY); } catch (e) {} }
+const SLIM_DETAIL_FIELDS = ["Version", "EntryStart", "EntryDate1", "EntryDate2", "EntryDate3", "Stages",
+  "UseORISForEntries", "CurrentStartsCount", "CurrentResultsCount", "Cancelled", "GPSLat", "GPSLon"];
+function slimDetails(raw) {
+  const d = {};
+  SLIM_DETAIL_FIELDS.forEach((k) => { if (raw[k] !== undefined) d[k] = raw[k]; });
+  d.Services = values(raw.Services).map((x) => ({ ID: x.ID, NameCZ: x.NameCZ, NameEN: x.NameEN }));
+  return d;
+}
+function daysOf(from, to) {
+  const out = [];
+  for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) out.push(ymd(d));
+  return out;
+}
+async function pool(items, n, fn) {
+  let i = 0;
+  const workers = Array.from({ length: Math.min(n, items.length) }, async () => {
+    while (i < items.length) { const item = items[i++]; try { await fn(item); } catch (e) { if (DEBUG) console.warn(e); } }
+  });
+  await Promise.all(workers);
+}
+
+/* ---------------- settings ---------------- */
+function loadSettings() {
+  try { return Object.assign({ me: "", group: "", si: "", nav: "auto", cal: "auto" }, JSON.parse(localStorage.getItem("omap.settings") || "{}")); }
+  catch (e) { return { me: "", group: "", si: "", nav: "auto", cal: "auto" }; }
+}
+// Czech registration IDs start with the club code: ABC1234 belongs to club ABC
+const clubOf = (reg) => { const m = /^([^\d\s]+)\d+$/.exec(reg); return m ? m[1] : null; };
+const homeClubs = () => [...new Set(regList(settings.me).map(clubOf).filter(Boolean))];
+// clubs whose entries we need: yours, plus those of anyone in your group
+function entryClubs() {
+  return [...new Set(regList(settings.me).concat(regList(settings.group)).map(clubOf).filter(Boolean))];
+}
+// Entries without a club get a one-off registration ID (club number + member number, e.g. 0270001) that changes with
+// every event, so they are matched by SI ID instead
+const siList = () => regList(settings.si).filter((x) => /^\d+$/.test(x));
+const ONE_OFF = "*";
+// "Entered", "Free" and the entered pill need to know your entries
+const knowsEntries = () => homeClubs().length > 0 || siList().length > 0;
+function saveSettings(s) { try { localStorage.setItem("omap.settings", JSON.stringify(s)); } catch (e) {} }
+
+/* ---------------- domain mapping ---------------- */
+function classify(raw) {
+  const disc = raw.Discipline || {};
+  const lvl = raw.Level || {};
+  const discText = text(disc.ShortName, disc.NameCZ, disc.NameEN);
+  const nameAndDisc = text(discText, raw.Name);
+  const lvlText = text(lvl.ShortName, lvl.NameCZ, lvl.NameEN);
+
+  let format = "other";
+  for (const [key, re] of CONFIG.format) if (re.test(discText)) { format = key; break; }
+  let level = CONFIG.levelShort[String(lvl.ShortName || "").trim().toUpperCase()] || null;
+  if (!level) for (const [key, re] of CONFIG.level) if (re.test(text(lvl.NameCZ, lvl.NameEN))) { level = key; break; }
+  if (!level) level = CONFIG.levelFallback;
+
+  const services = values(raw.Services).map((s) => {
+    const name = s.NameCZ || s.NameEN || "";
+    return { id: String(s.ID), name, kind: serviceKind(name) };
+  }).filter((x) => x.name);
+  const svcText = services.map((x) => x.name).join(" | ");
+  const sportId = raw.Sport && raw.Sport.ID;
+
+  if (DEBUG) console.log(raw.ID, raw.Name, "| discipline:", discText, "| level:", lvlText, "| services:", svcText);
+
+  return {
+    format,
+    level,
+    sport: CONFIG.sport[sportId] || "foot",
+    night: CONFIG.night.test(nameAndDisc),
+    relay: CONFIG.relay.test(nameAndDisc),
+    team: CONFIG.team.test(nameAndDisc),
+    knockout: CONFIG.knockout.test(nameAndDisc),
+    freeOrder: CONFIG.freeOrder.test(nameAndDisc),
+    bed: services.some((x) => x.kind === "bed"),
+    meals: services.some((x) => x.kind === "meals"),
+    services
+  };
+}
+
+function serviceKind(name) {
+  if (CONFIG.services.bed.test(name)) return "bed";
+  if (CONFIG.services.meals.test(name)) return "meals";
+  return null;
+}
+
+function entryState(raw, now) {
+  const deadlines = [1, 2, 3]
+    .map((n) => ({ n, date: parseDT(raw["EntryDate" + n], true) }))
+    .filter((d) => d.date);
+  const opens = parseDT(raw.EntryStart, false);
+  if (opens && now < opens) return { phase: "notopen", opens, deadlines, tier: 0 };
+  const cur = deadlines.find((d) => d.date >= now);
+  if (cur) return { phase: "tier", tier: deadlines.indexOf(cur) + 1, deadlines, opens };
+  if (deadlines.length) return { phase: "closed", tier: 0, deadlines, opens };
+  return { phase: "unknown", tier: 0, deadlines, opens };
+}
+
+function normalize(raw, prev) {
+  const date = parseDT(raw.Date, false);
+  const lat = parseFloat(raw.GPSLat), lon = parseFloat(raw.GPSLon);
+  const ev = Object.assign({}, prev || {}, classify(raw), entryState(raw, new Date()));
+  ev.id = String(raw.ID);
+  ev.raw = raw;
+  ev.name = raw.Name || "Event " + raw.ID;
+  ev.place = raw.Place || "";
+  ev.org = raw.Org1 && raw.Org1.Abbr ? raw.Org1.Abbr : "";
+  ev.date = date;
+  ev.lat = isFinite(lat) && lat !== 0 ? lat : null;
+  ev.lon = isFinite(lon) && lon !== 0 ? lon : null;
+  ev.stages = parseInt(raw.Stages, 10) || 0;
+  ev.cancelled = String(raw.Cancelled) === "1";
+  ev.outsideOris = String(raw.UseORISForEntries) === "0";
+  ev.startList = (parseInt(raw.CurrentStartsCount, 10) || 0) > 0;
+  ev.results = (parseInt(raw.CurrentResultsCount, 10) || 0) > 0;
+  if (ev.entered === undefined) ev.entered = false;
+  if (ev.group === undefined) ev.group = 0;
+  if (!ev.ordered) ev.ordered = { bed: false, meals: false, ids: [] };
+  return ev;
+}
+
+/* ---------------- rendering ---------------- */
+function pinHtml(ev, selected, showTail) {
+  const F = FORMAT[ev.format], L = LEVEL[ev.level];
+  const cls = ev.entered ? "entered" : (ev.phase === "closed" ? "closed" : "");
+  let state = "";
+  if (ev.phase === "closed") state += ICON.lock;
+  if (ev.phase === "notopen") state += ICON.clock;
+  if (ev.phase !== "closed" && ev.deadlines.length) {
+    state += '<span class="pips">' + ev.deadlines.map((d, i) => '<span class="pip' + (ev.phase === "tier" && i < ev.tier ? " on" : "") + '"></span>').join("") + "</span>";
+  }
+  if (ev.entered) state += ICON.check;
+  const night = ev.night ? '<span class="badge b-night">' + ICON.night + "</span>" : "";
+  const svcs = (ev.bed ? '<span class="b-svc' + (ev.ordered.bed ? " ordered" : "") + '">' + ICON.bed + "</span>" : "") +
+    (ev.meals ? '<span class="b-svc' + (ev.ordered.meals ? " ordered" : "") + '">' + ICON.meals + "</span>" : "");
+  return '<div class="pin' + (selected ? " sel" : "") + popClass(ev) + '" style="' + popDelay(ev) + '" data-id="' + esc(ev.id) + '" tabindex="0" role="button" aria-label="' + esc(ariaLabel(ev)) + '">' +
+    '<div class="chip ' + cls + '">' +
+      '<span class="disc" style="background:' + F.bg + ";color:" + F.fg + '">' + F.text + "</span>" +
+      '<span class="lines"><span class="day">' + esc(ev.date ? fmt.short(ev.date) : "?") + '</span><span class="state">' + state + "</span></span>" +
+      '<span class="badge b-sport">' + ICON[ev.sport] + "</span>" +
+      (svcs || night ? '<span class="svcs">' + svcs + night + "</span>" : "") +
+      '<span class="badge b-level" style="background:' + L.bg + ";color:" + L.fg + '">' + L.code + "</span>" +
+      (ev.relay || ev.team ? '<span class="badge b-relay">' + ICON.relay + "</span>" : "") +
+      (ev.group > 0 ? '<span class="badge b-group">' + ICON.person + "<span>" + ev.group + "</span></span>" : "") +
+    "</div>" +
+    (showTail ? '<div class="tail ' + cls + '"></div>' : "") +
+  "</div>";
+}
+function dotHtml(ev, selected, dx, dy) {
+  const F = FORMAT[ev.format], L = LEVEL[ev.level];
+  return '<div class="dot' + (ev.entered ? " entered" : "") + (selected ? " sel" : "") + popClass(ev) + '" data-id="' + esc(ev.id) + '" tabindex="0" role="button" aria-label="' + esc(ariaLabel(ev)) + '" style="' + popDelay(ev) + '--dx:' + (dx || 0) + "px;--dy:" + (dy || 0) + "px;background:" + L.bg + ";color:" + L.fg + ";border:5px solid " + (ev.entered ? "var(--orange)" : F.bg) + '">' + F.text + "</div>";
+}
+function ariaLabel(ev) {
+  const parts = [ev.name, ev.date ? fmt.full(ev.date) : "", FORMAT[ev.format].name, LEVEL[ev.level].name, SPORT_NAME[ev.sport]];
+  if (ev.night) parts.push("night");
+  if (ev.relay) parts.push("relay");
+  if (ev.phase === "tier") parts.push("entry deadline " + ev.tier + " of " + ev.deadlines.length + " is current");
+  if (ev.phase === "closed") parts.push("entries closed");
+  if (ev.phase === "notopen") parts.push("entries open " + fmt.mid(ev.opens));
+  if (ev.entered) parts.push("you are entered");
+  if (ev.ordered.bed) parts.push("accommodation ordered");
+  if (ev.ordered.meals) parts.push("meals ordered");
+  if (ev.group > 0) parts.push(ev.group + " from your group");
+  return parts.filter(Boolean).join(", ");
+}
+
+/* Navigation to the event: a link the phone hands to the navigation app.
+   Apple Maps links open the Maps app on iPhone/iPad/Mac, geo: opens Android's default app or chooser,
+   Google Maps, Mapy.com and Waze links open their apps when installed, otherwise their websites. */
+const NAV_NAME = { apple: "Apple Maps", google: "Google Maps", mapy: "Mapy.com", waze: "Waze" };
+function navTarget(ev) {
+  let app = settings.nav || "auto";
+  const ua = navigator.userAgent;
+  const isApple = /iPhone|iPad|iPod|Macintosh/.test(ua);
+  const isAndroid = /Android/.test(ua);
+  if (app === "auto") app = isApple ? "apple" : isAndroid ? "android" : "google";
+  const lat = ev.lat.toFixed(6), lon = ev.lon.toFixed(6), name = encodeURIComponent(ev.name);
+  switch (app) {
+    case "apple": return { url: "https://maps.apple.com/?daddr=" + lat + "," + lon + "&q=" + name, label: "Open in Maps" };
+    case "android": return { url: "geo:0,0?q=" + lat + "," + lon + "(" + name + ")", label: "Open in Maps", sameTab: true };
+    case "mapy": return { url: "https://mapy.com/fnc/v1/route?mapset=outdoor&end=" + lon + "," + lat + "&routeType=car_fast_traffic", label: "Open in Mapy.com" };
+    case "waze": return { url: "https://waze.com/ul?ll=" + lat + "," + lon + "&navigate=yes", label: "Open in Waze" };
+    default: return { url: "https://www.google.com/maps/dir/?api=1&destination=" + lat + "," + lon + "&travelmode=driving", label: settings.nav === "google" ? "Open in Google Maps" : "Open in Maps" };
+  }
+}
+/* "Add to calendar": the event as one all-day calendar event. A stage (E1, E2, …) or a single event is its own day;
+   a multi-day event (the parent of stages) spans from its first to its last stage. It's a one-time import, not a
+   subscription. Apple Calendar, Outlook and others take a calendar file (made in the page on desktop, the published
+   one on iPhone and iPad); Android can't open one into Google Calendar, so there it is a Google Calendar link. */
+function calendarApp() {
+  let app = settings.cal || "auto";
+  if (app === "auto") app = /Android/.test(navigator.userAgent) ? "google" : "file";
+  return app;
+}
+const isoPlusDays = (iso, n) => ymd(addDays(parseDT(iso, false), n));
+const icsDate = (iso) => iso.replace(/-/g, "");
+const isParent = (ev) => ev.stages > 1 && !isStage(ev.id);
+// ORIS keeps no last day on a multi-day event; its stages carry their dates
+const lastDays = new Map();   // parent ID -> { last: "YYYY-MM-DD", failed }
+const findingLastDay = new Set();
+async function findLastDay(ev) {
+  const first = String(ev.raw.Date).slice(0, 10);
+  findingLastDay.add(ev.id);
+  try {
+    // one event list over the month from the first day finds the stages, also outside the selected dates
+    const list = values(await oris("getEventList", Object.assign({ datefrom: first, dateto: isoPlusDays(first, 31) }, CONFIG.listParams)));
+    const dates = list.filter((raw) => String(raw.ParentID || "0") === ev.id).map((raw) => String(raw.Date).slice(0, 10)).sort();
+    lastDays.set(ev.id, { last: dates.length ? dates[dates.length - 1] : first, failed: false });
+  } catch (e) {
+    if (DEBUG) console.warn(e);
+    lastDays.set(ev.id, { last: first, failed: true });
+  }
+  findingLastDay.delete(ev.id);
+  refreshEvent(ev.id);
+}
+// the event's days, { first, last, partial }, or null while the last day of a multi-day event is being found
+function eventDays(ev) {
+  const first = String(ev.raw.Date).slice(0, 10);
+  let days = { first, last: first, partial: false };
+  if (isParent(ev)) {
+    const found = lastDays.get(ev.id);
+    days = found ? { first, last: found.last, partial: found.failed } : null;
+  }
+  return days;
+}
+const eventIcs = (ev, days) => ICS.event({ id: ev.id, name: ev.name, place: ev.place, lat: ev.lat, lon: ev.lon, url: CONFIG.eventUrl(ev.id),
+  first: days.first, last: days.last });
+// iPhone and iPad open a calendar file only from a real address, not one made in the page, so there the button links to
+// the event's file published with the feeds (events in the next 6 months); without one the button is disabled
+const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+const eventFileUrl = (id) => "feeds/events/" + id + ".ics";
+const eventFiles = new Map();   // event ID -> "checking" | "yes" | "no"
+async function checkEventFile(id) {
+  eventFiles.set(id, "checking");
+  let found = "no";
+  try { found = (await fetch(eventFileUrl(id), { method: "HEAD", cache: "no-cache" })).ok ? "yes" : "no"; }
+  catch (e) { if (DEBUG) console.warn(e); }
+  eventFiles.set(id, found);
+  refreshEvent(id);
+}
+function calendarButton(ev) {
+  const icon = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>';
+  const days = eventDays(ev);
+  const file = calendarApp() === "file" && isIos ? eventFiles.get(ev.id) : null;
+  let html = '<button class="open-btn secondary" type="button" disabled>' + icon + "Finding the event's days…</button>";
+  if (file === "checking") {
+    html = '<button class="open-btn secondary" type="button" disabled>' + icon + "Checking…</button>";
+  } else if (file === "yes") {
+    // Safari opens the file in place. The Home Screen app and Safari's in-app viewer don't hand it to Calendar, so there
+    // the link opens real Safari: the x-safari-https: scheme (iOS 17+, not documented by Apple)
+    const url = new URL(eventFileUrl(ev.id), location.href).href;
+    html = '<a class="open-btn secondary" href="' + esc(navigator.standalone ? "x-safari-" + url : url) + '">' + icon + "Add to calendar</a>";
+  } else if (days) {
+    // without a published file (beyond the 6-month horizon, or added since the last feed run) iOS gets Google Calendar
+    const google = calendarApp() === "google" || file === "no";
+    const label = (google ? "Add to Google Calendar" : "Add to calendar") + (days.partial ? " (first day only)" : "");
+    let href = "", attrs = "";
+    if (google) {
+      href = "https://calendar.google.com/calendar/render?" + new URLSearchParams({ action: "TEMPLATE", text: ev.name,
+        dates: icsDate(days.first) + "/" + icsDate(isoPlusDays(days.last, 1)), details: CONFIG.eventUrl(ev.id), location: ev.place }).toString();
+      attrs = ' target="_blank" rel="noopener"';
+    } else {
+      // made in the page and downloaded, then opened in the calendar app (desktop browsers)
+      href = "data:text/calendar;charset=utf-8," + encodeURIComponent(eventIcs(ev, days));
+      const name = ev.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "") || "event";
+      attrs = ' download="' + esc(name) + '.ics"';
+    }
+    html = '<a class="open-btn secondary" href="' + esc(href) + '"' + attrs + ">" + icon + label + "</a>";
+  }
+  return html;
+}
+function cardHtml(ev) {
+  const F = FORMAT[ev.format], L = LEVEL[ev.level];
+  const tags = [];
+  tags.push('<span class="tag"><span class="sw" style="background:' + F.bg + '"></span>' + F.name + "</span>");
+  tags.push('<span class="tag"><span class="lvl" style="background:' + L.bg + ";color:" + L.fg + '">' + L.code + "</span>" + L.name + "</span>");
+  tags.push('<span class="tag">' + ICON[ev.sport] + SPORT_NAME[ev.sport] + "</span>");
+  if (ev.night) tags.push('<span class="tag">' + ICON.night + "Night</span>");
+  if (ev.relay) tags.push('<span class="tag">' + ICON.relay + "Relay</span>");
+  else if (ev.team) tags.push('<span class="tag">' + ICON.relay + "Team</span>");
+  if (ev.bed) tags.push('<span class="tag' + (ev.ordered.bed ? " ordered" : "") + '">' + ICON.bed + (ev.ordered.bed ? "Accommodation ordered" : "Accommodation") + "</span>");
+  if (ev.meals) tags.push('<span class="tag' + (ev.ordered.meals ? " ordered" : "") + '">' + ICON.meals + (ev.ordered.meals ? "Meals ordered" : "Meals") + "</span>");
+  if (ev.knockout) tags.push('<span class="tag">Knock-out sprint</span>');
+  if (ev.freeOrder) tags.push('<span class="tag">Free order</span>');
+  if (ev.stages > 1) tags.push('<span class="tag">Multi-event, ' + ev.stages + " stages</span>");
+
+  let steps = "";
+  if (ev.deadlines.length) {
+    steps = '<div class="steps" style="--n:' + ev.deadlines.length + ";grid-template-columns:repeat(" + ev.deadlines.length + ',minmax(0,1fr))">' +
+      ev.deadlines.map((d, i) => {
+        const n = i + 1;
+        const st = ev.phase === "closed" || (ev.phase === "tier" && n < ev.tier) ? "past" : (ev.phase === "tier" && n === ev.tier ? "now" : "next");
+        const c = st === "past" ? { bg: "#DDE1E4", fg: "#5A636B" } : TIER[n];
+        return '<div class="step ' + st + '"><span class="num" style="background:' + c.bg + ";color:" + c.fg + '">' + n + '</span><span class="date">' + fmt.mid(d.date) + '</span><span class="now-label">' + (st === "now" ? "Now" : "") + "</span></div>";
+      }).join("") + "</div>";
+  }
+
+  let closes = "";
+  if (ev.phase === "tier") {
+    const d = ev.deadlines[ev.tier - 1].date;
+    closes = '<div class="closes">Deadline ' + ev.tier + " closes " + fmt.mid(d) + ", " + daysUntil(d) + "</div>";
+  } else if (ev.phase === "notopen") {
+    closes = '<div class="closes">Entries open ' + fmt.mid(ev.opens) + ", " + daysUntil(ev.opens) + "</div>";
+  } else if (ev.phase === "closed") {
+    closes = '<div class="closes muted">Entries closed</div>';
+  } else {
+    closes = '<div class="closes muted">No entry deadlines in ORIS</div>';
+  }
+
+  const pills = [];
+  if (knowsEntries()) pills.push(ev.entered ? '<span class="pill entered">' + ICON.check.replace('width="9" height="9"', 'width="14" height="14"') + "You are entered</span>" : '<span class="pill">' + (ev.unchecked ? "Entries not checked yet for all SI IDs" : "Not entered") + "</span>");
+  if (ev.group > 0) pills.push('<span class="pill group">' + ICON.person + ev.group + " from your group</span>");
+  if (ev.startList) pills.push('<span class="pill"><span class="letter" style="background:#D42A7C">S</span>Start list</span>');
+  if (ev.results) pills.push('<span class="pill"><span class="letter" style="background:#7B2CBF">V</span>Results</span>');
+  if (ev.outsideOris) pills.push('<span class="pill">Entries outside ORIS</span>');
+
+  const meta = [ev.date ? fmt.full(ev.date) : "", ev.place, ev.org].filter(Boolean).map(esc).join(", ");
+  return '<div class="card-head"><div><h2>' + esc(ev.name) + '</h2><div class="meta">' + meta + "</div></div>" +
+    '<button class="icon-btn" type="button" id="cardClose" aria-label="Close details">' + ICON.close + "</button></div>" +
+    '<div class="tags">' + tags.join("") + "</div>" +
+    (ev.services.length ? '<div class="svc-names">' + ev.services.map((x) => esc(x.name) + (ev.ordered.ids.indexOf(x.id) >= 0 ? " (ordered)" : "")).join(", ") + "</div>" : "") +
+    steps + closes +
+    (pills.length ? '<div class="pills">' + pills.join("") + "</div>" : "") +
+    (knowsEntries() ? '<button class="open-btn secondary refresh" type="button" id="checkNow"' + (checking.has(ev.id) ? " disabled>" : ">") +
+      '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>' +
+      (checking.has(ev.id) ? "Refreshing…" : "Refresh from ORIS") + "</button>" : "") +
+    '<a class="open-btn" href="' + CONFIG.eventUrl(ev.id) + '" target="_blank" rel="noopener">Open in ORIS</a>' +
+    (ev.lat !== null ? (() => {
+      const nav = navTarget(ev);
+      return '<a class="open-btn secondary" href="' + esc(nav.url) + '"' + (nav.sameTab ? "" : ' target="_blank" rel="noopener"') + '>' +
+        '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8z"/></svg>' + nav.label + "</a>";
+    })() : "") +
+    calendarButton(ev);
+}
+
+/* ---------------- app state ---------------- */
+const params = new URLSearchParams(location.search);
+const MAX_DAYS = 62;   // keeps the number of ORIS requests reasonable
+let ranges = [];          // the selected day ranges
+let rangesMode = "words";  // how the URL describes them: "words" (relative) or "dates" (fixed)
+let chosenSel = null;      // the pill words last tapped; wins when several word sets give the same days (e.g. on a weekend)
+function currentSel() {
+  if (chosenSel && rangesKey(presetRanges(chosenSel)) === rangesKey(ranges)) return chosenSel;
+  return matchingSel(ranges);
+}
+const allDays = () => ranges.flatMap((r) => rangeDays(r)).map(ymd);
+let settings = loadSettings();
+let events = new Map();     // id -> event
+let selectedId = null;
+let filters = { open: false, mine: false, free: false };
+let busyDays = new Set();   // days with an event you are entered in (recomputed on every draw)
+let loadToken = 0;
+
+const map = L.map("map", { zoomControl: false, attributionControl: true }).setView([49.8, 15.5], 7);
+L.tileLayer(CONFIG.tiles.url, { maxZoom: 18, subdomains: CONFIG.tiles.subdomains, attribution: CONFIG.tiles.attribution, referrerPolicy: "strict-origin-when-cross-origin" }).addTo(map);
+const layer = L.layerGroup().addTo(map);
+
+function compact() { return map.getZoom() < CONFIG.compactBelowZoom; }
+function passesFilters(ev) {
+  if (ev.cancelled) return false;
+  // "Free": hide other events on days you already have an event; your own events stay visible
+  if (filters.free && !ev.entered && ev.date && busyDays.has(ymd(ev.date))) return false;
+  if (filters.open && ev.phase !== "tier") return false;
+  if (filters.mine && !ev.entered) return false;
+  return true;
+}
+function visible(ev) { return passesFilters(ev) && ev.lat !== null; }
+let drawQueued = false;
+function scheduleDraw() {
+  if (drawQueued) return;
+  drawQueued = true;
+  requestAnimationFrame(() => { drawQueued = false; drawAll(); });
+}
+// Group events whose markers would overlap at the current zoom
+function groupsFor(list, isCompact) {
+  const dx = isCompact ? 16 : 90, dy = isCompact ? 16 : 40;
+  const groups = [];
+  for (const ev of list) {
+    const p = map.latLngToLayerPoint([ev.lat, ev.lon]);
+    const g = groups.find((g) => Math.abs(g.p.x - p.x) < dx && Math.abs(g.p.y - p.y) < dy);
+    if (g) g.items.push(ev); else groups.push({ p, latlng: [ev.lat, ev.lon], items: [ev] });
+  }
+  return groups;
+}
+function addGroup(g, isCompact) {
+  const n = g.items.length;
+  const hasSel = g.items.some((e) => e.id === selectedId);
+  let html;
+  if (!isCompact) {
+    // Zoomed in: stack the chips above the spot, earliest on top; only the bottom one points at the map
+    const last = g.items[n - 1];
+    const puff = popping.has(last.id) ? '<span class="puff" style="' + popDelay(last) + '"></span>' : "";
+    html = '<div class="stack">' + g.items.map((ev, i) => pinHtml(ev, ev.id === selectedId, i === n - 1)).join("") + puff + "</div>";
+  } else if (n === 1) {
+    html = dotHtml(g.items[0], hasSel, 0, 0);
+  } else {
+    const r = Math.max(24, n * 6), size = 2 * r + 36;
+    html = '<div class="dotgroup' + (hasSel ? " open" : "") + '" style="--size:' + size + 'px">' +
+      g.items.map((ev, i) => {
+        const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+        return dotHtml(ev, ev.id === selectedId, Math.round(r * Math.cos(a)), Math.round(r * Math.sin(a)));
+      }).join("") +
+      '<span class="dg-count">' + n + "</span></div>";
+  }
+  const m = L.marker(g.latlng, {
+    icon: L.divIcon({ className: "omark", html, iconSize: [0, 0], iconAnchor: [0, 0] }),
+    keyboard: false,
+    zIndexOffset: hasSel ? 1000 : (g.items.some((e) => e.entered) ? 500 : 0)
+  });
+  m.on("click", (e) => {
+    const t = e.originalEvent && e.originalEvent.target;
+    const el = t && t.closest ? t.closest("[data-id]") : null;
+    const ring = m.getElement() && m.getElement().querySelector(".dotgroup");
+    // A ring that was folded when the tap started only fans out; nothing gets selected yet
+    if (ring && ring.dataset.wasOpen !== "1") { ring.classList.add("open"); return; }
+    if (el) select(el.dataset.id);
+    else if (n === 1) select(g.items[0].id);
+  });
+  m.on("add", () => {
+    const ring = m.getElement() && m.getElement().querySelector(".dotgroup");
+    if (!ring) return;
+    // Remember whether the ring was already open when the press began (before any hover or focus opens it)
+    ring.addEventListener("pointerdown", () => { ring.dataset.wasOpen = ring.classList.contains("open") ? "1" : "0"; });
+    // Hover fans out only with a real mouse; on touch screens the first tap does it
+    ring.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") ring.classList.add("open"); });
+    ring.addEventListener("pointerleave", (e) => {
+      if (e.pointerType === "mouse" && !g.items.some((x) => x.id === selectedId)) ring.classList.remove("open");
+    });
+    ring.addEventListener("keyup", (e) => { if (e.key === "Tab") { ring.classList.add("open"); ring.dataset.wasOpen = "1"; } });
+  });
+  layer.addLayer(m);
+}
+// Markers new since the last draw get a staggered pop-in (zooming or detail updates don't replay it)
+let drawnIds = new Set();
+let popping = new Map();   // id -> delay in ms
+const popClass = (ev) => popping.has(ev.id) ? " pop" : "";
+const popDelay = (ev) => popping.has(ev.id) ? "--delay:" + popping.get(ev.id) + "ms;" : "";
+function drawAll() {
+  busyDays = new Set([...events.values()].filter((e) => e.entered && e.date && !e.cancelled).map((e) => ymd(e.date)));
+  layer.clearLayers();
+  const list = [...events.values()].filter(visible).sort((a, b) => (a.date || 0) - (b.date || 0));
+  popping = new Map();
+  list.filter((ev) => !drawnIds.has(ev.id)).forEach((ev, i) => popping.set(ev.id, Math.min(i * 35, 600)));
+  drawnIds = new Set(list.map((ev) => ev.id));
+  const isCompact = compact();
+  groupsFor(list, isCompact).forEach((g) => addGroup(g, isCompact));
+  // Both numbers follow the active filters, so they always add up to what matches
+  const matching = [...events.values()].filter(passesFilters);
+  const noLoc = matching.length - list.length;
+  $("#count").textContent = !matching.length
+    ? (events.size ? "No events match the filters" : "")
+    : list.length + " on map" + (noLoc ? ", " + noLoc + " without location" : "");
+  renderNoloc(matching.filter((e) => e.lat === null).sort((a, b) => (a.date || 0) - (b.date || 0)));
+  if (selectedId) {
+    const ev = events.get(selectedId);
+    if (ev && passesFilters(ev)) renderCard(ev); else closeCard();
+  }
+}
+
+const NOLOC_STACK_ABOVE = 5;   // more than this many fold into one stacked dot
+let nolocOpen = false;
+let nolocList = [];
+const PINOFF_ICON = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.4-6-11a6 6 0 0 1 10.2-4.3"/><path d="M17.7 8.6A6 6 0 0 1 18 10c0 2.9-1.6 5.6-3.3 7.6"/><path d="M3 3l18 18"/></svg>';
+function nolocFolded() {
+  return nolocList.length > NOLOC_STACK_ABOVE && !nolocOpen && !nolocList.some((e) => e.id === selectedId);
+}
+const NOLOC_CHIPS_MAX = 3;   // up to this many: full markers; more: dots (stacked above NOLOC_STACK_ABOVE)
+const LEAVE_MS = 200;
+let nolocMode = "none";      // "none" | "chips" | "dots"
+let nolocSwitching = false;
+function renderNoloc(list) {
+  nolocList = list;
+  const mode = !list.length ? "none" : list.length <= NOLOC_CHIPS_MAX ? "chips" : "dots";
+  if (nolocSwitching) return;                       // the form being swapped in will use the latest list
+  if (mode === nolocMode) { if (mode === "chips") updateChips(); if (mode === "dots") renderTray(); return; }
+  // switch forms: the old one slides away under the filter pills, then the new one slides out
+  const old = nolocMode;
+  nolocMode = mode;
+  const wait = leaveForm(old);
+  nolocSwitching = wait > 0;
+  const enter = () => {
+    nolocSwitching = false;
+    if (nolocMode === "chips") updateChips();
+    if (nolocMode === "dots") {
+      const tray = $("#noloc");
+      renderTray();
+      tray.classList.add("entering");
+      tray.addEventListener("animationend", () => tray.classList.remove("entering"), { once: true });
+    }
+    renderNoloc(nolocList);                           // catch up if the list changed meanwhile
+  };
+  if (wait) setTimeout(enter, wait); else enter();
+}
+function leaveEl(el, after) {
+  el.classList.remove("entering");
+  el.classList.add("leaving");
+  setTimeout(() => { after ? after(el) : el.remove(); }, LEAVE_MS);
+}
+function leaveForm(mode) {
+  if (mode === "chips") {
+    const kids = [...$("#nolocChips").children];
+    kids.forEach((el) => leaveEl(el));
+    return kids.length ? LEAVE_MS : 0;
+  }
+  if (mode === "dots") {
+    leaveEl($("#noloc"), (el) => { el.classList.remove("leaving"); el.hidden = true; el.innerHTML = ""; });
+    return LEAVE_MS;
+  }
+  return 0;
+}
+// Full markers, keyed by event so only the ones that come or go are animated
+function updateChips() {
+  const box = $("#nolocChips");
+  const live = new Map([...box.children].filter((el) => !el.classList.contains("leaving")).map((el) => [el.dataset.key, el]));
+  const want = new Set(nolocList.map((e) => e.id));
+  live.forEach((el, id) => { if (!want.has(id)) leaveEl(el); });
+  let prev = null, fresh = 0;
+  nolocList.forEach((ev) => {
+    let el = live.get(ev.id);
+    if (!el) {
+      el = document.createElement("span");
+      el.className = "nchip entering";
+      el.dataset.key = ev.id;
+      el.style.setProperty("--delay", (fresh++ * 40) + "ms");
+      el.addEventListener("animationend", () => el.classList.remove("entering"), { once: true });
+    }
+    const html = pinHtml(ev, ev.id === selectedId, false);
+    if (el._html !== html) { el.innerHTML = html; el._html = html; }
+    const ref = prev ? prev.nextSibling : box.firstChild;
+    if (el !== ref) box.insertBefore(el, ref);
+    prev = el;
+  });
+}
+function renderTray() {
+  const list = nolocList;
+  const el = $("#noloc");
+  el.hidden = false;
+  const folded = nolocFolded();
+  el.classList.toggle("folded", folded);
+  el.classList.toggle("unfolded", !folded && list.length > NOLOC_STACK_ABOVE);
+  const pin = '<span class="pinoff" title="Without location">' + PINOFF_ICON + "</span>";
+  if (folded) {
+    // all dots on one spot, the earliest on top, with a count: same as an overlapping group on the map
+    el.setAttribute("aria-label", list.length + " events without a location, tap to show");
+    el.innerHTML = pin + '<span class="cell">' + list.slice().reverse().map((ev) => dotHtml(ev, false, 0, 0)).join("") +
+      '<span class="dg-count">' + list.length + "</span></span>";
+  } else {
+    el.setAttribute("aria-label", "Events without a location");
+    el.innerHTML = pin + list.map((ev) => '<span class="cell">' + dotHtml(ev, ev.id === selectedId, 0, 0) + "</span>").join("");
+  }
+}
+$("#noloc").addEventListener("pointerdown", () => { $("#noloc").dataset.wasFolded = nolocFolded() ? "1" : "0"; });
+$("#noloc").addEventListener("click", (e) => {
+  // a tap on the folded stack only unfolds it; nothing gets selected yet
+  if ($("#noloc").dataset.wasFolded === "1" && nolocList.length > NOLOC_STACK_ABOVE) { nolocOpen = true; renderNoloc(nolocList); return; }
+  const dot = e.target.closest("[data-id]");
+  if (dot) { nolocOpen = true; select(dot.dataset.id); return; }
+  // the pin icon folds an unfolded stack again
+  if (e.target.closest(".pinoff") && nolocList.length > NOLOC_STACK_ABOVE) { nolocOpen = false; if (nolocList.some((x) => x.id === selectedId)) closeCard(); renderNoloc(nolocList); }
+});
+// with a mouse, hovering unfolds like the groups on the map
+$("#noloc").addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse" && nolocList.length > NOLOC_STACK_ABOVE && !nolocOpen) { nolocOpen = true; renderNoloc(nolocList); } });
+$("#noloc").addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse" && nolocOpen && !nolocList.some((x) => x.id === selectedId)) { nolocOpen = false; renderNoloc(nolocList); } });
+$("#nolocChips").addEventListener("click", (e) => { const el = e.target.closest("[data-id]"); if (el) select(el.dataset.id); });
+$("#nolocChips").addEventListener("keydown", (e) => {
+  const id = e.target && e.target.dataset ? e.target.dataset.id : null;
+  if (id && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); select(id); }
+});
+$("#noloc").addEventListener("keydown", (e) => {
+  const id = e.target && e.target.dataset ? e.target.dataset.id : null;
+  if (id && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); nolocOpen = true; select(id); }
+  else if (!id && (e.key === "Enter" || e.key === " ") && nolocFolded()) { e.preventDefault(); nolocOpen = true; renderNoloc(nolocList); }
+});
+function select(id) {
+  if (!events.get(id)) return;
+  selectedId = id;
+  renderCard(events.get(id));
+  scheduleDraw();
+}
+function renderCard(ev) {
+  const card = $("#card");
+  card.innerHTML = cardHtml(ev);
+  card.hidden = false;
+  $("#cardClose").addEventListener("click", closeCard);
+  const check = $("#checkNow");
+  if (check) check.addEventListener("click", () => checkNow(ev.id));
+  if (isParent(ev) && !lastDays.has(ev.id) && !findingLastDay.has(ev.id)) findLastDay(ev);
+  if (calendarApp() === "file" && isIos && !eventFiles.has(ev.id)) checkEventFile(ev.id);
+}
+function closeCard() {
+  const had = selectedId !== null;
+  selectedId = null;
+  $("#card").hidden = true;
+  if (had) scheduleDraw();
+}
+function setStatus(msg, retry) {
+  const el = $("#status");
+  if (!msg) { el.hidden = true; el.innerHTML = ""; return; }
+  el.hidden = false;
+  el.innerHTML = "<span>" + esc(msg) + "</span>" + (retry ? '<button type="button" id="retryBtn">Try again</button>' : "");
+  if (retry) $("#retryBtn").addEventListener("click", load);
+}
+
+/* ---------------- loading ---------------- */
+// Build the display model for one event from everything the store knows about it
+function buildEvent(id) {
+  const base = store.list[id];
+  if (!base) return null;
+  const det = store.details[id];
+  const ev = normalize(Object.assign({}, base, det ? det.d : {}, parentEntryInfo(id)));
+  ev.hasDetails = !!det;
+  ev.entered = false; ev.group = 0; ev.ordered = { bed: false, meals: false, ids: [] };
+  const clubs = entryClubs();
+  if (clubs.length) {
+    const me = new Set(regList(settings.me)), group = new Set(regList(settings.group));
+    const home = new Set(homeClubs());
+    const regsOf = (cs) => cs.flatMap((c) => (store.entries[c + "|" + id] || { regs: [] }).regs);
+    const all = regsOf(clubs);
+    ev.entered = all.some((r) => me.has(r));
+    // group: the listed group IDs, or everyone from the clubs of your own IDs when no group is set
+    ev.group = group.size ? all.filter((r) => group.has(r)).length : regsOf([...home]).length;
+    homeClubs().forEach((c) => markOrders(ev, store.orders[c + "|" + id], me));
+  }
+  oneOffEntries(id).forEach((e) => {
+    ev.entered = true;
+    markOrders(ev, store.orders[e.club + "|" + id], new Set([e.reg]));
+  });
+  // an event whose full entry list wasn't fetched yet (hourly cap) is unknown rather than "not entered"; one list covers
+  // all SI IDs, as it keeps every entry without a club, so they are always unchecked together
+  ev.unchecked = !ev.entered && siList().length > 0 && fullEntriesTaken(id) && !store.entries[ONE_OFF + "|" + id];
+  return ev;
+}
+// your entries without a club in the event, found by SI ID
+function oneOffEntries(id) {
+  const sis = new Set(siList());
+  return (store.entries[ONE_OFF + "|" + id] || { items: [] }).items.filter((e) => sis.has(e.si));
+}
+// A stage of a multi-day event (e.g. E1, E2) has its own entry list, but ORIS keeps the entry start, deadlines and
+// "entries in ORIS" on the parent event, so the stage itself says it doesn't take entries in ORIS
+const parentOf = (id) => String((store.list[id] || {}).ParentID || "0");
+const isStage = (id) => parentOf(id) !== "0";
+function parentEntryInfo(id) {
+  const det = store.details[id], par = store.details[parentOf(id)];
+  let info = {};
+  if (isStage(id) && par && (!det || String(det.d.UseORISForEntries) === "0")) {
+    info = { UseORISForEntries: par.d.UseORISForEntries, EntryStart: par.d.EntryStart,
+      EntryDate1: par.d.EntryDate1, EntryDate2: par.d.EntryDate2, EntryDate3: par.d.EntryDate3 };
+  }
+  return info;
+}
+function fullEntriesTaken(id) {
+  const det = store.details[id];
+  return !!det && (String(det.d.UseORISForEntries) !== "0" || isStage(id));
+}
+// events further away change less often, so their full entry list is kept longer
+function fullEntriesTtl(id) {
+  const days = (new Date(String(store.list[id].Date).slice(0, 10)) - new Date(ymd(new Date()))) / 86400000;
+  return days <= CONFIG.fullEntries.soonDays ? CONFIG.ttl.entries : CONFIG.fullEntries.ttlLater;
+}
+// Waits for the next allowed full entry list request: at least gapMs after the previous one and at most perHour per
+// rolling hour. The log is kept apart from the store, so neither reloading nor "refresh" resets it.
+// Resolves false when the hourly cap is used up; the remaining events are checked on a later load.
+const PACE_KEY = "omap.fullEntries";
+async function fullEntriesSlot() {
+  const log = paceLog();
+  const ok = log.length < CONFIG.fullEntries.perHour;
+  if (ok) {
+    const wait = log.length ? log[log.length - 1] + CONFIG.fullEntries.gapMs - nowMs() : 0;
+    if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+    logFullEntries();
+  }
+  return ok;
+}
+function paceLog() {
+  try { return JSON.parse(localStorage.getItem(PACE_KEY) || "[]").filter((t) => nowMs() - t < 3600000); }
+  catch (e) { return []; }
+}
+function logFullEntries() {
+  try { localStorage.setItem(PACE_KEY, JSON.stringify(paceLog().concat(nowMs()))); } catch (e) {}
+}
+function storeClubEntries(club, id, data) {
+  store.entries[club + "|" + id] = { t: nowMs(), regs: values(data).map((e) => String(e.RegNo || e.RegNum || "").toUpperCase()).filter(Boolean) };
+}
+// keeps only the entries without a club (one-off registration ID, digits only) that have an SI ID
+function storeOneOffEntries(id, data) {
+  store.entries[ONE_OFF + "|" + id] = { t: nowMs(), items: values(data)
+    .map((e) => ({ si: String(e.SI || ""), reg: String(e.RegNo || ""), club: String(e.ClubID || "") }))
+    .filter((e) => e.si && e.club && /^\d+$/.test(e.reg)) };
+}
+function storeOrders(club, id, data) {
+  store.orders[club + "|" + id] = { t: nowMs(), items: orderItems(data) };
+}
+// "Refresh from ORIS" on the card refetches this event's entries and service orders right away. It is a single request the
+// user asks for, so it skips the hourly cap on full entry lists, but it is logged so the automatic checks count it.
+const checking = new Set();   // events being checked now
+async function checkNow(id) {
+  checking.add(id);
+  refreshEvent(id);
+  try {
+    await Promise.all(entryClubs().map(async (club) => storeClubEntries(club, id, await oris("getEventEntries", { eventid: id, clubid: club }))));
+    if (siList().length && fullEntriesTaken(id)) {
+      logFullEntries();
+      storeOneOffEntries(id, await oris("getEventEntries", { eventid: id }));
+    }
+    const det = store.details[id];
+    if (det && det.d.Services.length) {
+      const clubs = homeClubs().concat(oneOffEntries(id).map((e) => e.club));
+      await Promise.all(clubs.map(async (club) => storeOrders(club, id, await oris("getEventServiceEntries", { eventid: id, clubid: club }))));
+    }
+  } catch (e) {
+    setStatus(e.message);
+  }
+  checking.delete(id);
+  saveStore();
+  refreshEvent(id);
+}
+// mark the services ordered under the given registration IDs
+function markOrders(ev, or, regs) {
+  if (or) {
+    or.items.filter((o) => regs.has(o.reg)).forEach((o) => {
+      const svc = ev.services.find((x) => x.id === o.sid);
+      const kind = svc ? svc.kind : serviceKind(o.name);
+      if (o.sid) ev.ordered.ids.push(o.sid);
+      if (kind) ev.ordered[kind] = true;
+    });
+  }
+}
+function orderItems(data) {
+  return values(data).map((o) => ({
+    reg: String(o.RegNo || o.RegNum || (o.ClubUser && o.ClubUser.RegNo) || "").toUpperCase(),
+    sid: String(o.ServiceID || (o.Service && o.Service.ID) || ""),
+    name: o.ServiceNameCZ || (o.Service && (o.Service.NameCZ || o.Service.NameEN)) || ""
+  }));
+}
+function idsInRange(days) {
+  const set = new Set(days);
+  return Object.keys(store.list).filter((id) => set.has(String(store.list[id].Date || "").slice(0, 10)));
+}
+function refreshEvent(id) {
+  const ev = buildEvent(id);
+  if (!ev) { events.delete(id); return; }
+  events.set(id, ev);
+  if (selectedId === id) renderCard(ev);
+  scheduleDraw();
+}
+// after a parent's details change, its stages shown on the map take the parent's entry info again
+function refreshStagesOf(id) {
+  [...events.keys()].filter((c) => parentOf(c) === id).forEach(refreshEvent);
+}
+
+let firstLoad = true;
+// More days than MAX_DAYS are kept as picked (the other end is often changed next), but not loaded:
+// the map keeps what it shows until the dates are shortened
+function load() {
+  const n = allDays().length;
+  let done;
+  if (n > MAX_DAYS) {
+    loadToken++;   // stops a load still running for the previous dates
+    setStatus("These dates cover " + n + " days. Shorten them to " + MAX_DAYS + " or fewer to load events");
+    done = Promise.resolve();
+  } else {
+    done = loadDays();
+  }
+  return done;
+}
+async function loadDays() {
+  const token = ++loadToken;
+  const days = allDays();
+
+  // 1. Show whatever is already known for this range, instantly
+  const showRange = () => {
+    events.clear();
+    idsInRange(days).forEach((id) => { const ev = buildEvent(id); if (ev) events.set(id, ev); });
+    scheduleDraw();
+  };
+  showRange();
+  if (firstLoad && events.size) { fitToEvents(); firstLoad = false; }
+
+  let capped = false;   // the hourly cap on full entry lists stopped the check
+  try {
+    // 2. Event lists only for days not covered or gone stale
+    // One request per day, a few at a time, so the map fills in day by day as answers arrive
+    const missing = days.filter((d) => !fresh(store.days[d], CONFIG.ttl.list));
+    let daysDone = 0, failed = null;
+    if (missing.length) setStatus("Loading events, day 0 of " + missing.length);
+    await pool(missing, CONFIG.concurrency, async (day) => {
+      let list;
+      try { list = values(await oris("getEventList", Object.assign({ datefrom: day, dateto: day }, CONFIG.listParams))); }
+      catch (e) { failed = e; return; }
+      if (token !== loadToken) return;
+      // replace that day: events moved away or removed from ORIS disappear
+      Object.keys(store.list).forEach((id) => { if (String(store.list[id].Date || "").slice(0, 10) === day) delete store.list[id]; });
+      list.forEach((raw) => { store.list[String(raw.ID)] = raw; });
+      store.days[day] = nowMs();
+      saveStore();
+      showRange();
+      setStatus("Loading events, day " + (++daysDone) + " of " + missing.length);
+    });
+    if (token !== loadToken) return;
+    if (failed) throw failed;
+    showRange();
+    if (firstLoad) { fitToEvents(); firstLoad = false; }
+
+    const ids = idsInRange(days).filter((id) => String(store.list[id].Cancelled) !== "1");
+    if (!ids.length) { setStatus(events.size ? "" : "No events in ORIS for these dates"); return; }
+
+    // 3. Details: only new events, events whose ORIS version changed, or very old copies
+    const needDetails = ids.filter((id) => {
+      const det = store.details[id], v = store.list[id].Version;
+      if (!det || !fresh(det.t, CONFIG.ttl.details)) return true;
+      return v !== undefined && String(v) !== String(det.v);
+    });
+    let done = 0;
+    if (needDetails.length) setStatus("Loading details 0 of " + needDetails.length);
+    await pool(needDetails, CONFIG.concurrency, async (id) => {
+      const raw = await oris("getEvent", { id });
+      if (token !== loadToken || !raw) return;
+      store.details[id] = { t: nowMs(), v: raw.Version !== undefined ? String(raw.Version) : String(store.list[id].Version), d: slimDetails(raw) };
+      saveStore();
+      refreshEvent(id);
+      refreshStagesOf(id);
+      setStatus("Loading details " + (++done) + " of " + needDetails.length);
+    });
+    if (token !== loadToken) return;
+
+    // parents of stages whose parent isn't in the dates (e.g. only day 2 is shown): their entry info is used by the stages
+    const needParents = [...new Set(ids.map(parentOf))]
+      .filter((p) => p !== "0" && !store.list[p] && !fresh((store.details[p] || {}).t, CONFIG.ttl.details));
+    await pool(needParents, CONFIG.concurrency, async (p) => {
+      const raw = await oris("getEvent", { id: p });
+      if (token !== loadToken || !raw) return;
+      store.details[p] = { t: nowMs(), v: String(raw.Version), d: slimDetails(raw) };
+      saveStore();
+      refreshStagesOf(p);
+    });
+    if (token !== loadToken) return;
+
+    // 4. Entries (for the clubs of your IDs and your group IDs) and service orders (clubs of your IDs only):
+    //    these change most often, so they expire soonest
+    const clubs = entryClubs();
+    if (clubs.length) {
+      const pairs = [];
+      clubs.forEach((club) => ids.forEach((id) => { if (!fresh((store.entries[club + "|" + id] || {}).t, CONFIG.ttl.entries)) pairs.push([club, id]); }));
+      if (pairs.length) setStatus("Checking your entries");
+      await pool(pairs, CONFIG.concurrency, async ([club, id]) => {
+        const data = await oris("getEventEntries", { eventid: id, clubid: club });
+        if (token !== loadToken) return;
+        storeClubEntries(club, id, data);
+        saveStore();
+        refreshEvent(id);
+      });
+      if (token !== loadToken) return;
+
+      // only services ordered under your own IDs count, so only the clubs of your own IDs are asked
+      const orderPairs = [];
+      homeClubs().forEach((club) => ids.forEach((id) => {
+        const det = store.details[id];
+        if (det && det.d.Services.length && !fresh((store.orders[club + "|" + id] || {}).t, CONFIG.ttl.entries)) orderPairs.push([club, id]);
+      }));
+      if (orderPairs.length) setStatus("Checking your service orders");
+      await pool(orderPairs, CONFIG.concurrency, async ([club, id]) => {
+        const data = await oris("getEventServiceEntries", { eventid: id, clubid: club });
+        if (token !== loadToken) return;
+        if (DEBUG && values(data).length) console.log("service order sample", values(data)[0]);
+        storeOrders(club, id, data);
+        saveStore();
+        refreshEvent(id);
+      });
+      if (token !== loadToken) return;
+    }
+
+    // 5. Entries without a club, matched by SI ID. These are not filtered by club, so ORIS sends each event's
+    //    full entry list: only asked for when an SI ID is set, and only the entries without a club are kept
+    if (siList().length) {
+      // nearest events first; events that don't take entries in ORIS have none to find
+      const need = ids.filter((id) => fullEntriesTaken(id) && !fresh((store.entries[ONE_OFF + "|" + id] || {}).t, fullEntriesTtl(id)))
+        .sort((a, b) => String(store.list[a].Date).localeCompare(String(store.list[b].Date)));
+      let checked = 0;
+      for (const id of need) {
+        if (token === loadToken && !(await fullEntriesSlot())) capped = true;
+        if (token !== loadToken || capped) break;
+        if (token === loadToken) {
+          setStatus("Checking entries without a club " + (++checked) + " of " + need.length);
+          try {
+            const data = await oris("getEventEntries", { eventid: id });
+            if (token === loadToken) {
+              storeOneOffEntries(id, data);
+              saveStore();
+              refreshEvent(id);
+            }
+          } catch (e) { if (DEBUG) console.warn(e); }
+        }
+      }
+      if (token !== loadToken) return;
+
+      // their service orders, asked for by the one-off club of the entry
+      const orderPairs = [];
+      ids.forEach((id) => {
+        const det = store.details[id];
+        if (det && det.d.Services.length) {
+          oneOffEntries(id).forEach((e) => { if (!fresh((store.orders[e.club + "|" + id] || {}).t, CONFIG.ttl.entries)) orderPairs.push([e.club, id]); });
+        }
+      });
+      if (orderPairs.length) setStatus("Checking your service orders");
+      await pool(orderPairs, CONFIG.concurrency, async ([club, id]) => {
+        const data = await oris("getEventServiceEntries", { eventid: id, clubid: club });
+        if (token !== loadToken) return;
+        storeOrders(club, id, data);
+        saveStore();
+        refreshEvent(id);
+      });
+      if (token !== loadToken) return;
+    }
+    drawAll();
+    setStatus(capped ? "Some entries without a club are not checked yet. Try again in an hour" : "");
+  } catch (e) {
+    if (token === loadToken) setStatus(e.message + (events.size ? ". Showing saved data" : ""), true);
+  }
+}
+function fitToEvents() {
+  const pts = [...events.values()].filter((e) => !e.cancelled && e.lat !== null).map((e) => [e.lat, e.lon]);
+  if (pts.length) map.fitBounds(pts, { padding: [40, 40], maxZoom: 10 });
+}
+
+/* ---------------- wiring ---------------- */
+map.on("zoomend", drawAll);
+// Keyboard: Enter or Space on a focused marker opens it
+document.getElementById("map").addEventListener("keydown", (e) => {
+  const id = e.target && e.target.dataset ? e.target.dataset.id : null;
+  if (id && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); select(id); }
+});
+map.on("click", () => { nolocOpen = false; closeCard(); scheduleDraw(); });   // also folds any fanned-out group and the no-location tray
+const fmtDay = (d) => d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+const fmtRange = (r) => ymd(r.from) === ymd(r.to) ? fmtDay(r.from) : fmtDay(r.from) + " – " + fmtDay(r.to);
+
+// Apply a new selection: update the pill, header, editor and URL, then load
+function applyRanges(list, mode, sel) {
+  chosenSel = sel || null;
+  list = normalizeRanges(list);
+  if (!list.length) return;
+  ranges = list;
+  rangesMode = mode;
+  renderDates();
+  const cur = currentSel();
+  const url = new URL(location.href);
+  url.searchParams.delete("days");
+  if (mode === "words" && cur) {
+    const w = selWords(cur).join("-");
+    if (w !== "this-week") url.searchParams.set("days", w);   // no parameter = this week
+  } else {
+    url.searchParams.set("days", rangesKey(ranges));
+  }
+  history.replaceState(null, "", url.toString().replace(/%2C/g, ","));
+  load();
+}
+function renderDates() {
+  const sel = currentSel();
+  const lit = new Set(sel ? selWords(sel) : []);
+  document.querySelectorAll("[data-word]").forEach((b) => {
+    b.setAttribute("aria-pressed", String(lit.has(b.dataset.word)));
+    // a word that would leave no days (e.g. "this work week" on a Saturday) can't be picked
+    const next = tapWord(sel, b.dataset.word);
+    b.disabled = !next || !presetRanges(next).length;
+  });
+  $("#rangeLabel").textContent = ranges.length ? fmtRange(ranges[0]) : "";
+  const more = $("#moreRanges");
+  more.hidden = ranges.length < 2;
+  more.textContent = "+" + (ranges.length - 1);
+  more.setAttribute("aria-label", "and " + (ranges.length - 1) + " more");
+  renderRows();
+}
+// A new range starts empty and joins the selection only once both From and To are set
+let draft = null;
+const X_ICON = '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l10 10M15 5L5 15"/></svg>';
+function dateField(edge, value) {
+  return '<label class="date-field' + (value ? "" : " empty") + '"><span>' + (edge === "from" ? "From" : "To") + '</span>' +
+    '<span class="inp"><input type="date" data-edge="' + edge + '" value="' + (value ? ymd(value) : "") + '">' +
+    '<span class="hint" aria-hidden="true">pick a date</span></span></label>';
+}
+function renderRows() {
+  let html = ranges.map((r, i) =>
+    '<div class="range-row" data-i="' + i + '">' + dateField("from", r.from) + dateField("to", r.to) +
+      (ranges.length > 1 ? '<button class="icon-btn" type="button" data-remove="' + i + '" aria-label="Remove ' + esc(fmtRange(r)) + '">' + X_ICON + "</button>" : "") +
+    "</div>").join("");
+  if (draft) {
+    html += '<div class="range-row" data-draft="1">' + dateField("from", draft.from) + dateField("to", draft.to) +
+      '<button class="icon-btn" type="button" data-remove="draft" aria-label="Remove new range">' + X_ICON + "</button></div>";
+  }
+  $("#rangeRows").innerHTML = html;
+  $("#addRange").hidden = !!draft;
+}
+// What the selection becomes after tapping a word (null = not possible)
+function tapWord(sel, word) {
+  const cur = sel ? { weeks: new Set(sel.weeks), part: sel.part } : { weeks: new Set(["this"]), part: "all" };
+  if (word === "this" || word === "next") {
+    if (!sel) { cur.weeks = new Set([word]); return cur; }
+    if (cur.weeks.has(word)) cur.weeks.delete(word); else cur.weeks.add(word);
+    return cur.weeks.size ? cur : null;   // keep at least one week
+  }
+  if (word === "week") cur.part = "all";
+  if (word === "work") cur.part = sel && sel.part === "work" ? "all" : "work";
+  if (word === "end") cur.part = sel && sel.part === "end" ? "all" : "end";
+  return cur;
+}
+document.querySelectorAll("[data-word]").forEach((b) => b.addEventListener("click", () => {
+  const next = tapWord(currentSel(), b.dataset.word);
+  if (next && presetRanges(next).length) applyRanges(presetRanges(next), "words", next);
+}));
+$("#rangeBtn").addEventListener("click", (e) => {
+  const open = e.currentTarget.getAttribute("aria-expanded") !== "true";
+  e.currentTarget.setAttribute("aria-expanded", String(open));
+  $("#dates").hidden = !open;
+});
+// Editing ranges by hand switches the URL to fixed dates.
+// A row's edits apply only once focus leaves the row: applying mid-edit re-renders the rows, which closes
+// the picker, and would take half-made dates (a year typed digit by digit, the date iOS pre-fills on tap).
+function settleRow(row) {
+  if (row.isConnected && !row.contains(document.activeElement)) {
+    const val = (edge) => parseDT(row.querySelector('input[data-edge="' + edge + '"]').value, false);
+    let from = val("from"), to = val("to");
+    if (row.dataset.draft) {
+      draft = { from, to };
+      if (from && to) { draft = null; applyRanges(ranges.concat([{ from, to }]), "dates"); }
+    } else if (from && to) {
+      const r = ranges[+row.dataset.i];
+      // moving one end past the other carries the range along, keeping its length
+      if (from > to) {
+        const len = dayDiff(r.from, r.to);
+        if (ymd(from) !== ymd(r.from)) to = addDays(from, len); else from = addDays(to, -len);
+      }
+      if (ymd(from) !== ymd(r.from) || ymd(to) !== ymd(r.to)) {
+        const list = ranges.map((x) => ({ from: x.from, to: x.to }));
+        list[+row.dataset.i] = { from, to };
+        applyRanges(list, "dates");
+      }
+    } else {
+      renderRows();   // a cleared boundary of a range goes back to its date
+    }
+  }
+}
+$("#rangeRows").addEventListener("change", (e) => {
+  const input = e.target.closest("input[data-edge]");
+  if (input) {
+    input.closest(".date-field").classList.toggle("empty", !parseDT(input.value, false));
+    const row = input.closest(".range-row");
+    setTimeout(() => settleRow(row));   // a picker may report the change after focus has left
+  }
+});
+$("#rangeRows").addEventListener("focusout", (e) => {
+  const row = e.target.closest(".range-row");
+  if (row) setTimeout(() => settleRow(row));   // by then focus has landed, possibly on the row's other field
+});
+// Keep focus in the date field while pressing remove, so leaving the field doesn't apply what's being removed
+$("#rangeRows").addEventListener("mousedown", (e) => { if (e.target.closest("[data-remove]")) e.preventDefault(); });
+$("#rangeRows").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-remove]");
+  if (!btn) return;
+  if (btn.dataset.remove === "draft") { draft = null; renderRows(); return; }
+  const list = ranges.filter((_, i) => i !== +btn.dataset.remove);
+  applyRanges(list, "dates");
+});
+// Add range: an empty row. The calendar opens only when you tap From or To.
+$("#addRange").addEventListener("click", () => {
+  if (!draft) draft = { from: null, to: null };
+  renderRows();
+});
+$("#fOpen").addEventListener("click", (e) => { filters.open = !filters.open; e.currentTarget.setAttribute("aria-pressed", String(filters.open)); drawAll(); });
+$("#fMine").addEventListener("click", (e) => { filters.mine = !filters.mine; e.currentTarget.setAttribute("aria-pressed", String(filters.mine)); drawAll(); });
+$("#fFree").addEventListener("click", (e) => { filters.free = !filters.free; e.currentTarget.setAttribute("aria-pressed", String(filters.free)); drawAll(); });
+// "Entered" and "Free" need to know your entries, so they only show once your registration ID or SI ID is set
+function updateFreeChip() {
+  const ok = knowsEntries();
+  $("#fMine").hidden = !ok;
+  $("#fFree").hidden = !ok;
+  if (!ok) {
+    filters.mine = false; filters.free = false;
+    $("#fMine").setAttribute("aria-pressed", "false");
+    $("#fFree").setAttribute("aria-pressed", "false");
+  }
+}
+updateFreeChip();
+// IDs without a club code (e.g. 0270001, a one-off ID given to an unregistered runner for a single event) can't be matched
+function updateRegWarnings() {
+  const unknown = (s) => regList(s).filter((r) => !clubOf(r));
+  const notClub = (list) => list.join(", ") + (list.length > 1 ? " are not club registration IDs" : " is not a club registration ID")
+    + " (ABC1234), so " + (list.length > 1 ? "they are" : "it is") + " ignored.";
+  const me = $("#sMe").value, meBad = unknown(me), groupBad = unknown($("#sGroup").value);
+  const hasSi = regList($("#sSi").value).some((x) => /^\d+$/.test(x));
+  let meMsg = "";
+  if (meBad.length) {
+    meMsg = notClub(meBad);
+    if (!regList(me).some(clubOf) && !hasSi) meMsg += " Some filters stay hidden until you add a club registration ID or an SI ID.";
+  }
+  const groupMsg = groupBad.length ? notClub(groupBad) : "";
+  $("#sMeWarn").textContent = meMsg; $("#sMeWarn").hidden = !meMsg;
+  $("#sGroupWarn").textContent = groupMsg; $("#sGroupWarn").hidden = !groupMsg;
+}
+$("#sMe").addEventListener("input", updateRegWarnings);
+$("#sGroup").addEventListener("input", updateRegWarnings);
+$("#sSi").addEventListener("input", updateRegWarnings);
+/* ---------------- Entry deadline reminders: subscribing to the calendar feeds ---------------- */
+// Feeds are published with the site by the Deploy workflow (scripts/build-feeds.mjs): feeds/(level|region)-<code>.ics,
+// the code in plain ASCII. Subscribing uses webcal: (iOS and macOS hand it to Calendar) or Google Calendar's "add by URL".
+const asciiCode = (code) => code.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+const feedUrl = (kind, code) => new URL("feeds/" + kind + "-" + asciiCode(code) + ".ics", location.href).href;
+function subscribeLink(url) {
+  const webcal = url.replace(/^https?:/, "webcal:");
+  let link = { href: webcal, attrs: "" };
+  if (calendarApp() === "google") link = { href: "https://calendar.google.com/calendar/r?cid=" + encodeURIComponent(webcal), attrs: ' target="_blank" rel="noopener"' };
+  return link;
+}
+function feedRow(kind, code, name, home) {
+  const url = feedUrl(kind, code), sub = subscribeLink(url);
+  return '<li' + (home ? ' class="home"' : "") + '><span class="label"><span class="code">' + esc(code) + '</span><span class="name">' + esc(name) +
+    (home ? " · <em>your club</em>" : "") + "</span></span>" +
+    '<button class="icon-btn copy" type="button" data-url="' + esc(url) + '" aria-label="Copy the address of the ' + esc(code) + ' feed">' + ICON.copy + "</button>" +
+    '<a class="btn" href="' + esc(sub.href) + '"' + sub.attrs + ">Subscribe</a></li>";
+}
+// ORIS regions with their names, and the regions of your clubs (from your registration IDs); loaded once
+let regionInfo = null;
+async function loadRegionInfo() {
+  const all = values(await oris("getList", { list: "region" }));
+  const regions = all.map((r) => ({ code: CONFIG.regionCode[r.ID] || r.ID, name: r.ID === "ČR" ? "National" : r.Description || r.ID }))
+    .sort((a, b) => a.code.localeCompare(b.code, "cs"));
+  const home = new Set();
+  if (homeClubs().length) {
+    // a club's region comes as the region's name (e.g. "Pražská")
+    const clubs = values(await oris("getCSOSClubList", {}));
+    homeClubs().forEach((abbr) => {
+      const club = clubs.find((c) => String(c.Abbr || "").toUpperCase() === abbr);
+      const region = club ? all.find((r) => r.Description === club.Region) : null;
+      if (region) home.add(CONFIG.regionCode[region.ID] || region.ID);
+    });
+  }
+  return { regions, home };
+}
+async function renderRegions() {
+  const ul = $("#calRegions");
+  if (!regionInfo) {
+    ul.innerHTML = '<li class="msg">Loading regions from ORIS…</li>';
+    try { regionInfo = await loadRegionInfo(); }
+    catch (e) {
+      if (DEBUG) console.warn(e);
+      ul.innerHTML = '<li class="msg">Couldn\'t load the regions from ORIS. <button class="btn" type="button" id="calRetry">Try again</button></li>';
+      $("#calRetry").addEventListener("click", renderRegions);
+    }
+  }
+  if (regionInfo) ul.innerHTML = regionInfo.regions.map((r) => feedRow("region", r.code, r.name, regionInfo.home.has(r.code))).join("");
+}
+function openCalendars() {
+  $("#calLevels").innerHTML = CONFIG.levelFeeds.map((f) => feedRow("level", f.code, f.name, false)).join("");
+  $("#calendars").showModal();
+  renderRegions();
+}
+$("#calClose").innerHTML = ICON.close;
+$("#calClose").addEventListener("click", () => $("#calendars").close());
+$("#calendarsBtn").addEventListener("click", openCalendars);
+$("#calendars").addEventListener("click", async (e) => {
+  const btn = e.target.closest ? e.target.closest("button.copy") : null;
+  if (btn) {
+    const url = btn.dataset.url;
+    try {
+      await navigator.clipboard.writeText(url);
+      btn.innerHTML = ICON.check.replace('width="9" height="9"', 'width="18" height="18"');
+      setTimeout(() => { btn.innerHTML = ICON.copy; }, 1500);
+    } catch (err) { window.prompt("Copy the feed's address:", url); }
+  }
+});
+// your clubs may change in Settings; their regions are looked up again next time
+$("#settings").addEventListener("close", () => { regionInfo = null; });
+
+$("#settingsBtn").addEventListener("click", () => {
+  $("#sMe").value = settings.me; $("#sGroup").value = settings.group; $("#sSi").value = settings.si || ""; $("#sNav").value = settings.nav || "auto";
+  $("#sCal").value = settings.cal || "auto";
+  updateRegWarnings();
+  $("#settings").showModal();
+});
+$("#settings").addEventListener("close", () => {
+  if ($("#settings").returnValue !== "save") return;
+  settings = { me: $("#sMe").value.trim(), group: $("#sGroup").value.trim(), si: $("#sSi").value.trim(), nav: $("#sNav").value, cal: $("#sCal").value };
+  saveSettings(settings);
+  updateFreeChip();
+  load();   // entries are stored per club, so a new club (or the first SI ID) is fetched and the rest comes from the store
+});
+$("#refreshBtn").addEventListener("click", () => { clearStore(); load(); });   // settings (club, numbers) are stored separately and stay
+
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#card").hidden) closeCard(); });
+
+// #calendars (the link in every feed entry) opens the reminders dialog; it is dropped from the URL after opening, so
+// that it doesn't end up in a Home Screen icon
+function openCalendarsFromUrl() {
+  const url = new URL(location.href);
+  if (url.hash === "#calendars") {
+    url.hash = "";
+    history.replaceState(null, "", url.toString().replace(/#$/, ""));
+    openCalendars();
+  }
+}
+window.addEventListener("hashchange", openCalendarsFromUrl);
+
+(function init() {
+  setTimeout(openCalendarsFromUrl, 0);
+  let parsed = parseDaysParam(params.get("days"));
+  // words that give no days today (e.g. "this-work-week" on a Saturday) fall back to this week
+  if (!parsed || (parsed.mode === "words" && !presetRanges(parsed.sel).length)) parsed = parseDaysParam("this-week");
+  if (parsed.mode === "words") applyRanges(presetRanges(parsed.sel), "words", parsed.sel);
+  else applyRanges(parsed.ranges, "dates");
+})();
+</script>
+</body>
+</html>

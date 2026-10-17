@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-9955-event
+DTSTAMP:20261017T104339Z
+DTSTART;VALUE=DATE:20261028
+DTEND;VALUE=DATE:20261029
+SUMMARY:Oblastní žebříček
+LOCATION:Prachatice - centrum ekologické výchovy Dřípatka
+GEO:49.00813;13.9935
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=9955
+URL:https://oris.ceskyorientak.cz/Zavod?id=9955
+END:VEVENT
+END:VCALENDAR

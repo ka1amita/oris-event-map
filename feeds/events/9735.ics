@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-9735-event
+DTSTAMP:20261017T104339Z
+DTSTART;VALUE=DATE:20261024
+DTEND;VALUE=DATE:20261025
+SUMMARY:Mistrovství oblasti v nočním OB
+LOCATION:Třeštice - hasičárna
+GEO:49.24593;15.44996
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=9735
+URL:https://oris.ceskyorientak.cz/Zavod?id=9735
+END:VEVENT
+END:VCALENDAR

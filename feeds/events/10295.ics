@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-10295-event
+DTSTAMP:20261017T104339Z
+DTSTART;VALUE=DATE:20261227
+DTEND;VALUE=DATE:20261228
+SUMMARY:Kufrování s Krakonošem aneb Jilemnice plná lampiónů
+LOCATION:Jilemnice\, Masarykovo náměstí
+GEO:50.608907045837;15.506075620651
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=10295
+URL:https://oris.ceskyorientak.cz/Zavod?id=10295
+END:VEVENT
+END:VCALENDAR

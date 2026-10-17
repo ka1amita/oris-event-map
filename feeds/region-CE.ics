@@ -1,0 +1,78 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map entry deadlines//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:ORIS ČE entry deadlines
+X-WR-CALDESC:ORIS map · region ČE entry deadline feed. Manage or unsubscr
+ ibe: https://www.matejkala.com/oris-event-map/#calendars
+X-WR-TIMEZONE:Europe/Prague
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Prague
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:oris-event-map-10251-entry-deadline-1-region-ce
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261025T235900
+SUMMARY:Entry deadline 1/1 · ČE · NN · Workshop pro trenéry: Problemat
+ ika rozvoje syndromu RED-S a poruch příjmu potravy v OB a jejich prevenc
+ e · Praha - Strahov
+DESCRIPTION:Workshop pro trenéry: Problematika rozvoje syndromu RED-S a po
+ ruch příjmu potravy v OB a jejich prevence\nPraha - Strahov\nEvent day: 
+ 2026-10-28\nEntry deadline 1 of 1 closes 2026-10-25 23:59:00\nhttps://oris
+ .ceskyorientak.cz/Zavod?id=10251\n\nORIS map · region ČE entry deadline 
+ feed. Manage or unsubscribe: https://www.matejkala.com/oris-event-map/#cal
+ endars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10251
+LOCATION:Praha - Strahov
+GEO:50.080387579861;14.385781288147
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · ČE · NN · Workshop pro trenéry: Probl
+ ematika rozvoje syndromu RED-S a poruch příjmu potravy v OB a jejich pre
+ vence · Praha - Strahov
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10332-entry-deadline-1-region-ce
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261206T235959
+SUMMARY:Entry deadline 1/1 · ČE · OP · JIH INDOOR #1: Gymnázium Jírov
+ cova České Budějovice · Gymnázium\, České Budějovice\, Jírovcova 
+ 8
+DESCRIPTION:JIH INDOOR #1: Gymnázium Jírovcova České Budějovice\nGymn
+ ázium\, České Budějovice\, Jírovcova 8\nEvent day: 2026-12-12\nEntry 
+ deadline 1 of 1 closes 2026-12-06 23:59:59\nhttps://oris.ceskyorientak.cz/
+ Zavod?id=10332\n\nORIS map · region ČE entry deadline feed. Manage or un
+ subscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10332
+LOCATION:Gymnázium\, České Budějovice\, Jírovcova 8
+GEO:48.97888;14.47779
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · ČE · OP · JIH INDOOR #1: Gymnázium J
+ írovcova České Budějovice · Gymnázium\, České Budějovice\, Jírov
+ cova 8
+END:VALARM
+END:VEVENT
+END:VCALENDAR

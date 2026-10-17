@@ -1,0 +1,219 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map entry deadlines//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:ORIS VČ entry deadlines
+X-WR-CALDESC:ORIS map · region VČ entry deadline feed. Manage or unsubscr
+ ibe: https://www.matejkala.com/oris-event-map/#calendars
+X-WR-TIMEZONE:Europe/Prague
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Prague
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:oris-event-map-10007-entry-deadline-1-region-vc
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261019T235959
+SUMMARY:Entry deadline 1/1 · VČ · OP · 11. kolo Orlické ligy · Žampa
+ ch\, areál zámeckého parku
+DESCRIPTION:11. kolo Orlické ligy\nŽampach\, areál zámeckého parku\nEv
+ ent day: 2026-10-21\nEntry deadline 1 of 1 closes 2026-10-19 23:59:59\nhtt
+ ps://oris.ceskyorientak.cz/Zavod?id=10007\n\nORIS map · region VČ entry 
+ deadline feed. Manage or unsubscribe: https://www.matejkala.com/oris-event
+ -map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10007
+LOCATION:Žampach\, areál zámeckého parku
+GEO:50.038227042143;16.430515050888
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · VČ · OP · 11. kolo Orlické ligy · Ž
+ ampach\, areál zámeckého parku
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-9581-entry-deadline-1-region-vc
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261018T235959
+SUMMARY:Entry deadline 1/1 · VČ · RL · Oblastní žebříček · Markou
+ šovice\, louka u kostela
+DESCRIPTION:Oblastní žebříček\nMarkoušovice\, louka u kostela\nEvent 
+ day: 2026-10-24\nEntry deadline 1 of 1 closes 2026-10-18 23:59:59\nhttps:/
+ /oris.ceskyorientak.cz/Zavod?id=9581\n\nORIS map · region VČ entry deadl
+ ine feed. Manage or unsubscribe: https://www.matejkala.com/oris-event-map/
+ #calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9581
+LOCATION:Markoušovice\, louka u kostela
+GEO:50.562890559203;16.007241010666
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · VČ · RL · Oblastní žebříček · Ma
+ rkoušovice\, louka u kostela
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10313-entry-deadline-1-region-vc
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261020T235959
+SUMMARY:Entry deadline 1/1 · VČ · OP · WAU Škola Radeč · ZŠ Radeč\
+ , Úpice
+DESCRIPTION:WAU Škola Radeč\nZŠ Radeč\, Úpice\nEvent day: 2026-10-24\n
+ Entry deadline 1 of 1 closes 2026-10-20 23:59:59\nhttps://oris.ceskyorient
+ ak.cz/Zavod?id=10313\n\nORIS map · region VČ entry deadline feed. Manage
+  or unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10313
+LOCATION:ZŠ Radeč\, Úpice
+GEO:50.508903032735;15.9903216362
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · VČ · OP · WAU Škola Radeč · ZŠ Rad
+ eč\, Úpice
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10254-entry-deadline-1-region-vc
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261025T235914
+SUMMARY:Entry deadline 1/1 · VČ · OP · Memoriál Ládi Hrubého
+DESCRIPTION:Memoriál Ládi Hrubého\nEvent day: 2026-10-28\nEntry deadline
+  1 of 1 closes 2026-10-25 23:59:14\nhttps://oris.ceskyorientak.cz/Zavod?id
+ =10254\n\nORIS map · region VČ entry deadline feed. Manage or unsubscrib
+ e: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10254
+GEO:50.676187724745;15.508963456901
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · VČ · OP · Memoriál Ládi Hrubého
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-9582-entry-deadline-1-region-vc
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261025T235959
+SUMMARY:Entry deadline 1/1 · VČ · RL · Oblastní žebříček · Choce
+ ň
+DESCRIPTION:Oblastní žebříček\nChoceň\nEvent day: 2026-11-01\nEntry d
+ eadline 1 of 1 closes 2026-10-25 23:59:59\nhttps://oris.ceskyorientak.cz/Z
+ avod?id=9582\n\nORIS map · region VČ entry deadline feed. Manage or unsu
+ bscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9582
+LOCATION:Choceň
+GEO:50.000112260126;16.202666759491
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · VČ · RL · Oblastní žebříček · Ch
+ oceň
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10001-entry-deadline-1-region-vc
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261102T235959
+SUMMARY:Entry deadline 1/1 · VČ · OP · 12. kolo Orlické ligy · Často
+ lovice
+DESCRIPTION:12. kolo Orlické ligy\nČastolovice\nEvent day: 2026-11-04\nEn
+ try deadline 1 of 1 closes 2026-11-02 23:59:59\nhttps://oris.ceskyorientak
+ .cz/Zavod?id=10001\n\nORIS map · region VČ entry deadline feed. Manage o
+ r unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10001
+LOCATION:Častolovice
+GEO:50.133949106014;16.185586452484
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · VČ · OP · 12. kolo Orlické ligy · Č
+ astolovice
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-9583-entry-deadline-1-region-vc
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261101T235959
+SUMMARY:Entry deadline 1/1 · VČ · RL · Oblastní žebříček · Kutná
+  Hora - Kaňk\, fotbalové hřiště
+DESCRIPTION:Oblastní žebříček\nKutná Hora - Kaňk\, fotbalové hřiš
+ tě\nEvent day: 2026-11-07\nEntry deadline 1 of 1 closes 2026-11-01 23:59:
+ 59\nhttps://oris.ceskyorientak.cz/Zavod?id=9583\n\nORIS map · region VČ 
+ entry deadline feed. Manage or unsubscribe: https://www.matejkala.com/oris
+ -event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9583
+LOCATION:Kutná Hora - Kaňk\, fotbalové hřiště
+GEO:49.975099603126;15.267519950867
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · VČ · RL · Oblastní žebříček · Ku
+ tná Hora - Kaňk\, fotbalové hřiště
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10317-entry-deadline-1-region-vc
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261115T101111
+SUMMARY:Entry deadline 1/1 · VČ · OP · Orienťák v Liboháji · Polič
+ ka Liboháj
+DESCRIPTION:Orienťák v Liboháji\nPolička Liboháj\nEvent day: 2026-11-1
+ 7\nEntry deadline 1 of 1 closes 2026-11-15 10:11:11\nhttps://oris.ceskyori
+ entak.cz/Zavod?id=10317\n\nORIS map · region VČ entry deadline feed. Man
+ age or unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10317
+LOCATION:Polička Liboháj
+GEO:49.703750580009;16.261696815491
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · VČ · OP · Orienťák v Liboháji · Po
+ lička Liboháj
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10295-entry-deadline-1-region-vc
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261228T120000
+SUMMARY:Entry deadline 1/1 · VČ · OP · Kufrování s Krakonošem aneb J
+ ilemnice plná lampiónů · Jilemnice\, Masarykovo náměstí
+DESCRIPTION:Kufrování s Krakonošem aneb Jilemnice plná lampiónů\nJile
+ mnice\, Masarykovo náměstí\nEvent day: 2026-12-27\nEntry deadline 1 of 
+ 1 closes 2026-12-28 12:00:00\nhttps://oris.ceskyorientak.cz/Zavod?id=10295
+ \n\nORIS map · region VČ entry deadline feed. Manage or unsubscribe: htt
+ ps://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10295
+LOCATION:Jilemnice\, Masarykovo náměstí
+GEO:50.608907045837;15.506075620651
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · VČ · OP · Kufrování s Krakonošem an
+ eb Jilemnice plná lampiónů · Jilemnice\, Masarykovo náměstí
+END:VALARM
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,72 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map entry deadlines//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:ORIS NC-NP-AL entry deadlines
+X-WR-CALDESC:ORIS map · level NC-NP-AL entry deadline feed. Manage or unsu
+ bscribe: https://www.matejkala.com/oris-event-map/#calendars
+X-WR-TIMEZONE:Europe/Prague
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Prague
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:oris-event-map-10072-entry-deadline-1-level-nc-np-al
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261103T235959
+SUMMARY:Entry deadline 1/1 · NC-NP-AL · NC · PTP PreO · Praha-Liboc\, O
+ bora Hvězda
+DESCRIPTION:PTP PreO\nPraha-Liboc\, Obora Hvězda\nEvent day: 2026-11-08\nE
+ ntry deadline 1 of 1 closes 2026-11-03 23:59:59\nhttps://oris.ceskyorienta
+ k.cz/Zavod?id=10072\n\nORIS map · level NC-NP-AL entry deadline feed. Man
+ age or unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10072
+LOCATION:Praha-Liboc\, Obora Hvězda
+GEO:50.083334194376;14.327759742737
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · NC-NP-AL · NC · PTP PreO · Praha-Liboc
+ \, Obora Hvězda
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10073-entry-deadline-1-level-nc-np-al
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261103T235959
+SUMMARY:Entry deadline 1/1 · NC-NP-AL · NP · PTP TempO · Praha-Ruzyně\
+ , Sídliště Na Dědině
+DESCRIPTION:PTP TempO\nPraha-Ruzyně\, Sídliště Na Dědině\nEvent day: 
+ 2026-11-08\nEntry deadline 1 of 1 closes 2026-11-03 23:59:59\nhttps://oris
+ .ceskyorientak.cz/Zavod?id=10073\n\nORIS map · level NC-NP-AL entry deadl
+ ine feed. Manage or unsubscribe: https://www.matejkala.com/oris-event-map/
+ #calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10073
+LOCATION:Praha-Ruzyně\, Sídliště Na Dědině
+GEO:50.09138826771;14.308319091797
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · NC-NP-AL · NP · PTP TempO · Praha-Ruzy
+ ně\, Sídliště Na Dědině
+END:VALARM
+END:VEVENT
+END:VCALENDAR

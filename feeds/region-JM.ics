@@ -1,0 +1,176 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map entry deadlines//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:ORIS JM entry deadlines
+X-WR-CALDESC:ORIS map · region JM entry deadline feed. Manage or unsubscri
+ be: https://www.matejkala.com/oris-event-map/#calendars
+X-WR-TIMEZONE:Europe/Prague
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Prague
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:oris-event-map-10275-entry-deadline-1-region-jm
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261020T235959
+SUMMARY:Entry deadline 1/1 · JM · OP · Liga škol · Brno-Řečkovice
+DESCRIPTION:Liga škol\nBrno-Řečkovice\nEvent day: 2026-10-23\nEntry dead
+ line 1 of 1 closes 2026-10-20 23:59:59\nhttps://oris.ceskyorientak.cz/Zavo
+ d?id=10275\n\nORIS map · region JM entry deadline feed. Manage or unsubsc
+ ribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10275
+LOCATION:Brno-Řečkovice
+GEO:49.2468;16.5855
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · JM · OP · Liga škol · Brno-Řečkovic
+ e
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-9864-entry-deadline-1-region-jm
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261019T235959
+SUMMARY:Entry deadline 1/2 · JM · RL · Oblastní žebříček · Brno\, 
+ Líšeń
+DESCRIPTION:Oblastní žebříček\nBrno\, Líšeń\nEvent day: 2026-10-24\
+ nEntry deadline 1 of 2 closes 2026-10-19 23:59:59\nhttps://oris.ceskyorien
+ tak.cz/Zavod?id=9864\n\nORIS map · region JM entry deadline feed. Manage 
+ or unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9864
+LOCATION:Brno\, Líšeń
+GEO:49.217541041562;16.695055961609
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/2 · JM · RL · Oblastní žebříček · Brn
+ o\, Líšeń
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-9864-entry-deadline-2-region-jm
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261021T200000
+SUMMARY:Entry deadline 2/2 · JM · RL · Oblastní žebříček · Brno\, 
+ Líšeń
+DESCRIPTION:Oblastní žebříček\nBrno\, Líšeń\nEvent day: 2026-10-24\
+ nEntry deadline 2 of 2 closes 2026-10-21 20:00:00\nhttps://oris.ceskyorien
+ tak.cz/Zavod?id=9864\n\nORIS map · region JM entry deadline feed. Manage 
+ or unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9864
+LOCATION:Brno\, Líšeń
+GEO:49.217541041562;16.695055961609
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · JM · RL · Oblastní žebříček · Brn
+ o\, Líšeń
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10323-entry-deadline-1-region-jm
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261102T235959
+SUMMARY:Entry deadline 1/1 · JM · OP · MB NOPB · Brno - Slatina
+DESCRIPTION:MB NOPB\nBrno - Slatina\nEvent day: 2026-11-05\nEntry deadline 
+ 1 of 1 closes 2026-11-02 23:59:59\nhttps://oris.ceskyorientak.cz/Zavod?id=
+ 10323\n\nORIS map · region JM entry deadline feed. Manage or unsubscribe:
+  https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10323
+LOCATION:Brno - Slatina
+GEO:49.1803;16.6853
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · JM · OP · MB NOPB · Brno - Slatina
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10247-entry-deadline-1-region-jm
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261031T235555
+SUMMARY:Entry deadline 1/1 · JM · OP · Oddílový přebor ZBM 2026 · Ba
+ bice nad Svitavou
+DESCRIPTION:Oddílový přebor ZBM 2026\nBabice nad Svitavou\nEvent day: 20
+ 26-11-14\nEntry deadline 1 of 1 closes 2026-10-31 23:55:55\nhttps://oris.c
+ eskyorientak.cz/Zavod?id=10247\n\nORIS map · region JM entry deadline fee
+ d. Manage or unsubscribe: https://www.matejkala.com/oris-event-map/#calend
+ ars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10247
+LOCATION:Babice nad Svitavou
+GEO:49.283056992985;16.69537782958
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · JM · OP · Oddílový přebor ZBM 2026 
+ · Babice nad Svitavou
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10304-entry-deadline-1-region-jm
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261202T235959
+SUMMARY:Entry deadline 1/1 · JM · OP · 2. Sportega BZL: Memoriál svobod
+ y · Žabovřesky
+DESCRIPTION:2. Sportega BZL: Memoriál svobody\nŽabovřesky\nEvent day: 20
+ 26-12-06\nEntry deadline 1 of 1 closes 2026-12-02 23:59:59\nhttps://oris.c
+ eskyorientak.cz/Zavod?id=10304\n\nORIS map · region JM entry deadline fee
+ d. Manage or unsubscribe: https://www.matejkala.com/oris-event-map/#calend
+ ars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10304
+LOCATION:Žabovřesky
+GEO:49.21535;16.58046
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · JM · OP · 2. Sportega BZL: Memoriál sv
+ obody · Žabovřesky
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-9807-entry-deadline-1-region-jm
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261210T235959
+SUMMARY:Entry deadline 1/1 · JM · OP · Běh na Býčí skálu - 64. roč
+ ník · Brno - Řečkovice\, Zamilovaný háj
+DESCRIPTION:Běh na Býčí skálu - 64. ročník\nBrno - Řečkovice\, Zam
+ ilovaný háj\nEvent day: 2026-12-12\nEntry deadline 1 of 1 closes 2026-12
+ -10 23:59:59\nhttps://oris.ceskyorientak.cz/Zavod?id=9807\n\nORIS map · r
+ egion JM entry deadline feed. Manage or unsubscribe: https://www.matejkala
+ .com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9807
+LOCATION:Brno - Řečkovice\, Zamilovaný háj
+GEO:49.245046618544;16.591678261757
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · JM · OP · Běh na Býčí skálu - 64. 
+ ročník · Brno - Řečkovice\, Zamilovaný háj
+END:VALARM
+END:VEVENT
+END:VCALENDAR

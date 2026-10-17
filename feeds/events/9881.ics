@@ -1,0 +1,18 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-9881-event
+DTSTAMP:20261017T104339Z
+DTSTART;VALUE=DATE:20261017
+DTEND;VALUE=DATE:20261018
+SUMMARY:Oblastní žebříček
+LOCATION:Francova Lhota\, místní část Pulčín - veřejné tábořišt
+ ě
+GEO:49.21987;18.07748
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=9881
+URL:https://oris.ceskyorientak.cz/Zavod?id=9881
+END:VEVENT
+END:VCALENDAR

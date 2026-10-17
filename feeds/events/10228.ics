@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-10228-event
+DTSTAMP:20261017T104339Z
+DTSTART;VALUE=DATE:20261121
+DTEND;VALUE=DATE:20261122
+SUMMARY:Metodický seminář trenérů a rozhodčích
+LOCATION:Jablonec nad Nisou - Gymnázium Dr. A. Randy
+GEO:50.728941227115;15.165520906448
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=10228
+URL:https://oris.ceskyorientak.cz/Zavod?id=10228
+END:VEVENT
+END:VCALENDAR

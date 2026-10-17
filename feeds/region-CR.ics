@@ -1,0 +1,223 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map entry deadlines//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:ORIS ČR entry deadlines
+X-WR-CALDESC:ORIS map · region ČR entry deadline feed. Manage or unsubscr
+ ibe: https://www.matejkala.com/oris-event-map/#calendars
+X-WR-TIMEZONE:Europe/Prague
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Prague
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:oris-event-map-10273-entry-deadline-2-region-cr
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261021T225859
+SUMMARY:Entry deadline 2/2 · ČR · OP · TESTY LOB - podzim 2026
+DESCRIPTION:TESTY LOB - podzim 2026\nEvent day: 2026-10-23\nEntry deadline 
+ 2 of 2 closes 2026-10-21 22:58:59\nhttps://oris.ceskyorientak.cz/Zavod?id=
+ 10273\n\nORIS map · region ČR entry deadline feed. Manage or unsubscribe
+ : https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10273
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · ČR · OP · TESTY LOB - podzim 2026
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10251-entry-deadline-1-region-cr
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261025T235900
+SUMMARY:Entry deadline 1/1 · ČR · NN · Workshop pro trenéry: Problemat
+ ika rozvoje syndromu RED-S a poruch příjmu potravy v OB a jejich prevenc
+ e · Praha - Strahov
+DESCRIPTION:Workshop pro trenéry: Problematika rozvoje syndromu RED-S a po
+ ruch příjmu potravy v OB a jejich prevence\nPraha - Strahov\nEvent day: 
+ 2026-10-28\nEntry deadline 1 of 1 closes 2026-10-25 23:59:00\nhttps://oris
+ .ceskyorientak.cz/Zavod?id=10251\n\nORIS map · region ČR entry deadline 
+ feed. Manage or unsubscribe: https://www.matejkala.com/oris-event-map/#cal
+ endars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10251
+LOCATION:Praha - Strahov
+GEO:50.080387579861;14.385781288147
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · ČR · NN · Workshop pro trenéry: Probl
+ ematika rozvoje syndromu RED-S a poruch příjmu potravy v OB a jejich pre
+ vence · Praha - Strahov
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10072-entry-deadline-1-region-cr
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261103T235959
+SUMMARY:Entry deadline 1/1 · ČR · NC · PTP PreO · Praha-Liboc\, Obora 
+ Hvězda
+DESCRIPTION:PTP PreO\nPraha-Liboc\, Obora Hvězda\nEvent day: 2026-11-08\nE
+ ntry deadline 1 of 1 closes 2026-11-03 23:59:59\nhttps://oris.ceskyorienta
+ k.cz/Zavod?id=10072\n\nORIS map · region ČR entry deadline feed. Manage 
+ or unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10072
+LOCATION:Praha-Liboc\, Obora Hvězda
+GEO:50.083334194376;14.327759742737
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · ČR · NC · PTP PreO · Praha-Liboc\, Ob
+ ora Hvězda
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10073-entry-deadline-1-region-cr
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261103T235959
+SUMMARY:Entry deadline 1/1 · ČR · NP · PTP TempO · Praha-Ruzyně\, Sí
+ dliště Na Dědině
+DESCRIPTION:PTP TempO\nPraha-Ruzyně\, Sídliště Na Dědině\nEvent day: 
+ 2026-11-08\nEntry deadline 1 of 1 closes 2026-11-03 23:59:59\nhttps://oris
+ .ceskyorientak.cz/Zavod?id=10073\n\nORIS map · region ČR entry deadline 
+ feed. Manage or unsubscribe: https://www.matejkala.com/oris-event-map/#cal
+ endars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10073
+LOCATION:Praha-Ruzyně\, Sídliště Na Dědině
+GEO:50.09138826771;14.308319091797
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · ČR · NP · PTP TempO · Praha-Ruzyně\,
+  Sídliště Na Dědině
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10312-entry-deadline-1-region-cr
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261129T235959
+SUMMARY:Entry deadline 1/2 · ČR · OP · ZHL Mikulášská knihovna · SV
+ K Hradec Králové
+DESCRIPTION:ZHL Mikulášská knihovna\nSVK Hradec Králové\nEvent day: 20
+ 26-12-05\nEntry deadline 1 of 2 closes 2026-11-29 23:59:59\nhttps://oris.c
+ eskyorientak.cz/Zavod?id=10312\n\nORIS map · region ČR entry deadline fe
+ ed. Manage or unsubscribe: https://www.matejkala.com/oris-event-map/#calen
+ dars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10312
+LOCATION:SVK Hradec Králové
+GEO:50.205072357349;15.83142314812
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/2 · ČR · OP · ZHL Mikulášská knihovna 
+ · SVK Hradec Králové
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10312-entry-deadline-2-region-cr
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261201T235959
+SUMMARY:Entry deadline 2/2 · ČR · OP · ZHL Mikulášská knihovna · SV
+ K Hradec Králové
+DESCRIPTION:ZHL Mikulášská knihovna\nSVK Hradec Králové\nEvent day: 20
+ 26-12-05\nEntry deadline 2 of 2 closes 2026-12-01 23:59:59\nhttps://oris.c
+ eskyorientak.cz/Zavod?id=10312\n\nORIS map · region ČR entry deadline fe
+ ed. Manage or unsubscribe: https://www.matejkala.com/oris-event-map/#calen
+ dars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10312
+LOCATION:SVK Hradec Králové
+GEO:50.205072357349;15.83142314812
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · ČR · OP · ZHL Mikulášská knihovna 
+ · SVK Hradec Králové
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10301-entry-deadline-1-region-cr
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20261115T000000
+SUMMARY:Entry deadline 1/1 · ČR · OP · Lyžařská akademie Paprsek 13.
+ -18.12.2026 · Paprsek
+DESCRIPTION:Lyžařská akademie Paprsek 13.-18.12.2026\nPaprsek\nEvent day
+ : 2026-12-13\nEntry deadline 1 of 1 closes 2026-11-15 00:00:00\nhttps://or
+ is.ceskyorientak.cz/Zavod?id=10301\n\nORIS map · region ČR entry deadlin
+ e feed. Manage or unsubscribe: https://www.matejkala.com/oris-event-map/#c
+ alendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10301
+LOCATION:Paprsek
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · ČR · OP · Lyžařská akademie Paprsek
+  13.-18.12.2026 · Paprsek
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10341-entry-deadline-1-region-cr
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20270110T140913
+SUMMARY:Entry deadline 1/1 · ČR · OP · JIH INDOOR #2:  ZŠ Tylova Píse
+ k · ZŠ Tylova Písek
+DESCRIPTION:JIH INDOOR #2:  ZŠ Tylova Písek\nZŠ Tylova Písek\nEvent day
+ : 2027-01-16\nEntry deadline 1 of 1 closes 2027-01-10 14:09:13\nhttps://or
+ is.ceskyorientak.cz/Zavod?id=10341\n\nORIS map · region ČR entry deadlin
+ e feed. Manage or unsubscribe: https://www.matejkala.com/oris-event-map/#c
+ alendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10341
+LOCATION:ZŠ Tylova Písek
+GEO:49.31075;14.15124
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · ČR · OP · JIH INDOOR #2:  ZŠ Tylova P
+ ísek · ZŠ Tylova Písek
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10342-entry-deadline-1-region-cr
+DTSTAMP:20261017T104332Z
+DTSTART;TZID=Europe/Prague:20270214T141636
+SUMMARY:Entry deadline 1/1 · ČR · OP · JIH INDOOR #3: ZŠ Husova Tábor
+  · ZŠ Husova Tábor
+DESCRIPTION:JIH INDOOR #3: ZŠ Husova Tábor\nZŠ Husova Tábor\nEvent day:
+  2027-02-20\nEntry deadline 1 of 1 closes 2027-02-14 14:16:36\nhttps://ori
+ s.ceskyorientak.cz/Zavod?id=10342\n\nORIS map · region ČR entry deadline
+  feed. Manage or unsubscribe: https://www.matejkala.com/oris-event-map/#ca
+ lendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10342
+LOCATION:ZŠ Husova Tábor
+GEO:49.40874;14.67637
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · ČR · OP · JIH INDOOR #3: ZŠ Husova T
+ ábor · ZŠ Husova Tábor
+END:VALARM
+END:VEVENT
+END:VCALENDAR
