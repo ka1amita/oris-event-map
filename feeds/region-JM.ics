@@ -1,0 +1,176 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map entry deadlines//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:ORIS JM entry deadlines
+X-WR-CALDESC:ORIS map · region JM entry deadline feed. Manage or unsubscri
+ be: https://www.matejkala.com/oris-event-map/#calendars
+X-WR-TIMEZONE:Europe/Prague
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Prague
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:oris-event-map-10323-entry-deadline-1-region-jm
+DTSTAMP:20261024T105916Z
+DTSTART;TZID=Europe/Prague:20261102T235959
+SUMMARY:Entry deadline 1/1 · JM · OP · MB NOPB · Brno - Slatina
+DESCRIPTION:MB NOPB\nBrno - Slatina\nEvent day: 2026-11-05\nEntry deadline 
+ 1 of 1 closes 2026-11-02 23:59:59\nhttps://oris.ceskyorientak.cz/Zavod?id=
+ 10323\n\nORIS map · region JM entry deadline feed. Manage or unsubscribe:
+  https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10323
+LOCATION:Brno - Slatina
+GEO:49.1803;16.6853
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · JM · OP · MB NOPB · Brno - Slatina
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10344-entry-deadline-1-region-jm
+DTSTAMP:20261024T105916Z
+DTSTART;TZID=Europe/Prague:20261103T235959
+SUMMARY:Entry deadline 1/1 · JM · OP · RBK Cup OPEN 2026 · Ochoz u Brna
+DESCRIPTION:RBK Cup OPEN 2026\nOchoz u Brna\nEvent day: 2026-11-08\nEntry d
+ eadline 1 of 1 closes 2026-11-03 23:59:59\nhttps://oris.ceskyorientak.cz/Z
+ avod?id=10344\n\nORIS map · region JM entry deadline feed. Manage or unsu
+ bscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10344
+LOCATION:Ochoz u Brna
+GEO:49.255453547397;16.736984146996
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · JM · OP · RBK Cup OPEN 2026 · Ochoz u 
+ Brna
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10247-entry-deadline-1-region-jm
+DTSTAMP:20261024T105916Z
+DTSTART;TZID=Europe/Prague:20261031T235555
+SUMMARY:Entry deadline 1/1 · JM · OP · Oddílový přebor ZBM 2026 · Ba
+ bice nad Svitavou
+DESCRIPTION:Oddílový přebor ZBM 2026\nBabice nad Svitavou\nEvent day: 20
+ 26-11-14\nEntry deadline 1 of 1 closes 2026-10-31 23:55:55\nhttps://oris.c
+ eskyorientak.cz/Zavod?id=10247\n\nORIS map · region JM entry deadline fee
+ d. Manage or unsubscribe: https://www.matejkala.com/oris-event-map/#calend
+ ars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10247
+LOCATION:Babice nad Svitavou
+GEO:49.283056992985;16.69537782958
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · JM · OP · Oddílový přebor ZBM 2026 
+ · Babice nad Svitavou
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10304-entry-deadline-1-region-jm
+DTSTAMP:20261024T105916Z
+DTSTART;TZID=Europe/Prague:20261202T235959
+SUMMARY:Entry deadline 1/1 · JM · OP · Sportega BZL: Memoriál svobody 
+ · Žabovřesky\, ZŠ náměstí Svornosti
+DESCRIPTION:Sportega BZL: Memoriál svobody\nŽabovřesky\, ZŠ náměstí 
+ Svornosti\nEvent day: 2026-12-06\nEntry deadline 1 of 1 closes 2026-12-02 
+ 23:59:59\nhttps://oris.ceskyorientak.cz/Zavod?id=10304\n\nORIS map · regi
+ on JM entry deadline feed. Manage or unsubscribe: https://www.matejkala.co
+ m/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10304
+LOCATION:Žabovřesky\, ZŠ náměstí Svornosti
+GEO:49.21535;16.58046
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · JM · OP · Sportega BZL: Memoriál svobo
+ dy · Žabovřesky\, ZŠ náměstí Svornosti
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-9807-entry-deadline-1-region-jm
+DTSTAMP:20261024T105916Z
+DTSTART;TZID=Europe/Prague:20261210T235959
+SUMMARY:Entry deadline 1/1 · JM · OP · Běh na Býčí skálu - 64. roč
+ ník · Brno - Řečkovice\, Zamilovaný háj
+DESCRIPTION:Běh na Býčí skálu - 64. ročník\nBrno - Řečkovice\, Zam
+ ilovaný háj\nEvent day: 2026-12-12\nEntry deadline 1 of 1 closes 2026-12
+ -10 23:59:59\nhttps://oris.ceskyorientak.cz/Zavod?id=9807\n\nORIS map · r
+ egion JM entry deadline feed. Manage or unsubscribe: https://www.matejkala
+ .com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9807
+LOCATION:Brno - Řečkovice\, Zamilovaný háj
+GEO:49.245046618544;16.591678261757
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · JM · OP · Běh na Býčí skálu - 64. 
+ ročník · Brno - Řečkovice\, Zamilovaný háj
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10306-entry-deadline-1-region-jm
+DTSTAMP:20261024T105916Z
+DTSTART;TZID=Europe/Prague:20270303T235959
+SUMMARY:Entry deadline 1/2 · JM · OP · Sportega BZL: BURE Cup · Brno - 
+ Bystrc
+DESCRIPTION:Sportega BZL: BURE Cup\nBrno - Bystrc\nEvent day: 2027-03-07\nE
+ ntry deadline 1 of 2 closes 2027-03-03 23:59:59\nhttps://oris.ceskyorienta
+ k.cz/Zavod?id=10306\n\nORIS map · region JM entry deadline feed. Manage o
+ r unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10306
+LOCATION:Brno - Bystrc
+GEO:49.217926477626;16.515959637046
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/2 · JM · OP · Sportega BZL: BURE Cup · Brn
+ o - Bystrc
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10306-entry-deadline-2-region-jm
+DTSTAMP:20261024T105916Z
+DTSTART;TZID=Europe/Prague:20270304T235959
+SUMMARY:Entry deadline 2/2 · JM · OP · Sportega BZL: BURE Cup · Brno - 
+ Bystrc
+DESCRIPTION:Sportega BZL: BURE Cup\nBrno - Bystrc\nEvent day: 2027-03-07\nE
+ ntry deadline 2 of 2 closes 2027-03-04 23:59:59\nhttps://oris.ceskyorienta
+ k.cz/Zavod?id=10306\n\nORIS map · region JM entry deadline feed. Manage o
+ r unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10306
+LOCATION:Brno - Bystrc
+GEO:49.217926477626;16.515959637046
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · JM · OP · Sportega BZL: BURE Cup · Brn
+ o - Bystrc
+END:VALARM
+END:VEVENT
+END:VCALENDAR

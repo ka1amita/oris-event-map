@@ -1,0 +1,18 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-10311-event
+DTSTAMP:20261024T105923Z
+DTSTART;VALUE=DATE:20270123
+DTEND;VALUE=DATE:20270124
+SUMMARY:Workshop pro kluby: Řízení a správa klubu\, sdílení dobré pr
+ axe
+LOCATION:Praha - Strahov
+GEO:50.080401349509;14.385695445903
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=10311
+URL:https://oris.ceskyorientak.cz/Zavod?id=10311
+END:VEVENT
+END:VCALENDAR

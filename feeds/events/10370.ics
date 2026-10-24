@@ -1,0 +1,15 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-10370-event
+DTSTAMP:20261024T105923Z
+DTSTART;VALUE=DATE:20270110
+DTEND;VALUE=DATE:20270111
+SUMMARY:Český pohár\, ŽA\, ŽB - krátká trať
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=10370
+URL:https://oris.ceskyorientak.cz/Zavod?id=10370
+END:VEVENT
+END:VCALENDAR

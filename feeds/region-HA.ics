@@ -1,0 +1,135 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map entry deadlines//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:ORIS HA entry deadlines
+X-WR-CALDESC:ORIS map · region HA entry deadline feed. Manage or unsubscri
+ be: https://www.matejkala.com/oris-event-map/#calendars
+X-WR-TIMEZONE:Europe/Prague
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Prague
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:oris-event-map-9795-entry-deadline-1-region-ha
+DTSTAMP:20261024T105916Z
+DTSTART;TZID=Europe/Prague:20261026T235959
+SUMMARY:Entry deadline 1/2 · HA · RL · Oblastní žebříček · Chabič
+ ov 35
+DESCRIPTION:Oblastní žebříček\nChabičov 35\nEvent day: 2026-10-31\nEn
+ try deadline 1 of 2 closes 2026-10-26 23:59:59\nhttps://oris.ceskyorientak
+ .cz/Zavod?id=9795\n\nORIS map · region HA entry deadline feed. Manage or 
+ unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9795
+LOCATION:Chabičov 35
+GEO:49.766200921367;17.296450138092
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/2 · HA · RL · Oblastní žebříček · Cha
+ bičov 35
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-9795-entry-deadline-2-region-ha
+DTSTAMP:20261024T105916Z
+DTSTART;TZID=Europe/Prague:20261027T130000
+SUMMARY:Entry deadline 2/2 · HA · RL · Oblastní žebříček · Chabič
+ ov 35
+DESCRIPTION:Oblastní žebříček\nChabičov 35\nEvent day: 2026-10-31\nEn
+ try deadline 2 of 2 closes 2026-10-27 13:00:00\nhttps://oris.ceskyorientak
+ .cz/Zavod?id=9795\n\nORIS map · region HA entry deadline feed. Manage or 
+ unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9795
+LOCATION:Chabičov 35
+GEO:49.766200921367;17.296450138092
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · HA · RL · Oblastní žebříček · Cha
+ bičov 35
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-9796-entry-deadline-1-region-ha
+DTSTAMP:20261024T105916Z
+DTSTART;TZID=Europe/Prague:20261102T235959
+SUMMARY:Entry deadline 1/2 · HA · RL · Oblastní žebříček · Nové M
+ lýny
+DESCRIPTION:Oblastní žebříček\nNové Mlýny\nEvent day: 2026-11-07\nEn
+ try deadline 1 of 2 closes 2026-11-02 23:59:59\nhttps://oris.ceskyorientak
+ .cz/Zavod?id=9796\n\nORIS map · region HA entry deadline feed. Manage or 
+ unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9796
+LOCATION:Nové Mlýny
+GEO:49.732302146314;16.995935440063
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/2 · HA · RL · Oblastní žebříček · Nov
+ é Mlýny
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-9796-entry-deadline-2-region-ha
+DTSTAMP:20261024T105916Z
+DTSTART;TZID=Europe/Prague:20261104T235959
+SUMMARY:Entry deadline 2/2 · HA · RL · Oblastní žebříček · Nové M
+ lýny
+DESCRIPTION:Oblastní žebříček\nNové Mlýny\nEvent day: 2026-11-07\nEn
+ try deadline 2 of 2 closes 2026-11-04 23:59:59\nhttps://oris.ceskyorientak
+ .cz/Zavod?id=9796\n\nORIS map · region HA entry deadline feed. Manage or 
+ unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9796
+LOCATION:Nové Mlýny
+GEO:49.732302146314;16.995935440063
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · HA · RL · Oblastní žebříček · Nov
+ é Mlýny
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10377-entry-deadline-1-region-ha
+DTSTAMP:20261024T105916Z
+DTSTART;TZID=Europe/Prague:20261220T235959
+SUMMARY:Entry deadline 1/1 · HA · OP · Vánoční pohár 2026 · Plumlov
+ \, kemp Žralok
+DESCRIPTION:Vánoční pohár 2026\nPlumlov\, kemp Žralok\nEvent day: 2026
+ -12-23\nEntry deadline 1 of 1 closes 2026-12-20 23:59:59\nhttps://oris.ces
+ kyorientak.cz/Zavod?id=10377\n\nORIS map · region HA entry deadline feed.
+  Manage or unsubscribe: https://www.matejkala.com/oris-event-map/#calendar
+ s
+URL:https://oris.ceskyorientak.cz/Zavod?id=10377
+LOCATION:Plumlov\, kemp Žralok
+GEO:49.46109;17.01278
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · HA · OP · Vánoční pohár 2026 · Plu
+ mlov\, kemp Žralok
+END:VALARM
+END:VEVENT
+END:VCALENDAR
