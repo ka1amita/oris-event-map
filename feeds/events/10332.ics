@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-10332-event
+DTSTAMP:20261031T122835Z
+DTSTART;VALUE=DATE:20261212
+DTEND;VALUE=DATE:20261213
+SUMMARY:JIH INDOOR #1: Gymnázium Jírovcova České Budějovice
+LOCATION:Gymnázium\, České Budějovice\, Jírovcova 8
+GEO:48.97888;14.47779
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=10332
+URL:https://oris.ceskyorientak.cz/Zavod?id=10332
+END:VEVENT
+END:VCALENDAR

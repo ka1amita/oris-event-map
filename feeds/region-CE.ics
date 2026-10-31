@@ -1,0 +1,75 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map entry deadlines//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:ORIS ČE entry deadlines
+X-WR-CALDESC:ORIS map · region ČE entry deadline feed. Manage or unsubscr
+ ibe: https://www.matejkala.com/oris-event-map/#calendars
+X-WR-TIMEZONE:Europe/Prague
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Prague
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:oris-event-map-10228-entry-deadline-1-region-ce
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261111T235959
+SUMMARY:Entry deadline 1/1 · ČE · NN · Metodický seminář trenérů a
+  rozhodčích · Jablonec nad Nisou - Gymnázium Dr. A. Randy
+DESCRIPTION:Metodický seminář trenérů a rozhodčích\nJablonec nad Nis
+ ou - Gymnázium Dr. A. Randy\nEvent day: 2026-11-21\nEntry deadline 1 of 1
+  closes 2026-11-11 23:59:59\nhttps://oris.ceskyorientak.cz/Zavod?id=10228\
+ n\nORIS map · region ČE entry deadline feed. Manage or unsubscribe: http
+ s://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10228
+LOCATION:Jablonec nad Nisou - Gymnázium Dr. A. Randy
+GEO:50.728941227115;15.165520906448
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · ČE · NN · Metodický seminář trenér
+ ů a rozhodčích · Jablonec nad Nisou - Gymnázium Dr. A. Randy
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10332-entry-deadline-1-region-ce
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261206T235959
+SUMMARY:Entry deadline 1/1 · ČE · OP · JIH INDOOR #1: Gymnázium Jírov
+ cova České Budějovice · Gymnázium\, České Budějovice\, Jírovcova 
+ 8
+DESCRIPTION:JIH INDOOR #1: Gymnázium Jírovcova České Budějovice\nGymn
+ ázium\, České Budějovice\, Jírovcova 8\nEvent day: 2026-12-12\nEntry 
+ deadline 1 of 1 closes 2026-12-06 23:59:59\nhttps://oris.ceskyorientak.cz/
+ Zavod?id=10332\n\nORIS map · region ČE entry deadline feed. Manage or un
+ subscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10332
+LOCATION:Gymnázium\, České Budějovice\, Jírovcova 8
+GEO:48.97888;14.47779
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · ČE · OP · JIH INDOOR #1: Gymnázium J
+ írovcova České Budějovice · Gymnázium\, České Budějovice\, Jírov
+ cova 8
+END:VALARM
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-10385-event
+DTSTAMP:20261031T122835Z
+DTSTART;VALUE=DATE:20261127
+DTEND;VALUE=DATE:20261128
+SUMMARY:Školení trenérů OB T3
+LOCATION:Gymnázium Dr. Antona Randy\, 466 01 Jablonec nad Nisou
+GEO:50.72879;15.16564
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=10385
+URL:https://oris.ceskyorientak.cz/Zavod?id=10385
+END:VEVENT
+END:VCALENDAR

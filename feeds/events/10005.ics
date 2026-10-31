@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-10005-event
+DTSTAMP:20261031T122835Z
+DTSTART;VALUE=DATE:20261129
+DTEND;VALUE=DATE:20261130
+SUMMARY:Adventní Indoor na Gymnáziu Teplice
+LOCATION:Teplice\, ul. Čs. dobrovolců 530/11\, Gymnázium
+GEO:50.637720853768;13.823059201241
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=10005
+URL:https://oris.ceskyorientak.cz/Zavod?id=10005
+END:VEVENT
+END:VCALENDAR

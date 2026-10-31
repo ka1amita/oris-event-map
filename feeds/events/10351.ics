@@ -1,0 +1,15 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-10351-event
+DTSTAMP:20261031T122835Z
+DTSTART;VALUE=DATE:20270424
+DTEND;VALUE=DATE:20270425
+SUMMARY:Mistrovství oblasti ve sprintu
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=10351
+URL:https://oris.ceskyorientak.cz/Zavod?id=10351
+END:VEVENT
+END:VCALENDAR

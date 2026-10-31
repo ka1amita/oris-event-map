@@ -1,0 +1,137 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map entry deadlines//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:ORIS VČ entry deadlines
+X-WR-CALDESC:ORIS map · region VČ entry deadline feed. Manage or unsubscr
+ ibe: https://www.matejkala.com/oris-event-map/#calendars
+X-WR-TIMEZONE:Europe/Prague
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Prague
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:oris-event-map-10001-entry-deadline-1-region-vc
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261102T235959
+SUMMARY:Entry deadline 1/1 · VČ · OP · 12. kolo Orlické ligy · Často
+ lovice
+DESCRIPTION:12. kolo Orlické ligy\nČastolovice\nEvent day: 2026-11-04\nEn
+ try deadline 1 of 1 closes 2026-11-02 23:59:59\nhttps://oris.ceskyorientak
+ .cz/Zavod?id=10001\n\nORIS map · region VČ entry deadline feed. Manage o
+ r unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10001
+LOCATION:Častolovice
+GEO:50.133949106014;16.185586452484
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · VČ · OP · 12. kolo Orlické ligy · Č
+ astolovice
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-9583-entry-deadline-1-region-vc
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261101T235959
+SUMMARY:Entry deadline 1/2 · VČ · RL · Oblastní žebříček · Kutná
+  Hora - Kaňk\, fotbalové hřiště
+DESCRIPTION:Oblastní žebříček\nKutná Hora - Kaňk\, fotbalové hřiš
+ tě\nEvent day: 2026-11-07\nEntry deadline 1 of 2 closes 2026-11-01 23:59:
+ 59\nhttps://oris.ceskyorientak.cz/Zavod?id=9583\n\nORIS map · region VČ 
+ entry deadline feed. Manage or unsubscribe: https://www.matejkala.com/oris
+ -event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9583
+LOCATION:Kutná Hora - Kaňk\, fotbalové hřiště
+GEO:49.975099603126;15.267519950867
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/2 · VČ · RL · Oblastní žebříček · Ku
+ tná Hora - Kaňk\, fotbalové hřiště
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-9583-entry-deadline-2-region-vc
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261102T235959
+SUMMARY:Entry deadline 2/2 · VČ · RL · Oblastní žebříček · Kutná
+  Hora - Kaňk\, fotbalové hřiště
+DESCRIPTION:Oblastní žebříček\nKutná Hora - Kaňk\, fotbalové hřiš
+ tě\nEvent day: 2026-11-07\nEntry deadline 2 of 2 closes 2026-11-02 23:59:
+ 59\nhttps://oris.ceskyorientak.cz/Zavod?id=9583\n\nORIS map · region VČ 
+ entry deadline feed. Manage or unsubscribe: https://www.matejkala.com/oris
+ -event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9583
+LOCATION:Kutná Hora - Kaňk\, fotbalové hřiště
+GEO:49.975099603126;15.267519950867
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · VČ · RL · Oblastní žebříček · Ku
+ tná Hora - Kaňk\, fotbalové hřiště
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10317-entry-deadline-1-region-vc
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261112T101111
+SUMMARY:Entry deadline 1/1 · VČ · OP · Orienťák v Liboháji · Polič
+ ka Liboháj
+DESCRIPTION:Orienťák v Liboháji\nPolička Liboháj\nEvent day: 2026-11-1
+ 7\nEntry deadline 1 of 1 closes 2026-11-12 10:11:11\nhttps://oris.ceskyori
+ entak.cz/Zavod?id=10317\n\nORIS map · region VČ entry deadline feed. Man
+ age or unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10317
+LOCATION:Polička Liboháj
+GEO:49.703750580009;16.261696815491
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · VČ · OP · Orienťák v Liboháji · Po
+ lička Liboháj
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10295-entry-deadline-1-region-vc
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261228T120000
+SUMMARY:Entry deadline 1/1 · VČ · OP · Kufrování s Krakonošem aneb J
+ ilemnice plná lampiónů · Jilemnice\, Masarykovo náměstí
+DESCRIPTION:Kufrování s Krakonošem aneb Jilemnice plná lampiónů\nJile
+ mnice\, Masarykovo náměstí\nEvent day: 2026-12-27\nEntry deadline 1 of 
+ 1 closes 2026-12-28 12:00:00\nhttps://oris.ceskyorientak.cz/Zavod?id=10295
+ \n\nORIS map · region VČ entry deadline feed. Manage or unsubscribe: htt
+ ps://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10295
+LOCATION:Jilemnice\, Masarykovo náměstí
+GEO:50.608907045837;15.506075620651
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · VČ · OP · Kufrování s Krakonošem an
+ eb Jilemnice plná lampiónů · Jilemnice\, Masarykovo náměstí
+END:VALARM
+END:VEVENT
+END:VCALENDAR

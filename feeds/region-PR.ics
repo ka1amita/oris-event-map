@@ -1,0 +1,221 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map entry deadlines//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:ORIS PR entry deadlines
+X-WR-CALDESC:ORIS map · region PR entry deadline feed. Manage or unsubscri
+ be: https://www.matejkala.com/oris-event-map/#calendars
+X-WR-TIMEZONE:Europe/Prague
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Prague
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:oris-event-map-10296-entry-deadline-1-region-pr
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261102T235959
+SUMMARY:Entry deadline 1/1 · PR · OP · HULK cup · Praha - Hrdlořezy
+DESCRIPTION:HULK cup\nPraha - Hrdlořezy\nEvent day: 2026-11-06\nEntry dead
+ line 1 of 1 closes 2026-11-02 23:59:59\nhttps://oris.ceskyorientak.cz/Zavo
+ d?id=10296\n\nORIS map · region PR entry deadline feed. Manage or unsubsc
+ ribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10296
+LOCATION:Praha - Hrdlořezy
+GEO:50.095125723975;14.518958330154
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · PR · OP · HULK cup · Praha - Hrdlořez
+ y
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-9908-entry-deadline-1-region-pr
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261101T235955
+SUMMARY:Entry deadline 1/2 · PR · RL · Oblastní žebříček · Sportov
+ iště U Říčanského lesa\, Říčany
+DESCRIPTION:Oblastní žebříček\nSportoviště U Říčanského lesa\, 
+ Říčany\nEvent day: 2026-11-07\nEntry deadline 1 of 2 closes 2026-11-01 
+ 23:59:55\nhttps://oris.ceskyorientak.cz/Zavod?id=9908\n\nORIS map · regio
+ n PR entry deadline feed. Manage or unsubscribe: https://www.matejkala.com
+ /oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9908
+LOCATION:Sportoviště U Říčanského lesa\, Říčany
+GEO:49.98918720576;14.686081409454
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/2 · PR · RL · Oblastní žebříček · Spo
+ rtoviště U Říčanského lesa\, Říčany
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-9908-entry-deadline-2-region-pr
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261103T235955
+SUMMARY:Entry deadline 2/2 · PR · RL · Oblastní žebříček · Sportov
+ iště U Říčanského lesa\, Říčany
+DESCRIPTION:Oblastní žebříček\nSportoviště U Říčanského lesa\, 
+ Říčany\nEvent day: 2026-11-07\nEntry deadline 2 of 2 closes 2026-11-03 
+ 23:59:55\nhttps://oris.ceskyorientak.cz/Zavod?id=9908\n\nORIS map · regio
+ n PR entry deadline feed. Manage or unsubscribe: https://www.matejkala.com
+ /oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9908
+LOCATION:Sportoviště U Říčanského lesa\, Říčany
+GEO:49.98918720576;14.686081409454
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · PR · RL · Oblastní žebříček · Spo
+ rtoviště U Říčanského lesa\, Říčany
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10158-entry-deadline-1-region-pr
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261109T235959
+SUMMARY:Entry deadline 1/2 · PR · OP · SMIK - 32. Mistrovství světa ve
+  SMIKu · Říčany\, sokolovna
+DESCRIPTION:SMIK - 32. Mistrovství světa ve SMIKu\nŘíčany\, sokolovna\
+ nEvent day: 2026-11-17\nEntry deadline 1 of 2 closes 2026-11-09 23:59:59\n
+ https://oris.ceskyorientak.cz/Zavod?id=10158\n\nORIS map · region PR entr
+ y deadline feed. Manage or unsubscribe: https://www.matejkala.com/oris-eve
+ nt-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10158
+LOCATION:Říčany\, sokolovna
+GEO:49.9974;14.67774
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/2 · PR · OP · SMIK - 32. Mistrovství svět
+ a ve SMIKu · Říčany\, sokolovna
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10158-entry-deadline-2-region-pr
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261111T235959
+SUMMARY:Entry deadline 2/2 · PR · OP · SMIK - 32. Mistrovství světa ve
+  SMIKu · Říčany\, sokolovna
+DESCRIPTION:SMIK - 32. Mistrovství světa ve SMIKu\nŘíčany\, sokolovna\
+ nEvent day: 2026-11-17\nEntry deadline 2 of 2 closes 2026-11-11 23:59:59\n
+ https://oris.ceskyorientak.cz/Zavod?id=10158\n\nORIS map · region PR entr
+ y deadline feed. Manage or unsubscribe: https://www.matejkala.com/oris-eve
+ nt-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10158
+LOCATION:Říčany\, sokolovna
+GEO:49.9974;14.67774
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · PR · OP · SMIK - 32. Mistrovství svět
+ a ve SMIKu · Říčany\, sokolovna
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10308-entry-deadline-1-region-pr
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261124T235959
+SUMMARY:Entry deadline 1/1 · PR · OP · Tour de Prague 2026 · Praha - Ch
+ uchelský háj
+DESCRIPTION:Tour de Prague 2026\nPraha - Chuchelský háj\nEvent day: 2026-
+ 11-28\nEntry deadline 1 of 1 closes 2026-11-24 23:59:59\nhttps://oris.cesk
+ yorientak.cz/Zavod?id=10308\n\nORIS map · region PR entry deadline feed. 
+ Manage or unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10308
+LOCATION:Praha - Chuchelský háj
+GEO:50.020755488768;14.382278315951
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · PR · OP · Tour de Prague 2026 · Praha 
+ - Chuchelský háj
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10272-entry-deadline-1-region-pr
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261125T235900
+SUMMARY:Entry deadline 1/1 · PR · OP · Čertoviny · Malé Přílepy\, F
+ ořtovna
+DESCRIPTION:Čertoviny\nMalé Přílepy\, Fořtovna\nEvent day: 2026-11-29\
+ nEntry deadline 1 of 1 closes 2026-11-25 23:59:00\nhttps://oris.ceskyorien
+ tak.cz/Zavod?id=10272\n\nORIS map · region PR entry deadline feed. Manage
+  or unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10272
+LOCATION:Malé Přílepy\, Fořtovna
+GEO:50.011310622825;14.113183021545
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · PR · OP · Čertoviny · Malé Přílepy
+ \, Fořtovna
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-9669-entry-deadline-1-region-pr
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20270110T235959
+SUMMARY:Entry deadline 1/2 · PR · OP · Opět na Kozla X^2 · Velké Popo
+ vice
+DESCRIPTION:Opět na Kozla X^2\nVelké Popovice\nEvent day: 2027-01-16\nEnt
+ ry deadline 1 of 2 closes 2027-01-10 23:59:59\nhttps://oris.ceskyorientak.
+ cz/Zavod?id=9669\n\nORIS map · region PR entry deadline feed. Manage or u
+ nsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9669
+LOCATION:Velké Popovice
+GEO:49.920801017207;14.640709161758
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/2 · PR · OP · Opět na Kozla X^2 · Velké 
+ Popovice
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-9669-entry-deadline-2-region-pr
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20270113T235959
+SUMMARY:Entry deadline 2/2 · PR · OP · Opět na Kozla X^2 · Velké Popo
+ vice
+DESCRIPTION:Opět na Kozla X^2\nVelké Popovice\nEvent day: 2027-01-16\nEnt
+ ry deadline 2 of 2 closes 2027-01-13 23:59:59\nhttps://oris.ceskyorientak.
+ cz/Zavod?id=9669\n\nORIS map · region PR entry deadline feed. Manage or u
+ nsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9669
+LOCATION:Velké Popovice
+GEO:49.920801017207;14.640709161758
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · PR · OP · Opět na Kozla X^2 · Velké 
+ Popovice
+END:VALARM
+END:VEVENT
+END:VCALENDAR

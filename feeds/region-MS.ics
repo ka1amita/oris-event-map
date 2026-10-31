@@ -1,0 +1,176 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map entry deadlines//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:ORIS MS entry deadlines
+X-WR-CALDESC:ORIS map · region MS entry deadline feed. Manage or unsubscri
+ be: https://www.matejkala.com/oris-event-map/#calendars
+X-WR-TIMEZONE:Europe/Prague
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Prague
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:oris-event-map-10365-entry-deadline-1-region-ms
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261101T235959
+SUMMARY:Entry deadline 1/1 · MS · OP · 1. zkouška sirén VI. ročník  
+ 2026/2027 · Ostrava Výškovice
+DESCRIPTION:1. zkouška sirén VI. ročník  2026/2027\nOstrava Výškovice
+ \nEvent day: 2026-11-04\nEntry deadline 1 of 1 closes 2026-11-01 23:59:59\
+ nhttps://oris.ceskyorientak.cz/Zavod?id=10365\n\nORIS map · region MS ent
+ ry deadline feed. Manage or unsubscribe: https://www.matejkala.com/oris-ev
+ ent-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10365
+LOCATION:Ostrava Výškovice
+GEO:49.77756;18.21878
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · MS · OP · 1. zkouška sirén VI. ročn
+ ík  2026/2027 · Ostrava Výškovice
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10320-entry-deadline-1-region-ms
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261102T235959
+SUMMARY:Entry deadline 1/1 · MS · OP · Oddílový přebor noční - BFM 
+ · Chlebovice
+DESCRIPTION:Oddílový přebor noční - BFM\nChlebovice\nEvent day: 2026-1
+ 1-06\nEntry deadline 1 of 1 closes 2026-11-02 23:59:59\nhttps://oris.cesky
+ orientak.cz/Zavod?id=10320\n\nORIS map · region MS entry deadline feed. M
+ anage or unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10320
+LOCATION:Chlebovice
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · MS · OP · Oddílový přebor noční - 
+ BFM · Chlebovice
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10303-entry-deadline-1-region-ms
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261102T235959
+SUMMARY:Entry deadline 1/1 · MS · OP · Přebor SKOB Ostrava · Hýlov
+DESCRIPTION:Přebor SKOB Ostrava\nHýlov\nEvent day: 2026-11-07\nEntry dead
+ line 1 of 1 closes 2026-11-02 23:59:59\nhttps://oris.ceskyorientak.cz/Zavo
+ d?id=10303\n\nORIS map · region MS entry deadline feed. Manage or unsubsc
+ ribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10303
+LOCATION:Hýlov
+GEO:49.811777841919;18.093774305887
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · MS · OP · Přebor SKOB Ostrava · Hýlo
+ v
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10103-entry-deadline-1-region-ms
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261115T235959
+SUMMARY:Entry deadline 1/1 · MS · OP · Školení rozhodčích 3. třídy
+  · Opava\, B. Němcové 20\, Klubovna šachistů
+DESCRIPTION:Školení rozhodčích 3. třídy\nOpava\, B. Němcové 20\, Kl
+ ubovna šachistů\nEvent day: 2026-11-21\nEntry deadline 1 of 1 closes 202
+ 6-11-15 23:59:59\nhttps://oris.ceskyorientak.cz/Zavod?id=10103\n\nORIS map
+  · region MS entry deadline feed. Manage or unsubscribe: https://www.mate
+ jkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10103
+LOCATION:Opava\, B. Němcové 20\, Klubovna šachistů
+GEO:49.930836885204;17.911255348094
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · MS · OP · Školení rozhodčích 3. tř
+ ídy · Opava\, B. Němcové 20\, Klubovna šachistů
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10319-entry-deadline-1-region-ms
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261125T235959
+SUMMARY:Entry deadline 1/1 · MS · OP · Slezská zimní liga Ondrášek 
+ · Příbor
+DESCRIPTION:Slezská zimní liga Ondrášek\nPříbor\nEvent day: 2026-11-2
+ 8\nEntry deadline 1 of 1 closes 2026-11-25 23:59:59\nhttps://oris.ceskyori
+ entak.cz/Zavod?id=10319\n\nORIS map · region MS entry deadline feed. Mana
+ ge or unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10319
+LOCATION:Příbor
+GEO:49.640337495988;18.14040184021
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · MS · OP · Slezská zimní liga Ondráš
+ ek · Příbor
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10338-entry-deadline-1-region-ms
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261209T235959
+SUMMARY:Entry deadline 1/1 · MS · OP · 4. Slezská zimní liga · Třine
+ c
+DESCRIPTION:4. Slezská zimní liga\nTřinec\nEvent day: 2026-12-12\nEntry 
+ deadline 1 of 1 closes 2026-12-09 23:59:59\nhttps://oris.ceskyorientak.cz/
+ Zavod?id=10338\n\nORIS map · region MS entry deadline feed. Manage or uns
+ ubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10338
+LOCATION:Třinec
+GEO:49.67670962673;18.675250427887
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · MS · OP · 4. Slezská zimní liga · T
+ řinec
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10331-entry-deadline-1-region-ms
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261231T235959
+SUMMARY:Entry deadline 1/1 · MS · OP · VELIKONOČNÍ SOUSTŘEDĚNÍ  202
+ 7 VE SVRATCE - MOV\, HAV\, SFM\,TRI · SVRATKA
+DESCRIPTION:VELIKONOČNÍ SOUSTŘEDĚNÍ  2027 VE SVRATCE - MOV\, HAV\, SFM
+ \,TRI\nSVRATKA\nEvent day: 2027-03-25\nEntry deadline 1 of 1 closes 2026-1
+ 2-31 23:59:59\nhttps://oris.ceskyorientak.cz/Zavod?id=10331\n\nORIS map ·
+  region MS entry deadline feed. Manage or unsubscribe: https://www.matejka
+ la.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10331
+LOCATION:SVRATKA
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · MS · OP · VELIKONOČNÍ SOUSTŘEDĚNÍ 
+  2027 VE SVRATCE - MOV\, HAV\, SFM\,TRI · SVRATKA
+END:VALARM
+END:VEVENT
+END:VCALENDAR

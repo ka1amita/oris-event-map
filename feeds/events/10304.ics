@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-10304-event
+DTSTAMP:20261031T122835Z
+DTSTART;VALUE=DATE:20261206
+DTEND;VALUE=DATE:20261207
+SUMMARY:Sportega BZL: Memoriál svobody
+LOCATION:Žabovřesky\, ZŠ náměstí Svornosti
+GEO:49.21535;16.58046
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=10304
+URL:https://oris.ceskyorientak.cz/Zavod?id=10304
+END:VEVENT
+END:VCALENDAR

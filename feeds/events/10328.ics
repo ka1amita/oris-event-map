@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-10328-event
+DTSTAMP:20261031T122835Z
+DTSTART;VALUE=DATE:20261106
+DTEND;VALUE=DATE:20261107
+SUMMARY:Podzimní mládežnické soustředění Oblasti Vysočina
+LOCATION:Řásná\, Velký Pařezitý rybník
+GEO:49.228500269135;15.38409948349
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=10328
+URL:https://oris.ceskyorientak.cz/Zavod?id=10328
+END:VEVENT
+END:VCALENDAR

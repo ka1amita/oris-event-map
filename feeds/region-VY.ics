@@ -1,0 +1,129 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map entry deadlines//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:ORIS VY entry deadlines
+X-WR-CALDESC:ORIS map · region VY entry deadline feed. Manage or unsubscri
+ be: https://www.matejkala.com/oris-event-map/#calendars
+X-WR-TIMEZONE:Europe/Prague
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Prague
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:oris-event-map-10054-entry-deadline-1-region-vy
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261102T235546
+SUMMARY:Entry deadline 1/2 · VY · OP · 7. DL Stříbrný Lopeček · Lop
+ eček u Ratibořských Hor
+DESCRIPTION:7. DL Stříbrný Lopeček\nLopeček u Ratibořských Hor\nEven
+ t day: 2026-11-07\nEntry deadline 1 of 2 closes 2026-11-02 23:55:46\nhttps
+ ://oris.ceskyorientak.cz/Zavod?id=10054\n\nORIS map · region VY entry dea
+ dline feed. Manage or unsubscribe: https://www.matejkala.com/oris-event-ma
+ p/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10054
+LOCATION:Lopeček u Ratibořských Hor
+GEO:49.445919045046;14.769637584686
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/2 · VY · OP · 7. DL Stříbrný Lopeček ·
+  Lopeček u Ratibořských Hor
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10054-entry-deadline-2-region-vy
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261106T180000
+SUMMARY:Entry deadline 2/2 · VY · OP · 7. DL Stříbrný Lopeček · Lop
+ eček u Ratibořských Hor
+DESCRIPTION:7. DL Stříbrný Lopeček\nLopeček u Ratibořských Hor\nEven
+ t day: 2026-11-07\nEntry deadline 2 of 2 closes 2026-11-06 18:00:00\nhttps
+ ://oris.ceskyorientak.cz/Zavod?id=10054\n\nORIS map · region VY entry dea
+ dline feed. Manage or unsubscribe: https://www.matejkala.com/oris-event-ma
+ p/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10054
+LOCATION:Lopeček u Ratibořských Hor
+GEO:49.445919045046;14.769637584686
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · VY · OP · 7. DL Stříbrný Lopeček ·
+  Lopeček u Ratibořských Hor
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10267-entry-deadline-1-region-vy
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261108T235959
+SUMMARY:Entry deadline 1/1 · VY · OP · Dušičkový závod · Skala (hos
+ tinec u Bačkovských)
+DESCRIPTION:Dušičkový závod\nSkala (hostinec u Bačkovských)\nEvent da
+ y: 2026-11-14\nEntry deadline 1 of 1 closes 2026-11-08 23:59:59\nhttps://o
+ ris.ceskyorientak.cz/Zavod?id=10267\n\nORIS map · region VY entry deadlin
+ e feed. Manage or unsubscribe: https://www.matejkala.com/oris-event-map/#c
+ alendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10267
+LOCATION:Skala (hostinec u Bačkovských)
+GEO:49.868923810308;15.948886871338
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · VY · OP · Dušičkový závod · Skala 
+ (hostinec u Bačkovských)
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10297-entry-deadline-1-region-vy
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261126T235959
+SUMMARY:Entry deadline 1/2 · VY · OP · Mareda cup 44
+DESCRIPTION:Mareda cup 44\nEvent day: 2026-11-28\nEntry deadline 1 of 2 clo
+ ses 2026-11-26 23:59:59\nhttps://oris.ceskyorientak.cz/Zavod?id=10297\n\nO
+ RIS map · region VY entry deadline feed. Manage or unsubscribe: https://w
+ ww.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10297
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/2 · VY · OP · Mareda cup 44
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10297-entry-deadline-2-region-vy
+DTSTAMP:20261031T122827Z
+DTSTART;TZID=Europe/Prague:20261127T215955
+SUMMARY:Entry deadline 2/2 · VY · OP · Mareda cup 44
+DESCRIPTION:Mareda cup 44\nEvent day: 2026-11-28\nEntry deadline 2 of 2 clo
+ ses 2026-11-27 21:59:55\nhttps://oris.ceskyorientak.cz/Zavod?id=10297\n\nO
+ RIS map · region VY entry deadline feed. Manage or unsubscribe: https://w
+ ww.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10297
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · VY · OP · Mareda cup 44
+END:VALARM
+END:VEVENT
+END:VCALENDAR
