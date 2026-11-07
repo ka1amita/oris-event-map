@@ -1,0 +1,18 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-10392-event
+DTSTAMP:20261107T055740Z
+DTSTART;VALUE=DATE:20261206
+DTEND;VALUE=DATE:20261207
+SUMMARY:Workshop pro trenéry: Silová a plyometrická příprava orientač
+ ního běžce
+LOCATION:Brno - Strange training\, s.r.o.\, Šámalova 62a
+GEO:49.197406589088;16.633960597445
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=10392
+URL:https://oris.ceskyorientak.cz/Zavod?id=10392
+END:VEVENT
+END:VCALENDAR

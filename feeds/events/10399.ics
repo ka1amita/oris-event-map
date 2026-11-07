@@ -1,0 +1,18 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-10399-event
+DTSTAMP:20261107T055740Z
+DTSTART;VALUE=DATE:20261119
+DTEND;VALUE=DATE:20261120
+SUMMARY:Campus Orienteering Challenge
+LOCATION:Areál Přírodovědecké fakulty MU\, Kotlářská 267/2\, Brno m
+ ísto startu: https://mapy.com/s/cozogugego
+GEO:49.204511534801;16.59760594368
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=10399
+URL:https://oris.ceskyorientak.cz/Zavod?id=10399
+END:VEVENT
+END:VCALENDAR
