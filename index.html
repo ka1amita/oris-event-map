@@ -337,11 +337,13 @@ dialog p { margin: 0 0 16px; font-size: 14px; line-height: 20px; color: var(--mu
     <h2 id="calTitle" tabindex="-1" autofocus style="outline: none">Entry deadline reminders</h2>
     <button class="icon-btn" type="button" id="calClose" aria-label="Close"></button>
   </div>
-  <p>Subscribe to a feed in your calendar app: one calendar entry per entry deadline, with an alert a day before. The feeds are rebuilt from ORIS every 6 hours.</p>
-  <h3>Top levels</h3>
+  <p>Subscribe to a feed in your calendar app: one calendar entry per entry deadline, with an alert a day before. The feeds are rebuilt from ORIS and the other sources every 6 hours.</p>
+  <h3>Top level</h3>
   <ul class="feeds" id="calLevels"></ul>
-  <h3>Regions <span>· all events, including trainings</span></h3>
+  <h3>Regional <span>· all events, including trainings</span></h3>
   <ul class="feeds" id="calRegions"></ul>
+  <h3>Other <span>· events that are not in ORIS</span></h3>
+  <ul class="feeds" id="calSources"></ul>
   <div class="cal-notes">
     <small><b>iPhone:</b> in the Subscription's Details, turn <i>Remove Alerts</i> off, and keep <i>Event Alerts</i> on.</small>
     <small><b>Google Calendar:</b> it refreshes a feed only every 12–24 hours and ignores its alerts; set notifications on the calendar.</small>
@@ -363,6 +365,14 @@ const CONFIG = {
   api: "https://oris.ceskyorientak.cz/API/",
   eventUrl: (id) => "https://oris.ceskyorientak.cz/Zavod?id=" + id,
   listParams: { all: 1 },            // include events outside the official calendar
+  // ORIS is the primary source. Secondary sources are web pages a browser can't read from another site, so
+  // scripts/build-feeds.mjs reads them (one adapter per source) and publishes their native events (the ones a source
+  // doesn't take over from elsewhere) in the shape of ORIS events as sourcesFile.
+  // feed: the source publishes entry deadlines, so it has an entry deadline feed (feeds/source-<code>.ics).
+  sources: [
+    { code: "OL", name: "O-liga", url: "https://o-liga.cz/", feed: true }
+  ],
+  sourcesFile: "feeds/sources.json",
   // OpenStreetMap's tile servers refuse requests without a Referer, which is what
   // a page opened straight from disk (file://) sends. There, fall back to CARTO.
   tiles: location.protocol === "file:" ? {
@@ -378,7 +388,7 @@ const CONFIG = {
   concurrency: 4,                    // parallel ORIS requests
   // How long cached ORIS data counts as fresh (minutes). Event details are also
   // refetched whenever ORIS reports a new version of the event.
-  ttl: { list: 6 * 60, details: 7 * 24 * 60, entries: 30 },
+  ttl: { list: 6 * 60, details: 7 * 24 * 60, entries: 30, sources: 6 * 60 },
   // Full entry lists (to find entries without a club by SI ID) are heavy for ORIS, so they are fetched one at a
   // time, spaced out, capped per hour, and kept longer for events further away
   fullEntries: { gapMs: 1500, perHour: 120, soonDays: 14, ttlLater: 12 * 60 },
@@ -661,12 +671,13 @@ const oris = orisRaw;   // every ORIS call goes through the store below, not a p
      entries[club|id]   registration IDs entered for the club
      entries[*|id]      entries without a club (SI ID, one-off registration ID and club), matched by SI ID
      orders[club|id]    service orders for the club (or for the one-off club of an entry without a club)
+     sources            { t, list[id] }: the events of the secondary sources (CONFIG.sources), in the shape of list[id]
 */
 const STORE_KEY = "omap.store.v2";
 const nowMs = () => Date.now();
 const fresh = (t, minutes) => t && nowMs() - t < minutes * 60000;
 let store = loadStore();
-function emptyStore() { return { days: {}, list: {}, details: {}, entries: {}, orders: {} }; }
+function emptyStore() { return { days: {}, list: {}, details: {}, entries: {}, orders: {}, sources: { t: 0, list: {} } }; }
 function loadStore() {
   try {
     const st = Object.assign(emptyStore(), JSON.parse(localStorage.getItem(STORE_KEY) || "{}"));
@@ -678,6 +689,7 @@ function loadStore() {
         delete st.list[id]; delete st.details[id];
       }
     });
+    Object.keys(st.sources.list).forEach((id) => { if (String(st.sources.list[id].Date || "").slice(0, 10) < today) delete st.sources.list[id]; });
     const live = new Set(Object.keys(st.list));
     // details of a stage's parent are kept while one of its stages is
     const parents = new Set(Object.values(st.list).map((raw) => String(raw.ParentID || "0")));
@@ -802,6 +814,8 @@ function normalize(raw, prev) {
   const ev = Object.assign({}, prev || {}, classify(raw), entryState(raw, new Date()));
   ev.id = String(raw.ID);
   ev.raw = raw;
+  ev.source = CONFIG.sources.find((s) => s.code === raw.Source) || null;   // a secondary source, or null for ORIS
+  ev.url = raw.Url || CONFIG.eventUrl(raw.ID);
   ev.name = raw.Name || "Event " + raw.ID;
   ev.place = raw.Place || "";
   ev.org = raw.Org1 && raw.Org1.Abbr ? raw.Org1.Abbr : "";
@@ -923,7 +937,7 @@ function eventDays(ev) {
   }
   return days;
 }
-const eventIcs = (ev, days) => ICS.event({ id: ev.id, name: ev.name, place: ev.place, lat: ev.lat, lon: ev.lon, url: CONFIG.eventUrl(ev.id),
+const eventIcs = (ev, days) => ICS.event({ id: ev.id, name: ev.name, place: ev.place, lat: ev.lat, lon: ev.lon, url: ev.url,
   first: days.first, last: days.last });
 // iPhone and iPad open a calendar file only from a real address, not one made in the page, so there the button links to
 // the event's file published with the feeds (events in the next 6 months); without one the button is disabled
@@ -957,7 +971,7 @@ function calendarButton(ev) {
     let href = "", attrs = "";
     if (google) {
       href = "https://calendar.google.com/calendar/render?" + new URLSearchParams({ action: "TEMPLATE", text: ev.name,
-        dates: icsDate(days.first) + "/" + icsDate(isoPlusDays(days.last, 1)), details: CONFIG.eventUrl(ev.id), location: ev.place }).toString();
+        dates: icsDate(days.first) + "/" + icsDate(isoPlusDays(days.last, 1)), details: ev.url, location: ev.place }).toString();
       attrs = ' target="_blank" rel="noopener"';
     } else {
       // made in the page and downloaded, then opened in the calendar app (desktop browsers)
@@ -975,6 +989,7 @@ function cardHtml(ev) {
   tags.push('<span class="tag"><span class="sw" style="background:' + F.bg + '"></span>' + F.name + "</span>");
   tags.push('<span class="tag"><span class="lvl" style="background:' + L.bg + ";color:" + L.fg + '">' + L.code + "</span>" + L.name + "</span>");
   tags.push('<span class="tag">' + ICON[ev.sport] + SPORT_NAME[ev.sport] + "</span>");
+  if (ev.source) tags.push('<span class="tag">' + esc(ev.source.name) + "</span>");
   if (ev.night) tags.push('<span class="tag">' + ICON.night + "Night</span>");
   if (ev.relay) tags.push('<span class="tag">' + ICON.relay + "Relay</span>");
   else if (ev.team) tags.push('<span class="tag">' + ICON.relay + "Team</span>");
@@ -1004,11 +1019,11 @@ function cardHtml(ev) {
   } else if (ev.phase === "closed") {
     closes = '<div class="closes muted">Entries closed</div>';
   } else {
-    closes = '<div class="closes muted">No entry deadlines in ORIS</div>';
+    closes = '<div class="closes muted">' + (ev.source ? "No entry deadlines published" : "No entry deadlines in ORIS") + "</div>";
   }
 
   const pills = [];
-  if (knowsEntries()) pills.push(ev.entered ? '<span class="pill entered">' + ICON.check.replace('width="9" height="9"', 'width="14" height="14"') + "You are entered</span>" : '<span class="pill">' + (ev.unchecked ? "Entries not checked yet for all SI IDs" : "Not entered") + "</span>");
+  if (knowsEntries() && !ev.source) pills.push(ev.entered ? '<span class="pill entered">' + ICON.check.replace('width="9" height="9"', 'width="14" height="14"') + "You are entered</span>" : '<span class="pill">' + (ev.unchecked ? "Entries not checked yet for all SI IDs" : "Not entered") + "</span>");
   if (ev.group > 0) pills.push('<span class="pill group">' + ICON.person + ev.group + " from your group</span>");
   if (ev.startList) pills.push('<span class="pill"><span class="letter" style="background:#D42A7C">S</span>Start list</span>');
   if (ev.results) pills.push('<span class="pill"><span class="letter" style="background:#7B2CBF">V</span>Results</span>');
@@ -1021,10 +1036,10 @@ function cardHtml(ev) {
     (ev.services.length ? '<div class="svc-names">' + ev.services.map((x) => esc(x.name) + (ev.ordered.ids.indexOf(x.id) >= 0 ? " (ordered)" : "")).join(", ") + "</div>" : "") +
     steps + closes +
     (pills.length ? '<div class="pills">' + pills.join("") + "</div>" : "") +
-    (knowsEntries() ? '<button class="open-btn secondary refresh" type="button" id="checkNow"' + (checking.has(ev.id) ? " disabled>" : ">") +
+    (knowsEntries() && !ev.source ? '<button class="open-btn secondary refresh" type="button" id="checkNow"' + (checking.has(ev.id) ? " disabled>" : ">") +
       '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>' +
       (checking.has(ev.id) ? "Refreshing…" : "Refresh from ORIS") + "</button>" : "") +
-    '<a class="open-btn" href="' + CONFIG.eventUrl(ev.id) + '" target="_blank" rel="noopener">Open in ORIS</a>' +
+    '<a class="open-btn" href="' + esc(ev.url) + '" target="_blank" rel="noopener">' + (ev.source ? "Open the event's page" : "Open in ORIS") + "</a>" +
     (ev.lat !== null ? (() => {
       const nav = navTarget(ev);
       return '<a class="open-btn secondary" href="' + esc(nav.url) + '"' + (nav.sameTab ? "" : ' target="_blank" rel="noopener"') + '>' +
@@ -1303,8 +1318,11 @@ function setStatus(msg, retry) {
 
 /* ---------------- loading ---------------- */
 // Build the display model for one event from everything the store knows about it
+// an event as listed by its source: ORIS, or a secondary source
+const listed = (id) => store.list[id] || store.sources.list[id];
+const isSecondary = (id) => !store.list[id] && !!store.sources.list[id];
 function buildEvent(id) {
-  const base = store.list[id];
+  const base = listed(id);
   if (!base) return null;
   const det = store.details[id];
   const ev = normalize(Object.assign({}, base, det ? det.d : {}, parentEntryInfo(id)));
@@ -1434,7 +1452,22 @@ function orderItems(data) {
 }
 function idsInRange(days) {
   const set = new Set(days);
-  return Object.keys(store.list).filter((id) => set.has(String(store.list[id].Date || "").slice(0, 10)));
+  return Object.keys(store.list).concat(Object.keys(store.sources.list).filter(isSecondary))
+    .filter((id) => set.has(String(listed(id).Date || "").slice(0, 10)));
+}
+// The events of the secondary sources, published with the feeds. They are an extra: without the file (a local copy
+// without built feeds, a failed request) the map shows ORIS alone.
+async function loadSources() {
+  try {
+    const res = await fetch(CONFIG.sourcesFile, { cache: "no-cache" });
+    if (res.ok) {
+      const today = ymd(new Date());
+      const list = {};
+      values((await res.json()).events).filter((raw) => String(raw.Date || "").slice(0, 10) >= today).forEach((raw) => { list[String(raw.ID)] = raw; });
+      store.sources = { t: nowMs(), list };
+      saveStore();
+    }
+  } catch (e) { if (DEBUG) console.warn(e); }
 }
 function refreshEvent(id) {
   const ev = buildEvent(id);
@@ -1475,6 +1508,9 @@ async function loadDays() {
   };
   showRange();
   if (firstLoad && events.size) { fitToEvents(); firstLoad = false; }
+  // the secondary sources load alongside ORIS and join the map when they arrive
+  const sourcesLoaded = fresh(store.sources.t, CONFIG.ttl.sources) ? Promise.resolve()
+    : loadSources().then(() => { if (token === loadToken) showRange(); });
 
   let capped = false;   // the hourly cap on full entry lists stopped the check
   try {
@@ -1501,8 +1537,13 @@ async function loadDays() {
     showRange();
     if (firstLoad) { fitToEvents(); firstLoad = false; }
 
-    const ids = idsInRange(days).filter((id) => String(store.list[id].Cancelled) !== "1");
-    if (!ids.length) { setStatus(events.size ? "" : "No events in ORIS for these dates"); return; }
+    // everything below asks ORIS about its own events; those of the secondary sources are complete as listed
+    const ids = idsInRange(days).filter((id) => !isSecondary(id) && String(store.list[id].Cancelled) !== "1");
+    if (!ids.length) {
+      await sourcesLoaded;
+      if (token === loadToken) setStatus(events.size ? "" : "No events for these dates");
+      return;
+    }
 
     // 3. Details: only new events, events whose ORIS version changed, or very old copies
     const needDetails = ids.filter((id) => {
@@ -1799,7 +1840,7 @@ $("#sMe").addEventListener("input", updateRegWarnings);
 $("#sGroup").addEventListener("input", updateRegWarnings);
 $("#sSi").addEventListener("input", updateRegWarnings);
 /* ---------------- Entry deadline reminders: subscribing to the calendar feeds ---------------- */
-// Feeds are published with the site by the Deploy workflow (scripts/build-feeds.mjs): feeds/(level|region)-<code>.ics,
+// Feeds are published with the site by the Deploy workflow (scripts/build-feeds.mjs): feeds/(level|region|source)-<code>.ics,
 // the code in plain ASCII. Subscribing uses webcal: (iOS and macOS hand it to Calendar) or Google Calendar's "add by URL".
 const asciiCode = (code) => code.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
 const feedUrl = (kind, code) => new URL("feeds/" + kind + "-" + asciiCode(code) + ".ics", location.href).href;
@@ -1849,6 +1890,7 @@ async function renderRegions() {
 }
 function openCalendars() {
   $("#calLevels").innerHTML = CONFIG.levelFeeds.map((f) => feedRow("level", f.code, f.name, false)).join("");
+  $("#calSources").innerHTML = CONFIG.sources.filter((s) => s.feed).map((s) => feedRow("source", s.code, s.name, false)).join("");
   $("#calendars").showModal();
   renderRegions();
 }

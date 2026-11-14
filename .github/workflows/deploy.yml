@@ -38,7 +38,7 @@ env:
   DEPLOY: index.html icon.png README.md
   NOT_DEPLOYED: '^(scripts/|\.github/)'
   # Feeds that must always be built
-  REQUIRED_FEEDS: level-NC-NP-AL.ics level-BL-CE.ics level-BL-MO.ics region-CR.ics region-CE.ics region-MO.ics
+  REQUIRED_FEEDS: level-NC-NP-AL.ics level-BL-CE.ics level-BL-MO.ics region-CR.ics region-CE.ics region-MO.ics source-OL.ics sources.json
 
 jobs:
   deploy:

@@ -4,6 +4,16 @@ A map of Czech orienteering events from [ORIS](https://oris.ceskyorientak.cz/), 
 
 Static page, no build step. Data comes live from the public ORIS API (JSONP, as ORIS documents for cross-domain use). Map tiles from OpenStreetMap, map library Leaflet.
 
+## Sources
+
+ORIS is the system of record for Czech orienteering events and the preferred source. Other sources are added only for events that are missing in ORIS.
+
+One of them is [O-liga](https://o-liga.cz/). Only its native events are added, the rows with the key `O-liga #<number>`: they are known not to be published in ORIS, so there is no overlap. Its other rows are events taken over from elsewhere and are left out.
+
+- **How it is read:** the O-liga page can't be read by a browser from another site, so the feed run (`scripts/build-feeds.mjs`, every 6 hours) reads it and publishes its events as `feeds/sources.json`, which the app loads next to ORIS.
+- **What it gives:** the day, place, coordinates (its Mapy.com link) and one entry deadline (from the event's page).
+- **How the events show:** as trainings, level NN, format "Other". The detail card names the source and links to the event's page. There are no entries, start lists or services to check.
+
 ## Files
 
 ```
@@ -69,8 +79,8 @@ Without a club, enter your SI IDs instead. Unregistered runners get a one-off re
 - **Group badge**: number of entries from your group, or from your whole club if the group is empty.
 - **Entered** and **Free** filters appear once a club registration ID or an SI ID is set. Entered shows only events you are entered in; Free hides other events on days you already have one (your own stay visible).
 - **Navigation app**: what "Open in Maps" on the detail card opens, with the event location as the destination. "Phone default" uses Apple Maps on iPhone, iPad and Mac, the system chooser (`geo:` link) on Android, and Google Maps on the web elsewhere. Google Maps, Mapy.com and Waze can be picked explicitly; their links open the app when it is installed.
-- **Calendar**: what "Add to calendar" on the detail card does. It adds the event as one all-day calendar event (name, place, ORIS link) and is a one-time import, not a subscription. A stage of a multi-day event (E1, E2, …) is its own day; the multi-day event itself spans from its first to its last stage (ORIS keeps no last day, so the app looks up the stages' dates). "Calendar file" opens an `.ics` file: on a desktop the page makes it, and it downloads and opens in Apple Calendar, Outlook or another calendar app. iPhone and iPad open a calendar file only from a real address, so there the button links to the event's file published with the feeds (`feeds/events/<ORIS event ID>.ics`, for events in the next 6 months, updated every 6 hours); for an event without one (further out, or added to ORIS in the last few hours) it offers Google Calendar instead. "Google Calendar" opens a prefilled Google Calendar event. "Phone default" is Google Calendar on Android, which can't open a calendar file into Google Calendar, and a calendar file elsewhere. The same setting decides how "Subscribe" works in the entry deadline reminders.
-- **Entry deadline reminders** (*Subscribe in your calendar…*): lists the calendar feeds of entry deadlines (see below), the top levels and every region, sorted by code, with your club's region highlighted (found in ORIS from your registration IDs). *Subscribe* opens a `webcal://` link, which iPhone, iPad and Mac hand to Calendar, or with the Google setting Google Calendar's "add by URL"; the copy button copies the feed's address for other apps.
+- **Calendar**: what "Add to calendar" on the detail card does. It adds the event as one all-day calendar event (name, place, ORIS link) and is a one-time import, not a subscription. A stage of a multi-day event (E1, E2, …) is its own day; the multi-day event itself spans from its first to its last stage (ORIS keeps no last day, so the app looks up the stages' dates). "Calendar file" opens an `.ics` file: on a desktop the page makes it, and it downloads and opens in Apple Calendar, Outlook or another calendar app. iPhone and iPad open a calendar file only from a real address, so there the button links to the event's file published with the feeds (`feeds/events/<event ID>.ics`, for events in the next 6 months, updated every 6 hours); for an event without one (further out, or added to ORIS in the last few hours) it offers Google Calendar instead. "Google Calendar" opens a prefilled Google Calendar event. "Phone default" is Google Calendar on Android, which can't open a calendar file into Google Calendar, and a calendar file elsewhere. The same setting decides how "Subscribe" works in the entry deadline reminders.
+- **Entry deadline reminders** (*Subscribe in your calendar…*): lists the calendar feeds of entry deadlines (see below), the top levels and every region, sorted by code, with your club's region highlighted (found in ORIS from your registration IDs), then the other sources. *Subscribe* opens a `webcal://` link, which iPhone, iPad and Mac hand to Calendar, or with the Google setting Google Calendar's "add by URL"; the copy button copies the feed's address for other apps.
 
 ## Marker encoding
 
@@ -91,17 +101,18 @@ Zoomed out, markers shrink to dots: the ring is the format color (orange when yo
 
 `scripts/build-feeds.mjs` builds calendar feeds (`.ics`) that remind you of entry deadlines. Subscribe to the ones you want in your phone's calendar app, from Settings → *Subscribe in your calendar…* in the app, or by their addresses, e.g. `https://www.matejkala.com/oris-event-map/feeds/level-NC-NP-AL.ics`.
 
-- **Feeds:** `(level|region)-<code>.ics`, the code in plain ASCII, e.g. `region-VY.ics` or `level-BL-CE.ics`.
+- **Feeds:** `(level|region|source)-<code>.ics`, the code in plain ASCII, e.g. `region-VY.ics` or `level-BL-CE.ics`.
   - One per ORIS region: `region-CR` (national), `region-CE` (Čechy), `region-MO` (Morava), and the regional areas (`region-PR`, `region-SC`, `region-HA`, …). An event filed under several regions is in each of their feeds. Region feeds hold every level, including trainings and other events.
   - One per top level group: `level-NC-NP-AL` (national championship, national cup, A ladder), `level-BL-CE` and `level-BL-MO` (B ladder Čechy and Morava). No lower levels.
-- **Entries:** one per entry deadline (1, 2, 3) that is still ahead, in the next 6 months, at the deadline's time (ORIS times are Prague time), with an alert 1 day before. Title: `Entry deadline 2/3 · <feed> · <level> · <event> · <place>`, with the level codes of the markers; the description has the ORIS link and how to unsubscribe.
+  - One per secondary source that publishes entry deadlines: `source-OL` (O-liga).
+- **Entries:** one per entry deadline (1, 2, 3) that is still ahead, in the next 6 months, at the deadline's time (ORIS times are Prague time), with an alert 1 day before. Title: `Entry deadline 2/3 · <feed> · <level> · <event> · <place>`, with the level codes of the markers; the description has the event's link (ORIS, or the event's page for a secondary source) and how to unsubscribe.
 - **Multi-day events** appear once: ORIS keeps the entry deadlines on the parent event, not on its stages.
 - **iPhone alerts:** a subscribed calendar has two switches. *Remove Alerts* (in the subscription's details) is on by default and drops the feed's alerts: turn it off. *Event Alerts* (under Notifications) must stay on.
 - **Unsubscribe:** on iPhone, Settings → Apps → Calendar → Calendar Accounts → Subscribed Calendars → the feed → Delete Account; in Google Calendar, the calendar's options → Settings → Unsubscribe.
 
-It also writes one calendar file per event in its range, `feeds/events/<ORIS event ID>.ics`, used by "Add to calendar" on iPhone and iPad (no feed: these come and go with the events).
+It also writes one calendar file per event in its range, `feeds/events/<event ID>.ics`, used by "Add to calendar" on iPhone and iPad (no feed: these come and go with the events), and `feeds/sources.json`, the events of the secondary sources for the app. A secondary source that can't be read (its site is down, its page changed) is left out of that run with a warning.
 
-Run it with `node scripts/build-feeds.mjs [--debug] [output directory]` (default `feeds`). `--debug` logs each event: its ORIS level and badge code, regions, entry deadlines and feeds.
+Run it with `node scripts/build-feeds.mjs [--debug] [output directory]` (default `feeds`). `--debug` logs each event: its ORIS level and badge code, regions, entry deadlines and feeds, and each event of the secondary sources. To see the secondary sources in a local copy of the app, build the feeds into `feeds` first.
 
 ### Levels of combined races
 
@@ -133,6 +144,7 @@ Data is kept in the browser (localStorage), so changing dates or filters is inst
 - **Full entry lists** (only with an SI ID set) are heavy for ORIS, so they are fetched one at a time, 1.5 s apart, nearest events first, at most 120 per hour (also across reloads and refreshes). Events that don't take entries in ORIS are skipped, except stages of a multi-day event (E1, E2, …): ORIS marks those as not taking entries, as their entries go through the parent event, but each stage still has its own entry list. A stage without its own entry start and deadlines shows its parent's. Lists expire after 30 minutes for events within 14 days, 12 hours for later ones. Events not reached within the hourly cap show "Entries not checked yet for all SI IDs" and are checked on a later load.
 - **Refresh from ORIS** on the event card refetches that event's entries and service orders right away, e.g. right after you entered. It skips the hourly cap (it is one request you ask for), but counts toward it.
 - **Filters** (open for entry, entered) never fetch anything; they filter what is already loaded.
-- **Refresh button** (circular arrow): forgets all saved ORIS data and loads the current dates fresh. Your settings (registration IDs, SI IDs, navigation app) stay.
+- **Secondary sources** (`feeds/sources.json`) are fetched again after 6 hours.
+- **Refresh button** (circular arrow): forgets all saved event data and loads the current dates fresh. Your settings (registration IDs, SI IDs, navigation app) stay.
 
 Past days are dropped automatically. The durations are in `CONFIG.ttl`.
