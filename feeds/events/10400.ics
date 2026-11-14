@@ -1,0 +1,18 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-10400-event
+DTSTAMP:20261114T011641Z
+DTSTART;VALUE=DATE:20270220
+DTEND;VALUE=DATE:20270221
+SUMMARY:Workshop pro trenéry: Každý postup má řešení - metody rozvoj
+ e závodní navigace
+LOCATION:Hradec Králové
+GEO:50.20923;15.83277
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=10400
+URL:https://oris.ceskyorientak.cz/Zavod?id=10400
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,166 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map entry deadlines//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:ORIS JM entry deadlines
+X-WR-CALDESC:ORIS map · region JM entry deadline feed. Manage or unsubscri
+ be: https://www.matejkala.com/oris-event-map/#calendars
+X-WR-TIMEZONE:Europe/Prague
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Prague
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:oris-event-map-10399-entry-deadline-1-region-jm
+DTSTAMP:20261114T011632Z
+DTSTART;TZID=Europe/Prague:20261117T180000
+SUMMARY:Entry deadline 1/1 · JM · OP · Campus Orienteering Challenge · 
+ Areál Přírodovědecké fakulty MU\, Kotlářská 267/2\, Brno místo st
+ artu: https://mapy.com/s/cozogugego
+DESCRIPTION:Campus Orienteering Challenge\nAreál Přírodovědecké fakult
+ y MU\, Kotlářská 267/2\, Brno místo startu: https://mapy.com/s/cozogug
+ ego\nEvent day: 2026-11-19\nEntry deadline 1 of 1 closes 2026-11-17 18:00:
+ 00\nhttps://oris.ceskyorientak.cz/Zavod?id=10399\n\nORIS map · region JM 
+ entry deadline feed. Manage or unsubscribe: https://www.matejkala.com/oris
+ -event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10399
+LOCATION:Areál Přírodovědecké fakulty MU\, Kotlářská 267/2\, Brno m
+ ísto startu: https://mapy.com/s/cozogugego
+GEO:49.204511534801;16.59760594368
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · JM · OP · Campus Orienteering Challenge
+  · Areál Přírodovědecké fakulty MU\, Kotlářská 267/2\, Brno míst
+ o startu: https://mapy.com/s/cozogugego
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10304-entry-deadline-1-region-jm
+DTSTAMP:20261114T011632Z
+DTSTART;TZID=Europe/Prague:20261202T235959
+SUMMARY:Entry deadline 1/1 · JM · OP · Sportega BZL: Memoriál svobody 
+ · Žabovřesky\, ZŠ náměstí Svornosti
+DESCRIPTION:Sportega BZL: Memoriál svobody\nŽabovřesky\, ZŠ náměstí 
+ Svornosti\nEvent day: 2026-12-06\nEntry deadline 1 of 1 closes 2026-12-02 
+ 23:59:59\nhttps://oris.ceskyorientak.cz/Zavod?id=10304\n\nORIS map · regi
+ on JM entry deadline feed. Manage or unsubscribe: https://www.matejkala.co
+ m/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10304
+LOCATION:Žabovřesky\, ZŠ náměstí Svornosti
+GEO:49.21535;16.58046
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · JM · OP · Sportega BZL: Memoriál svobo
+ dy · Žabovřesky\, ZŠ náměstí Svornosti
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10392-entry-deadline-1-region-jm
+DTSTAMP:20261114T011632Z
+DTSTART;TZID=Europe/Prague:20261130T235959
+SUMMARY:Entry deadline 1/1 · JM · NN · Workshop pro trenéry: Silová a 
+ plyometrická příprava orientačního běžce · Brno - Strange training
+ \, s.r.o.\, Šámalova 62a
+DESCRIPTION:Workshop pro trenéry: Silová a plyometrická příprava orien
+ tačního běžce\nBrno - Strange training\, s.r.o.\, Šámalova 62a\nEven
+ t day: 2026-12-06\nEntry deadline 1 of 1 closes 2026-11-30 23:59:59\nhttps
+ ://oris.ceskyorientak.cz/Zavod?id=10392\n\nORIS map · region JM entry dea
+ dline feed. Manage or unsubscribe: https://www.matejkala.com/oris-event-ma
+ p/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10392
+LOCATION:Brno - Strange training\, s.r.o.\, Šámalova 62a
+GEO:49.197406589088;16.633960597445
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · JM · NN · Workshop pro trenéry: Silov
+ á a plyometrická příprava orientačního běžce · Brno - Strange tra
+ ining\, s.r.o.\, Šámalova 62a
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-9807-entry-deadline-1-region-jm
+DTSTAMP:20261114T011632Z
+DTSTART;TZID=Europe/Prague:20261210T235959
+SUMMARY:Entry deadline 1/1 · JM · OP · Běh na Býčí skálu - 64. roč
+ ník · Brno - Řečkovice\, Zamilovaný háj
+DESCRIPTION:Běh na Býčí skálu - 64. ročník\nBrno - Řečkovice\, Zam
+ ilovaný háj\nEvent day: 2026-12-12\nEntry deadline 1 of 1 closes 2026-12
+ -10 23:59:59\nhttps://oris.ceskyorientak.cz/Zavod?id=9807\n\nORIS map · r
+ egion JM entry deadline feed. Manage or unsubscribe: https://www.matejkala
+ .com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9807
+LOCATION:Brno - Řečkovice\, Zamilovaný háj
+GEO:49.245046618544;16.591678261757
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · JM · OP · Běh na Býčí skálu - 64. 
+ ročník · Brno - Řečkovice\, Zamilovaný háj
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10306-entry-deadline-1-region-jm
+DTSTAMP:20261114T011632Z
+DTSTART;TZID=Europe/Prague:20270303T235959
+SUMMARY:Entry deadline 1/2 · JM · OP · Sportega BZL: BURE Cup · Brno - 
+ Bystrc
+DESCRIPTION:Sportega BZL: BURE Cup\nBrno - Bystrc\nEvent day: 2027-03-07\nE
+ ntry deadline 1 of 2 closes 2027-03-03 23:59:59\nhttps://oris.ceskyorienta
+ k.cz/Zavod?id=10306\n\nORIS map · region JM entry deadline feed. Manage o
+ r unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10306
+LOCATION:Brno - Bystrc
+GEO:49.217926477626;16.515959637046
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/2 · JM · OP · Sportega BZL: BURE Cup · Brn
+ o - Bystrc
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10306-entry-deadline-2-region-jm
+DTSTAMP:20261114T011632Z
+DTSTART;TZID=Europe/Prague:20270304T235959
+SUMMARY:Entry deadline 2/2 · JM · OP · Sportega BZL: BURE Cup · Brno - 
+ Bystrc
+DESCRIPTION:Sportega BZL: BURE Cup\nBrno - Bystrc\nEvent day: 2027-03-07\nE
+ ntry deadline 2 of 2 closes 2027-03-04 23:59:59\nhttps://oris.ceskyorienta
+ k.cz/Zavod?id=10306\n\nORIS map · region JM entry deadline feed. Manage o
+ r unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10306
+LOCATION:Brno - Bystrc
+GEO:49.217926477626;16.515959637046
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · JM · OP · Sportega BZL: BURE Cup · Brn
+ o - Bystrc
+END:VALARM
+END:VEVENT
+END:VCALENDAR

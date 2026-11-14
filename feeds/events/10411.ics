@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-10411-event
+DTSTAMP:20261114T011641Z
+DTSTART;VALUE=DATE:20261121
+DTEND;VALUE=DATE:20261122
+SUMMARY:Měřený trénink při O-víkendu 2026
+LOCATION:Jablonec nad Nisou - sídliště Žižkův vrch
+GEO:50.722268353757;15.158181849583
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=10411
+URL:https://oris.ceskyorientak.cz/Zavod?id=10411
+END:VEVENT
+END:VCALENDAR

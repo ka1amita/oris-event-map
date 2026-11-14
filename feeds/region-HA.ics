@@ -1,0 +1,117 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map entry deadlines//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:ORIS HA entry deadlines
+X-WR-CALDESC:ORIS map · region HA entry deadline feed. Manage or unsubscri
+ be: https://www.matejkala.com/oris-event-map/#calendars
+X-WR-TIMEZONE:Europe/Prague
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Prague
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:oris-event-map-10404-entry-deadline-1-region-ha
+DTSTAMP:20261114T011632Z
+DTSTART;TZID=Europe/Prague:20261118T235959
+SUMMARY:Entry deadline 1/1 · HA · OP · Vánoční Perníček - Zimní li
+ gy Hanácké oblasti 2026-2027 · Olomouc\, Neředín
+DESCRIPTION:Vánoční Perníček - Zimní ligy Hanácké oblasti 2026-2027
+ \nOlomouc\, Neředín\nEvent day: 2026-11-21\nEntry deadline 1 of 1 closes
+  2026-11-18 23:59:59\nhttps://oris.ceskyorientak.cz/Zavod?id=10404\n\nORIS
+  map · region HA entry deadline feed. Manage or unsubscribe: https://www.
+ matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10404
+LOCATION:Olomouc\, Neředín
+GEO:49.597659203309;17.229534387589
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · HA · OP · Vánoční Perníček - Zimn
+ í ligy Hanácké oblasti 2026-2027 · Olomouc\, Neředín
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10402-entry-deadline-1-region-ha
+DTSTAMP:20261114T011632Z
+DTSTART;TZID=Europe/Prague:20261129T235959
+SUMMARY:Entry deadline 1/2 · HA · OP · 37. ročník Mikulášského orie
+ ntačního běhu · Slatinice\, sokolovna
+DESCRIPTION:37. ročník Mikulášského orientačního běhu\nSlatinice\, 
+ sokolovna\nEvent day: 2026-12-05\nEntry deadline 1 of 2 closes 2026-11-29 
+ 23:59:59\nhttps://oris.ceskyorientak.cz/Zavod?id=10402\n\nORIS map · regi
+ on HA entry deadline feed. Manage or unsubscribe: https://www.matejkala.co
+ m/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10402
+LOCATION:Slatinice\, sokolovna
+GEO:49.559474274447;17.100369930267
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/2 · HA · OP · 37. ročník Mikulášského 
+ orientačního běhu · Slatinice\, sokolovna
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10402-entry-deadline-2-region-ha
+DTSTAMP:20261114T011632Z
+DTSTART;TZID=Europe/Prague:20261201T235959
+SUMMARY:Entry deadline 2/2 · HA · OP · 37. ročník Mikulášského orie
+ ntačního běhu · Slatinice\, sokolovna
+DESCRIPTION:37. ročník Mikulášského orientačního běhu\nSlatinice\, 
+ sokolovna\nEvent day: 2026-12-05\nEntry deadline 2 of 2 closes 2026-12-01 
+ 23:59:59\nhttps://oris.ceskyorientak.cz/Zavod?id=10402\n\nORIS map · regi
+ on HA entry deadline feed. Manage or unsubscribe: https://www.matejkala.co
+ m/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10402
+LOCATION:Slatinice\, sokolovna
+GEO:49.559474274447;17.100369930267
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · HA · OP · 37. ročník Mikulášského 
+ orientačního běhu · Slatinice\, sokolovna
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10377-entry-deadline-1-region-ha
+DTSTAMP:20261114T011632Z
+DTSTART;TZID=Europe/Prague:20261220T235959
+SUMMARY:Entry deadline 1/1 · HA · OP · Vánoční pohár 2026 · Plumlov
+ \, kemp Žralok
+DESCRIPTION:Vánoční pohár 2026\nPlumlov\, kemp Žralok\nEvent day: 2026
+ -12-23\nEntry deadline 1 of 1 closes 2026-12-20 23:59:59\nhttps://oris.ces
+ kyorientak.cz/Zavod?id=10377\n\nORIS map · region HA entry deadline feed.
+  Manage or unsubscribe: https://www.matejkala.com/oris-event-map/#calendar
+ s
+URL:https://oris.ceskyorientak.cz/Zavod?id=10377
+LOCATION:Plumlov\, kemp Žralok
+GEO:49.46109;17.01278
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · HA · OP · Vánoční pohár 2026 · Plu
+ mlov\, kemp Žralok
+END:VALARM
+END:VEVENT
+END:VCALENDAR
