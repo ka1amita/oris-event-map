@@ -12,6 +12,7 @@ One of them is [O-liga](https://o-liga.cz/). Only its native events are added, t
 
 - **How it is read:** the O-liga page can't be read by a browser from another site, so the feed run (`scripts/build-feeds.mjs`, every 6 hours) reads it and publishes its events as `feeds/sources.json`, which the app loads next to ORIS.
 - **What it gives:** the day, place, coordinates (its Mapy.com link) and one entry deadline (from the event's page).
+- **A week, not a day:** an O-liga training can be run on your own for about a week, until the controls are collected. So the event lasts 7 days, from the listed day to the day before the next weekly training: it shows whenever the selected dates touch that week, the marker reads e.g. `10–16`, and "Add to calendar" adds all 7 days. The "Free" filter hides it only when you have an event on every one of its days.
 - **How the events show:** as trainings, level NN, format "Other". The detail card names the source and links to the event's page. There are no entries, start lists or services to check.
 
 ## Files

@@ -676,6 +676,10 @@ const oris = orisRaw;   // every ORIS call goes through the store below, not a p
 const STORE_KEY = "omap.store.v2";
 const nowMs = () => Date.now();
 const fresh = (t, minutes) => t && nowMs() - t < minutes * 60000;
+// An event of a secondary source can run for several days (LastDate, e.g. an O-liga training stays in the terrain for
+// a week); ORIS events have one day each
+const firstDayOf = (raw) => String(raw.Date || "").slice(0, 10);
+const lastDayOf = (raw) => String(raw.LastDate || raw.Date || "").slice(0, 10);
 let store = loadStore();
 function emptyStore() { return { days: {}, list: {}, details: {}, entries: {}, orders: {}, sources: { t: 0, list: {} } }; }
 function loadStore() {
@@ -689,7 +693,7 @@ function loadStore() {
         delete st.list[id]; delete st.details[id];
       }
     });
-    Object.keys(st.sources.list).forEach((id) => { if (String(st.sources.list[id].Date || "").slice(0, 10) < today) delete st.sources.list[id]; });
+    Object.keys(st.sources.list).forEach((id) => { if (lastDayOf(st.sources.list[id]) < today) delete st.sources.list[id]; });
     const live = new Set(Object.keys(st.list));
     // details of a stage's parent are kept while one of its stages is
     const parents = new Set(Object.values(st.list).map((raw) => String(raw.ParentID || "0")));
@@ -820,6 +824,7 @@ function normalize(raw, prev) {
   ev.place = raw.Place || "";
   ev.org = raw.Org1 && raw.Org1.Abbr ? raw.Org1.Abbr : "";
   ev.date = date;
+  ev.lastDate = lastDayOf(raw) > firstDayOf(raw) ? parseDT(raw.LastDate, false) : null;   // set when it runs for several days
   ev.lat = isFinite(lat) && lat !== 0 ? lat : null;
   ev.lon = isFinite(lon) && lon !== 0 ? lon : null;
   ev.stages = parseInt(raw.Stages, 10) || 0;
@@ -850,7 +855,7 @@ function pinHtml(ev, selected, showTail) {
   return '<div class="pin' + (selected ? " sel" : "") + popClass(ev) + '" style="' + popDelay(ev) + '" data-id="' + esc(ev.id) + '" tabindex="0" role="button" aria-label="' + esc(ariaLabel(ev)) + '">' +
     '<div class="chip ' + cls + '">' +
       '<span class="disc" style="background:' + F.bg + ";color:" + F.fg + '">' + F.text + "</span>" +
-      '<span class="lines"><span class="day">' + esc(ev.date ? fmt.short(ev.date) : "?") + '</span><span class="state">' + state + "</span></span>" +
+      '<span class="lines"><span class="day">' + esc(ev.lastDate ? ev.date.getDate() + "–" + ev.lastDate.getDate() : ev.date ? fmt.short(ev.date) : "?") + '</span><span class="state">' + state + "</span></span>" +
       '<span class="badge b-sport">' + ICON[ev.sport] + "</span>" +
       (svcs || night ? '<span class="svcs">' + svcs + night + "</span>" : "") +
       '<span class="badge b-level" style="background:' + L.bg + ";color:" + L.fg + '">' + L.code + "</span>" +
@@ -865,7 +870,7 @@ function dotHtml(ev, selected, dx, dy) {
   return '<div class="dot' + (ev.entered ? " entered" : "") + (selected ? " sel" : "") + popClass(ev) + '" data-id="' + esc(ev.id) + '" tabindex="0" role="button" aria-label="' + esc(ariaLabel(ev)) + '" style="' + popDelay(ev) + '--dx:' + (dx || 0) + "px;--dy:" + (dy || 0) + "px;background:" + L.bg + ";color:" + L.fg + ";border:5px solid " + (ev.entered ? "var(--orange)" : F.bg) + '">' + F.text + "</div>";
 }
 function ariaLabel(ev) {
-  const parts = [ev.name, ev.date ? fmt.full(ev.date) : "", FORMAT[ev.format].name, LEVEL[ev.level].name, SPORT_NAME[ev.sport]];
+  const parts = [ev.name, ev.lastDate ? fmt.range(ev.date, ev.lastDate) : ev.date ? fmt.full(ev.date) : "", FORMAT[ev.format].name, LEVEL[ev.level].name, SPORT_NAME[ev.sport]];
   if (ev.night) parts.push("night");
   if (ev.relay) parts.push("relay");
   if (ev.phase === "tier") parts.push("entry deadline " + ev.tier + " of " + ev.deadlines.length + " is current");
@@ -930,7 +935,7 @@ async function findLastDay(ev) {
 // the event's days, { first, last, partial }, or null while the last day of a multi-day event is being found
 function eventDays(ev) {
   const first = String(ev.raw.Date).slice(0, 10);
-  let days = { first, last: first, partial: false };
+  let days = { first, last: lastDayOf(ev.raw), partial: false };
   if (isParent(ev)) {
     const found = lastDays.get(ev.id);
     days = found ? { first, last: found.last, partial: found.failed } : null;
@@ -1029,7 +1034,7 @@ function cardHtml(ev) {
   if (ev.results) pills.push('<span class="pill"><span class="letter" style="background:#7B2CBF">V</span>Results</span>');
   if (ev.outsideOris) pills.push('<span class="pill">Entries outside ORIS</span>');
 
-  const meta = [ev.date ? fmt.full(ev.date) : "", ev.place, ev.org].filter(Boolean).map(esc).join(", ");
+  const meta = [ev.lastDate ? fmt.range(ev.date, ev.lastDate) : ev.date ? fmt.full(ev.date) : "", ev.place, ev.org].filter(Boolean).map(esc).join(", ");
   return '<div class="card-head"><div><h2>' + esc(ev.name) + '</h2><div class="meta">' + meta + "</div></div>" +
     '<button class="icon-btn" type="button" id="cardClose" aria-label="Close details">' + ICON.close + "</button></div>" +
     '<div class="tags">' + tags.join("") + "</div>" +
@@ -1074,7 +1079,8 @@ function compact() { return map.getZoom() < CONFIG.compactBelowZoom; }
 function passesFilters(ev) {
   if (ev.cancelled) return false;
   // "Free": hide other events on days you already have an event; your own events stay visible
-  if (filters.free && !ev.entered && ev.date && busyDays.has(ymd(ev.date))) return false;
+  // (an event that runs for several days is hidden only when all its days are taken)
+  if (filters.free && !ev.entered && ev.date && rangeDays({ from: ev.date, to: ev.lastDate || ev.date }).every((d) => busyDays.has(ymd(d)))) return false;
   if (filters.open && ev.phase !== "tier") return false;
   if (filters.mine && !ev.entered) return false;
   return true;
@@ -1451,9 +1457,9 @@ function orderItems(data) {
   }));
 }
 function idsInRange(days) {
-  const set = new Set(days);
+  // an event that runs for several days is in the dates when any of its days is
   return Object.keys(store.list).concat(Object.keys(store.sources.list).filter(isSecondary))
-    .filter((id) => set.has(String(listed(id).Date || "").slice(0, 10)));
+    .filter((id) => days.some((day) => firstDayOf(listed(id)) <= day && day <= lastDayOf(listed(id))));
 }
 // The events of the secondary sources, published with the feeds. They are an extra: without the file (a local copy
 // without built feeds, a failed request) the map shows ORIS alone.
@@ -1463,7 +1469,7 @@ async function loadSources() {
     if (res.ok) {
       const today = ymd(new Date());
       const list = {};
-      values((await res.json()).events).filter((raw) => String(raw.Date || "").slice(0, 10) >= today).forEach((raw) => { list[String(raw.ID)] = raw; });
+      values((await res.json()).events).filter((raw) => lastDayOf(raw) >= today).forEach((raw) => { list[String(raw.ID)] = raw; });
       store.sources = { t: nowMs(), list };
       saveStore();
     }

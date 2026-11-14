@@ -37,7 +37,9 @@ const CONFIG = {
   refresh: "PT6H",
   timeZone: "Europe/Prague",
   userAgent: "oris-event-map feeds (https://www.matejkala.com/oris-event-map/)",
-  oliga: { home: "https://o-liga.cz/" },
+  // an O-liga training can be run on its own for about a week, until the controls are collected: the listed day
+  // and the days after it, up to the day before the next weekly training
+  oliga: { home: "https://o-liga.cz/", days: 7 },
   // the level feeds (levelFeeds) are defined in the app's CONFIG
 };
 
@@ -79,9 +81,10 @@ async function oris(method, params) {
 /* ---------------- Secondary sources: one adapter each ----------------
    An adapter reads its source's page and returns the source's native events from the given day on, in the shape of
    ORIS events (the fields the app and the feeds read), plus:
-     ID      "<source>-…", never a number, so it can't collide with an ORIS event ID
-     Source  the source's code in CONFIG.sources of index.html
-     Url     the event's page (the organizer's, or the source's when the event has none)
+     ID        "<source>-…", never a number, so it can't collide with an ORIS event ID
+     LastDate  the last day of an event that runs for several days (ORIS has no such field)
+     Source    the source's code in CONFIG.sources of index.html
+     Url       the event's page (the organizer's, or the source's when the event has none)
    The sources list trainings, hence the level; UseORISForEntries = 0 keeps the app from asking ORIS about entries. */
 const sourceEvent = (source, id, fields) => Object.assign({ ID: id, Source: source, Sport: { ID: "1" },
   Level: { ShortName: "", NameCZ: "trénink", NameEN: "training" }, Cancelled: "0", UseORISForEntries: "0" }, fields);
@@ -104,7 +107,9 @@ function czechDay(text) {
 
 /* O-liga: the table on o-liga.cz, columns #, Datum, Den, Místo, Kde, Mapa, Pokyny, …, Poznámka. Native = Místo carries
    the key "O-liga #<number>" (other rows are events taken over from elsewhere, e.g. PZL). Kde is a Mapy.com short
-   link that redirects to an address with the coordinates; the entry deadline is on the event's page. */
+   link that redirects to an address with the coordinates; the entry deadline is on the event's page. The event
+   lasts CONFIG.oliga.days days from the listed one. */
+const dayPlus = (day, n) => isoDay(new Date(Date.parse(day + "T00:00:00Z") + n * 86400000));
 async function oligaEvents(fromDay) {
   const home = await pageText(CONFIG.oliga.home);
   const rows = home.split(/<tr[\s>]/i).slice(1).map(tableCells).filter((cells) => cells.length >= 12 && czechDay(plainText(cells[1])));
@@ -113,13 +118,14 @@ async function oligaEvents(fromDay) {
   for (const cells of rows) {
     const day = czechDay(plainText(cells[1]));
     const key = /O-liga #(\d+)/.exec(plainText(cells[3]));
-    if (key && day >= fromDay && !events.has(key[1])) {
+    const lastDay = dayPlus(day, CONFIG.oliga.days - 1);
+    if (key && lastDay >= fromDay && !events.has(key[1])) {
       const id = day.slice(0, 4) + "-" + key[1];
       // the event's own page; Pokyny links to it, or to an older article with the instructions
       const page = new URL("/event/" + id + "/info", CONFIG.oliga.home).href;
       const url = new URL(firstLink(cells[6]) || page, CONFIG.oliga.home).href;
       const place = plainText(cells[3].replace(/O-liga #\d+/, ""));
-      events.set(key[1], sourceEvent("OL", "oliga-" + id, Object.assign({ Name: "O-liga #" + key[1], Date: day, Place: place,
+      events.set(key[1], sourceEvent("OL", "oliga-" + id, Object.assign({ Name: "O-liga #" + key[1], Date: day, LastDate: lastDay, Place: place,
         Map: plainText(cells[5]), Org1: { Abbr: "O-liga" }, Discipline: { NameCZ: plainText(cells[11]) }, Url: url },
         await mapyCoordinates(firstLink(cells[4])), await oligaEntryDeadline(page))));
     }
@@ -159,7 +165,7 @@ async function secondaryEvents(fromDay, debug) {
       const events = await ADAPTERS[source.code](fromDay);
       all.push(...events);
       console.log("Source " + source.code + ": " + events.length + " native events");
-      if (debug) events.forEach((ev) => console.log(ev.ID + " " + ev.Date + " " + ev.Name + " | " + (ev.Place || "-") +
+      if (debug) events.forEach((ev) => console.log(ev.ID + " " + ev.Date + (ev.LastDate ? ".." + ev.LastDate : "") + " " + ev.Name + " | " + (ev.Place || "-") +
         " | " + (ev.GPSLat ? ev.GPSLat + "," + ev.GPSLon : "no coordinates") + " | entry deadline " + (ev.EntryDate1 || "-") + " | " + ev.Url));
     } catch (e) {
       console.log("::warning::Source " + source.code + " failed and is left out: " + e.message);
@@ -228,7 +234,7 @@ function entryDeadlineEntries(app, ev, feed, now, stamp) {
   tiers.forEach((t, i) => {
     if (pragueToDate(t.p) > now) {
       const title = ["Entry deadline " + (i + 1) + "/" + tiers.length, feed.code, level, ev.Name, place].filter(Boolean).join(" · ");
-      const about = [ev.Name, place, "Event day: " + ev.Date, "Entry deadline " + (i + 1) + " of " + tiers.length + " closes " + t.raw,
+      const about = [ev.Name, place, ev.LastDate ? "Event days: " + ev.Date + " to " + ev.LastDate : "Event day: " + ev.Date, "Entry deadline " + (i + 1) + " of " + tiers.length + " closes " + t.raw,
         CONFIG.eventUrl(ev)].filter(Boolean);
       // the feed note is set apart by a blank line
       const desc = about.join("\n") + "\n\n" + feedNote(feed);
@@ -324,7 +330,8 @@ async function main() {
   await mkdir(join(outDir, "events"), { recursive: true });
   for (const ev of live.concat(secondary)) {
     const first = String(ev.Date).slice(0, 10);
-    const last = lastStage.get(String(ev.ID)) > first ? lastStage.get(String(ev.ID)) : first;
+    const lastKnown = ev.LastDate || lastStage.get(String(ev.ID));
+    const last = lastKnown > first ? lastKnown : first;
     await writeFile(join(outDir, "events", ev.ID + ".ics"), ICS.event({ id: String(ev.ID), name: ev.Name, place: String(ev.Place || "").trim(),
       lat: +ev.GPSLat, lon: +ev.GPSLon, url: CONFIG.eventUrl(ev), first, last }));
   }
