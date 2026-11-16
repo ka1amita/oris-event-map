@@ -6,14 +6,16 @@ Static page, no build step. Data comes live from the public ORIS API (JSONP, as 
 
 ## Sources
 
-ORIS is the system of record for Czech orienteering events and the preferred source. Other sources are added only for events that are missing in ORIS.
+ORIS is the system of record for Czech orienteering events and the preferred source. Other sources are added only for events that are missing in ORIS: O-liga and EPO OB. Their pages can't be read by a browser from another site, so the feed run (`scripts/build-feeds.mjs`, every 6 hours) reads them and publishes their events as `feeds/sources.json`, which the app loads next to ORIS. The events show as trainings, level NN, format "Other". The detail card names the source and links to the event's page. There are no entries, start lists or services to check.
 
-One of them is [O-liga](https://o-liga.cz/). Only its native events are added, the rows with the key `O-liga #<number>`: they are known not to be published in ORIS, so there is no overlap. Its other rows are events taken over from elsewhere and are left out.
+**[O-liga](https://o-liga.cz/).** Only its native events are added, the rows with the key `O-liga #<number>`: they are known not to be published in ORIS, so there is no overlap. Its other rows are events taken over from elsewhere and are left out.
 
-- **How it is read:** the O-liga page can't be read by a browser from another site, so the feed run (`scripts/build-feeds.mjs`, every 6 hours) reads it and publishes its events as `feeds/sources.json`, which the app loads next to ORIS.
 - **What it gives:** the day, place, coordinates (its Mapy.com link) and one entry deadline (from the event's page).
 - **A week, not a day:** an O-liga training can be run on your own for about a week, until the controls are collected. So the event lasts 7 days, from the listed day to the day before the next weekly training: it shows whenever the selected dates touch that week, the marker reads e.g. `10–16`, and "Add to calendar" adds all 7 days. The "Free" filter hides it only when you have an event on every one of its days.
-- **How the events show:** as trainings, level NN, format "Other". The detail card names the source and links to the event's page. There are no entries, start lists or services to check.
+
+**[EPO OB](https://outdoor.vse.cz/epo-ob/)** (Ekonom Praha Outdoor). The upcoming trainings listed under "termínovka" are added; they are not published in ORIS.
+
+- **What it gives:** the name and the day. Once the instructions ("Propozice", a Google document) are published, also the coordinates of the assembly point (its Mapy.com link) and one entry deadline, and the event's page is that document. Until then the event has no location (it shows in the filter row) and links to its Facebook event.
 
 ## Files
 
@@ -105,7 +107,7 @@ Zoomed out, markers shrink to dots: the ring is the format color (orange when yo
 - **Feeds:** `(level|region|source)-<code>.ics`, the code in plain ASCII, e.g. `region-VY.ics` or `level-BL-CE.ics`.
   - One per ORIS region: `region-CR` (national), `region-CE` (Čechy), `region-MO` (Morava), and the regional areas (`region-PR`, `region-SC`, `region-HA`, …). An event filed under several regions is in each of their feeds. Region feeds hold every level, including trainings and other events.
   - One per top level group: `level-NC-NP-AL` (national championship, national cup, A ladder), `level-BL-CE` and `level-BL-MO` (B ladder Čechy and Morava). No lower levels.
-  - One per secondary source that publishes entry deadlines: `source-OL` (O-liga).
+  - One per secondary source that publishes entry deadlines: `source-OL` (O-liga), `source-EPO` (EPO OB).
 - **Entries:** one per entry deadline (1, 2, 3) that is still ahead, in the next 6 months, at the deadline's time (ORIS times are Prague time), with an alert 1 day before. Title: `Entry deadline 2/3 · <feed> · <level> · <event> · <place>`, with the level codes of the markers; the description has the event's link (ORIS, or the event's page for a secondary source) and how to unsubscribe.
 - **Multi-day events** appear once: ORIS keeps the entry deadlines on the parent event, not on its stages.
 - **iPhone alerts:** a subscribed calendar has two switches. *Remove Alerts* (in the subscription's details) is on by default and drops the feed's alerts: turn it off. *Event Alerts* (under Notifications) must stay on.

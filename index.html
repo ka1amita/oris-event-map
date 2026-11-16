@@ -370,7 +370,8 @@ const CONFIG = {
   // doesn't take over from elsewhere) in the shape of ORIS events as sourcesFile.
   // feed: the source publishes entry deadlines, so it has an entry deadline feed (feeds/source-<code>.ics).
   sources: [
-    { code: "OL", name: "O-liga", url: "https://o-liga.cz/", feed: true }
+    { code: "OL", name: "O-liga", url: "https://o-liga.cz/", feed: true },
+    { code: "EPO", name: "EPO OB", url: "https://outdoor.vse.cz/epo-ob/", feed: true }
   ],
   sourcesFile: "feeds/sources.json",
   // OpenStreetMap's tile servers refuse requests without a Referer, which is what

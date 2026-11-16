@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /* Builds calendar feeds of entry deadlines: one per ORIS region (feeds/region-XX.ics), one per top level
    group (feeds/level-NC-NP-AL.ics, level-BL-CE.ics, level-BL-MO.ics; no lower levels) and one per secondary source
-   that publishes entry deadlines (feeds/source-OL.ics). Also writes one calendar file per event
+   that publishes entry deadlines (feeds/source-OL.ics, source-EPO.ics). Also writes one calendar file per event
    (feeds/events/<event ID>.ics) for "Add to calendar" on iPhone and iPad.
    File names: (level|region|source)-<code>.ics, the code in plain ASCII, e.g. level-BL-CE.ics or region-VY.ics.
 
-   ORIS is the primary source. The secondary sources (CONFIG.sources in index.html: O-liga) are web pages a browser
+   ORIS is the primary source. The secondary sources (CONFIG.sources in index.html: O-liga, EPO OB) are web pages a browser
    can't read from another site, so their adapters run here and publish the events in the shape of ORIS events as
    feeds/sources.json, which the app loads. A secondary source gives only its native events: the ones it doesn't
    take over from elsewhere.
@@ -40,6 +40,7 @@ const CONFIG = {
   // an O-liga training can be run on its own for about a week, until the controls are collected: the listed day
   // and the days after it, up to the day before the next weekly training
   oliga: { home: "https://o-liga.cz/", days: 7 },
+  epo: { home: "https://outdoor.vse.cz/epo-ob/" },
   // the level feeds (levelFeeds) are defined in the app's CONFIG
 };
 
@@ -127,20 +128,20 @@ async function oligaEvents(fromDay) {
       const place = plainText(cells[3].replace(/O-liga #\d+/, ""));
       events.set(key[1], sourceEvent("OL", "oliga-" + id, Object.assign({ Name: "O-liga #" + key[1], Date: day, LastDate: lastDay, Place: place,
         Map: plainText(cells[5]), Org1: { Abbr: "O-liga" }, Discipline: { NameCZ: plainText(cells[11]) }, Url: url },
-        await mapyCoordinates(firstLink(cells[4])), await oligaEntryDeadline(page))));
+        await mapyCoordinates(firstLink(cells[4]), "O-liga"), await oligaEntryDeadline(page))));
     }
   }
   return [...events.values()];
 }
 // mapy.com/s/<code> redirects to …?x=<longitude>&y=<latitude>&…
-async function mapyCoordinates(link) {
+async function mapyCoordinates(link, source) {
   let found = {};
   if (/\/\/mapy\.com\/s\//.test(link)) {
     try {
       const res = await fetch(link, { redirect: "manual", headers: { "User-Agent": CONFIG.userAgent } });
       const to = new URL(res.headers.get("location") || "", link).searchParams;
       if (+to.get("x") && +to.get("y")) found = { GPSLat: to.get("y"), GPSLon: to.get("x") };
-    } catch (e) { console.log("::warning::O-liga: no coordinates from " + link + " (" + e.message + ")"); }
+    } catch (e) { console.log("::warning::" + source + ": no coordinates from " + link + " (" + e.message + ")"); }
   }
   return found;
 }
@@ -155,7 +156,60 @@ async function oligaEntryDeadline(page) {
   return found;
 }
 
-const ADAPTERS = { OL: oligaEvents };
+/* EPO OB: the cards on outdoor.vse.cz/epo-ob between the titles "termínovka <year>" and "proběhlé tréninky <year>"
+   (the cards below are past events). A card's paragraphs: the name ("EPO OB <place>"), "<year> – trénink #<number>",
+   the organizer, the day, then Přihlášky and Propozice, links once they are published. Propozice is a Google
+   document; its text gives the Mapy.com short link of the assembly point and the entry deadline. The site lists
+   its own events only, so all of them are native. */
+async function epoEvents(fromDay) {
+  const home = await pageText(CONFIG.epo.home);
+  const upcoming = /termínovka\s+\d{4}([\s\S]*?)(?:proběhlé\s+tréninky|$)/i.exec(home);
+  if (!upcoming) throw new Error("EPO OB: no \"termínovka\" title in " + CONFIG.epo.home);
+  const events = [];
+  for (const card of upcoming[1].split(/<div class="wp-block-columns[\s"]/i).slice(1)) {
+    const paragraphs = [...card.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)].map((m) => m[1]);
+    const texts = paragraphs.map(plainText);
+    const name = texts[0] || "";
+    const day = czechDay(texts.find(czechDay) || "");
+    if (name && day && day >= fromDay) {
+      const number = /(\d{4})\D+trénink\s*#\s*(\d+)/i.exec(texts.join(" | "));
+      const linkOf = (label) => firstLink(paragraphs.find((p) => plainText(p) === label) || "");
+      const instructions = linkOf("Propozice");
+      const facebook = (/href\s*=\s*"(https:\/\/www\.facebook\.com\/events\/[^"]+)"/i.exec(card) || [])[1];
+      events.push(sourceEvent("EPO", "epo-" + (number ? number[1] + "-" + number[2] : day), Object.assign({ Name: name, Date: day,
+        Place: name.replace(/^EPO OB\s+/i, ""), Org1: { Abbr: "EPO" }, Discipline: { NameCZ: "trénink" },
+        Url: instructions || facebook || CONFIG.epo.home }, await epoInstructions(instructions, day))));
+    }
+  }
+  return events;
+}
+// The text of the Propozice document: "Shromaždiště: … https://mapy.com/s/<code>" and
+// "Přihlášky: … do středy 25. listopadu do 12:00" (the month also as a number; the year is the event's)
+const CZECH_MONTHS = ["ledna", "února", "března", "dubna", "května", "června", "července", "srpna", "září", "října", "listopadu", "prosince"];
+async function epoInstructions(link, day) {
+  let found = {};
+  const doc = /docs\.google\.com\/document\/d\/([\w-]+)/.exec(link);
+  if (doc) {
+    try {
+      const text = await pageText("https://docs.google.com/document/d/" + doc[1] + "/export?format=txt");
+      const mapy = /https:\/\/mapy\.com\/s\/\w+/.exec(text);
+      const entries = (/^\s*Přihlášky:.*$/im.exec(text) || [""])[0];
+      const m = /\bdo\s+(?:\S+\s+)?(\d{1,2})\.\s*(\d{1,2}(?=\.)|[a-zá-ž]+)\.?\s*(?:\d{4}\s*)?(?:do|v)\s+(\d{1,2})[:.](\d\d)/i.exec(entries);
+      const month = m ? (+m[2] || CZECH_MONTHS.indexOf(m[2].toLowerCase()) + 1) : 0;
+      let deadline = {};
+      if (month) {
+        // the entry deadline is before the event: a December one of a January event is in the year before
+        const at = pad(month) + "-" + pad(+m[1]);
+        const year = at > day.slice(5) ? +day.slice(0, 4) - 1 : +day.slice(0, 4);
+        deadline = { EntryDate1: year + "-" + at + " " + pad(+m[3]) + ":" + m[4] + ":00" };
+      }
+      found = Object.assign(mapy ? await mapyCoordinates(mapy[0], "EPO OB") : {}, deadline);
+    } catch (e) { console.log("::warning::EPO OB: nothing read from " + link + " (" + e.message + ")"); }
+  }
+  return found;
+}
+
+const ADAPTERS = { OL: oligaEvents, EPO: epoEvents };
 // The native events of every secondary source. A source that fails (its site is down, its page changed) is left out
 // with a warning; ORIS feeds are built all the same.
 async function secondaryEvents(fromDay, debug) {
@@ -186,7 +240,7 @@ function eventRegions(ev) {
 }
 
 /* ---------------- Feeds: one per region, plus one per top level ---------------- */
-// A feed is { kind: "region" | "level" | "source", code: "ČR" | "BL-ČE" | "OL", events: [] }
+// A feed is { kind: "region" | "level" | "source", code: "ČR" | "BL-ČE" | "OL" | "EPO", events: [] }
 const feedFile = (f) => f.kind + "-" + ascii(f.code).toUpperCase() + ".ics";
 const feedId = (f) => f.kind + "-" + ascii(f.code).toLowerCase();
 function eventLevelFeeds(app, ev) {
