@@ -1,0 +1,132 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map entry deadlines//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:ORIS ČE entry deadlines
+X-WR-CALDESC:ORIS map · region ČE entry deadline feed. Manage or unsubscr
+ ibe: https://www.matejkala.com/oris-event-map/#calendars
+X-WR-TIMEZONE:Europe/Prague
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Prague
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:oris-event-map-10282-entry-deadline-1-region-ce
+DTSTAMP:20261121T070607Z
+DTSTART;TZID=Europe/Prague:20261125T235959
+SUMMARY:Entry deadline 1/1 · ČE · NN · Metodický seminář: Sprint a s
+ printové mapy · Chvaletice
+DESCRIPTION:Metodický seminář: Sprint a sprintové mapy\nChvaletice\nEve
+ nt day: 2026-12-04\nEntry deadline 1 of 1 closes 2026-11-25 23:59:59\nhttp
+ s://oris.ceskyorientak.cz/Zavod?id=10282\n\nORIS map · region ČE entry d
+ eadline feed. Manage or unsubscribe: https://www.matejkala.com/oris-event-
+ map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10282
+LOCATION:Chvaletice
+GEO:50.031945596088;15.416001677513
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · ČE · NN · Metodický seminář: Sprint
+  a sprintové mapy · Chvaletice
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10392-entry-deadline-1-region-ce
+DTSTAMP:20261121T070607Z
+DTSTART;TZID=Europe/Prague:20261130T235959
+SUMMARY:Entry deadline 1/1 · ČE · NN · Workshop pro trenéry: Silová a
+  plyometrická příprava orientačního běžce · Brno - Strange trainin
+ g\, s.r.o.\, Šámalova 62a
+DESCRIPTION:Workshop pro trenéry: Silová a plyometrická příprava orien
+ tačního běžce\nBrno - Strange training\, s.r.o.\, Šámalova 62a\nEven
+ t day: 2026-12-06\nEntry deadline 1 of 1 closes 2026-11-30 23:59:59\nhttps
+ ://oris.ceskyorientak.cz/Zavod?id=10392\n\nORIS map · region ČE entry de
+ adline feed. Manage or unsubscribe: https://www.matejkala.com/oris-event-m
+ ap/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10392
+LOCATION:Brno - Strange training\, s.r.o.\, Šámalova 62a
+GEO:49.197406589088;16.633960597445
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · ČE · NN · Workshop pro trenéry: Silov
+ á a plyometrická příprava orientačního běžce · Brno - Strange tra
+ ining\, s.r.o.\, Šámalova 62a
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10419-entry-deadline-2-region-ce
+DTSTAMP:20261121T070607Z
+DTSTART;TZID=Europe/Prague:20261205T235959
+SUMMARY:Entry deadline 2/2 · ČE · OP · Ski akademie Mísečky - sprint
+DESCRIPTION:Ski akademie Mísečky - sprint\nEvent day: 2026-12-09\nEntry d
+ eadline 2 of 2 closes 2026-12-05 23:59:59\nhttps://oris.ceskyorientak.cz/Z
+ avod?id=10419\n\nORIS map · region ČE entry deadline feed. Manage or uns
+ ubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10419
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · ČE · OP · Ski akademie Mísečky - spr
+ int
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10420-entry-deadline-2-region-ce
+DTSTAMP:20261121T070607Z
+DTSTART;TZID=Europe/Prague:20261205T235959
+SUMMARY:Entry deadline 2/2 · ČE · OP · Ski akademie Mísečky - středn
+ í trať
+DESCRIPTION:Ski akademie Mísečky - střední trať\nEvent day: 2026-12-09
+ \nEntry deadline 2 of 2 closes 2026-12-05 23:59:59\nhttps://oris.ceskyorie
+ ntak.cz/Zavod?id=10420\n\nORIS map · region ČE entry deadline feed. Mana
+ ge or unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10420
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · ČE · OP · Ski akademie Mísečky - st
+ řední trať
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10421-entry-deadline-2-region-ce
+DTSTAMP:20261121T070607Z
+DTSTART;TZID=Europe/Prague:20261205T235959
+SUMMARY:Entry deadline 2/2 · ČE · OP · Ski akademie Mísečky - hladký
+  závod
+DESCRIPTION:Ski akademie Mísečky - hladký závod\nEvent day: 2026-12-10\
+ nEntry deadline 2 of 2 closes 2026-12-05 23:59:59\nhttps://oris.ceskyorien
+ tak.cz/Zavod?id=10421\n\nORIS map · region ČE entry deadline feed. Manag
+ e or unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10421
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · ČE · OP · Ski akademie Mísečky - hla
+ dký závod
+END:VALARM
+END:VEVENT
+END:VCALENDAR

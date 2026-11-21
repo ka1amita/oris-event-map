@@ -1,0 +1,145 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map entry deadlines//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:ORIS VY entry deadlines
+X-WR-CALDESC:ORIS map · region VY entry deadline feed. Manage or unsubscri
+ be: https://www.matejkala.com/oris-event-map/#calendars
+X-WR-TIMEZONE:Europe/Prague
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Prague
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:oris-event-map-10297-entry-deadline-1-region-vy
+DTSTAMP:20261121T070607Z
+DTSTART;TZID=Europe/Prague:20261126T235959
+SUMMARY:Entry deadline 1/2 · VY · OP · Mareda cup 2026
+DESCRIPTION:Mareda cup 2026\nEvent day: 2026-11-28\nEntry deadline 1 of 2 c
+ loses 2026-11-26 23:59:59\nhttps://oris.ceskyorientak.cz/Zavod?id=10297\n\
+ nORIS map · region VY entry deadline feed. Manage or unsubscribe: https:/
+ /www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10297
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/2 · VY · OP · Mareda cup 2026
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10297-entry-deadline-2-region-vy
+DTSTAMP:20261121T070607Z
+DTSTART;TZID=Europe/Prague:20261127T215955
+SUMMARY:Entry deadline 2/2 · VY · OP · Mareda cup 2026
+DESCRIPTION:Mareda cup 2026\nEvent day: 2026-11-28\nEntry deadline 2 of 2 c
+ loses 2026-11-27 21:59:55\nhttps://oris.ceskyorientak.cz/Zavod?id=10297\n\
+ nORIS map · region VY entry deadline feed. Manage or unsubscribe: https:/
+ /www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10297
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · VY · OP · Mareda cup 2026
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10055-entry-deadline-1-region-vy
+DTSTAMP:20261121T070607Z
+DTSTART;TZID=Europe/Prague:20261206T235959
+SUMMARY:Entry deadline 1/2 · VY · OP · 8. DL Předvánoční · Doubí u
+  Tábora
+DESCRIPTION:8. DL Předvánoční\nDoubí u Tábora\nEvent day: 2026-12-12\
+ nEntry deadline 1 of 2 closes 2026-12-06 23:59:59\nhttps://oris.ceskyorien
+ tak.cz/Zavod?id=10055\n\nORIS map · region VY entry deadline feed. Manage
+  or unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10055
+LOCATION:Doubí u Tábora
+GEO:49.322282877135;14.702367790139
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/2 · VY · OP · 8. DL Předvánoční · Doub
+ í u Tábora
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10055-entry-deadline-2-region-vy
+DTSTAMP:20261121T070607Z
+DTSTART;TZID=Europe/Prague:20261210T235959
+SUMMARY:Entry deadline 2/2 · VY · OP · 8. DL Předvánoční · Doubí u
+  Tábora
+DESCRIPTION:8. DL Předvánoční\nDoubí u Tábora\nEvent day: 2026-12-12\
+ nEntry deadline 2 of 2 closes 2026-12-10 23:59:59\nhttps://oris.ceskyorien
+ tak.cz/Zavod?id=10055\n\nORIS map · region VY entry deadline feed. Manage
+  or unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10055
+LOCATION:Doubí u Tábora
+GEO:49.322282877135;14.702367790139
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · VY · OP · 8. DL Předvánoční · Doub
+ í u Tábora
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10406-entry-deadline-1-region-vy
+DTSTAMP:20261121T070607Z
+DTSTART;TZID=Europe/Prague:20261218T235959
+SUMMARY:Entry deadline 1/2 · VY · OP · Vánoční kufrování · Chrast
+DESCRIPTION:Vánoční kufrování\nChrast\nEvent day: 2026-12-26\nEntry de
+ adline 1 of 2 closes 2026-12-18 23:59:59\nhttps://oris.ceskyorientak.cz/Za
+ vod?id=10406\n\nORIS map · region VY entry deadline feed. Manage or unsub
+ scribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10406
+LOCATION:Chrast
+GEO:49.900838764843;15.937256810883
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/2 · VY · OP · Vánoční kufrování · Chr
+ ast
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10406-entry-deadline-2-region-vy
+DTSTAMP:20261121T070607Z
+DTSTART;TZID=Europe/Prague:20261225T115959
+SUMMARY:Entry deadline 2/2 · VY · OP · Vánoční kufrování · Chrast
+DESCRIPTION:Vánoční kufrování\nChrast\nEvent day: 2026-12-26\nEntry de
+ adline 2 of 2 closes 2026-12-25 11:59:59\nhttps://oris.ceskyorientak.cz/Za
+ vod?id=10406\n\nORIS map · region VY entry deadline feed. Manage or unsub
+ scribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10406
+LOCATION:Chrast
+GEO:49.900838764843;15.937256810883
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · VY · OP · Vánoční kufrování · Chr
+ ast
+END:VALARM
+END:VEVENT
+END:VCALENDAR
