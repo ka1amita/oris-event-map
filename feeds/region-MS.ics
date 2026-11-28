@@ -1,0 +1,158 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map entry deadlines//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:ORIS MS entry deadlines
+X-WR-CALDESC:ORIS map · region MS entry deadline feed. Manage or unsubscri
+ be: https://www.matejkala.com/oris-event-map/#calendars
+X-WR-TIMEZONE:Europe/Prague
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Prague
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:oris-event-map-10383-entry-deadline-1-region-ms
+DTSTAMP:20261128T074740Z
+DTSTART;TZID=Europe/Prague:20261128T235959
+SUMMARY:Entry deadline 1/2 · MS · OP · 2. zkouška sirén VI. ročník 2
+ 026/2027 · SPŠ Místek
+DESCRIPTION:2. zkouška sirén VI. ročník 2026/2027\nSPŠ Místek\nEvent 
+ day: 2026-12-02\nEntry deadline 1 of 2 closes 2026-11-28 23:59:59\nhttps:/
+ /oris.ceskyorientak.cz/Zavod?id=10383\n\nORIS map · region MS entry deadl
+ ine feed. Manage or unsubscribe: https://www.matejkala.com/oris-event-map/
+ #calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10383
+LOCATION:SPŠ Místek
+GEO:49.673474254889;18.348155021667
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/2 · MS · OP · 2. zkouška sirén VI. ročn
+ ík 2026/2027 · SPŠ Místek
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10383-entry-deadline-2-region-ms
+DTSTAMP:20261128T074740Z
+DTSTART;TZID=Europe/Prague:20261129T235959
+SUMMARY:Entry deadline 2/2 · MS · OP · 2. zkouška sirén VI. ročník 2
+ 026/2027 · SPŠ Místek
+DESCRIPTION:2. zkouška sirén VI. ročník 2026/2027\nSPŠ Místek\nEvent 
+ day: 2026-12-02\nEntry deadline 2 of 2 closes 2026-11-29 23:59:59\nhttps:/
+ /oris.ceskyorientak.cz/Zavod?id=10383\n\nORIS map · region MS entry deadl
+ ine feed. Manage or unsubscribe: https://www.matejkala.com/oris-event-map/
+ #calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10383
+LOCATION:SPŠ Místek
+GEO:49.673474254889;18.348155021667
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · MS · OP · 2. zkouška sirén VI. ročn
+ ík 2026/2027 · SPŠ Místek
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10409-entry-deadline-1-region-ms
+DTSTAMP:20261128T074740Z
+DTSTART;TZID=Europe/Prague:20261129T200000
+SUMMARY:Entry deadline 1/1 · MS · OP · Slezská zimní liga Polsko-Skocz
+ ów · Skoczów\, Wzgórze Kaplicówka
+DESCRIPTION:Slezská zimní liga Polsko-Skoczów\nSkoczów\, Wzgórze Kapli
+ cówka\nEvent day: 2026-12-05\nEntry deadline 1 of 1 closes 2026-11-29 20:
+ 00:00\nhttps://oris.ceskyorientak.cz/Zavod?id=10409\n\nORIS map · region 
+ MS entry deadline feed. Manage or unsubscribe: https://www.matejkala.com/o
+ ris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10409
+LOCATION:Skoczów\, Wzgórze Kaplicówka
+GEO:49.79966;18.78066
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · MS · OP · Slezská zimní liga Polsko-S
+ koczów · Skoczów\, Wzgórze Kaplicówka
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10338-entry-deadline-1-region-ms
+DTSTAMP:20261128T074740Z
+DTSTART;TZID=Europe/Prague:20261209T235959
+SUMMARY:Entry deadline 1/1 · MS · OP · 4. Slezská zimní liga · Restau
+ race Bowling Green\, Polní 825
+DESCRIPTION:4. Slezská zimní liga\nRestaurace Bowling Green\, Polní 825\
+ nEvent day: 2026-12-12\nEntry deadline 1 of 1 closes 2026-12-09 23:59:59\n
+ https://oris.ceskyorientak.cz/Zavod?id=10338\n\nORIS map · region MS entr
+ y deadline feed. Manage or unsubscribe: https://www.matejkala.com/oris-eve
+ nt-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10338
+LOCATION:Restaurace Bowling Green\, Polní 825
+GEO:49.67670962673;18.675250427887
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · MS · OP · 4. Slezská zimní liga · Re
+ staurace Bowling Green\, Polní 825
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10410-entry-deadline-1-region-ms
+DTSTAMP:20261128T074740Z
+DTSTART;TZID=Europe/Prague:20270103T105554
+SUMMARY:Entry deadline 1/1 · MS · OP · 3. Zkouška sirén · Havířov
+DESCRIPTION:3. Zkouška sirén\nHavířov\nEvent day: 2027-01-06\nEntry dea
+ dline 1 of 1 closes 2027-01-03 10:55:54\nhttps://oris.ceskyorientak.cz/Zav
+ od?id=10410\n\nORIS map · region MS entry deadline feed. Manage or unsubs
+ cribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10410
+LOCATION:Havířov
+GEO:49.775756232375;18.461140394211
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · MS · OP · 3. Zkouška sirén · Havíř
+ ov
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10331-entry-deadline-1-region-ms
+DTSTAMP:20261128T074740Z
+DTSTART;TZID=Europe/Prague:20261231T235959
+SUMMARY:Entry deadline 1/1 · MS · OP · VELIKONOČNÍ SOUSTŘEDĚNÍ  202
+ 7 VE SVRATCE - MOV\, HAV\, SFM\,TRI · SVRATKA
+DESCRIPTION:VELIKONOČNÍ SOUSTŘEDĚNÍ  2027 VE SVRATCE - MOV\, HAV\, SFM
+ \,TRI\nSVRATKA\nEvent day: 2027-03-25\nEntry deadline 1 of 1 closes 2026-1
+ 2-31 23:59:59\nhttps://oris.ceskyorientak.cz/Zavod?id=10331\n\nORIS map ·
+  region MS entry deadline feed. Manage or unsubscribe: https://www.matejka
+ la.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10331
+LOCATION:SVRATKA
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · MS · OP · VELIKONOČNÍ SOUSTŘEDĚNÍ 
+  2027 VE SVRATCE - MOV\, HAV\, SFM\,TRI · SVRATKA
+END:VALARM
+END:VEVENT
+END:VCALENDAR

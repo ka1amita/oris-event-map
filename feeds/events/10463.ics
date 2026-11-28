@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-10463-event
+DTSTAMP:20261128T074751Z
+DTSTART;VALUE=DATE:20261227
+DTEND;VALUE=DATE:20261228
+SUMMARY:Žďárské vánoční kufrování
+LOCATION:Žďár nad Sázavou\, skautská klubovna\, Farská humna
+GEO:49.561207121707;15.935266619148
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=10463
+URL:https://oris.ceskyorientak.cz/Zavod?id=10463
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,15 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-10421-event
+DTSTAMP:20261128T074751Z
+DTSTART;VALUE=DATE:20261210
+DTEND;VALUE=DATE:20261211
+SUMMARY:Ski akademie Mísečky - hladký závod
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=10421
+URL:https://oris.ceskyorientak.cz/Zavod?id=10421
+END:VEVENT
+END:VCALENDAR

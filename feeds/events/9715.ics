@@ -1,0 +1,15 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-9715-event
+DTSTAMP:20261128T074751Z
+DTSTART;VALUE=DATE:20270523
+DTEND;VALUE=DATE:20270524
+SUMMARY:Český pohár\, žebříček A\, žebříček B-Morava
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=9715
+URL:https://oris.ceskyorientak.cz/Zavod?id=9715
+END:VEVENT
+END:VCALENDAR

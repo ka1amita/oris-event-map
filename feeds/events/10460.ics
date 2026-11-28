@@ -1,0 +1,16 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-10460-event
+DTSTAMP:20261128T074751Z
+DTSTART;VALUE=DATE:20270217
+DTEND;VALUE=DATE:20270218
+SUMMARY:Online seminář rozhodčích 1. třídy
+LOCATION:online
+DESCRIPTION:https://oris.ceskyorientak.cz/Zavod?id=10460
+URL:https://oris.ceskyorientak.cz/Zavod?id=10460
+END:VEVENT
+END:VCALENDAR

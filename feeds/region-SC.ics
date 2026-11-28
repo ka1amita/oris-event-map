@@ -1,0 +1,116 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map entry deadlines//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:ORIS SČ entry deadlines
+X-WR-CALDESC:ORIS map · region SČ entry deadline feed. Manage or unsubscr
+ ibe: https://www.matejkala.com/oris-event-map/#calendars
+X-WR-TIMEZONE:Europe/Prague
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Prague
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:oris-event-map-10330-entry-deadline-1-region-sc
+DTSTAMP:20261128T074740Z
+DTSTART;TZID=Europe/Prague:20261216T235959
+SUMMARY:Entry deadline 1/1 · SČ · OP · Prahou s mapou - Stromovka · Pr
+ aha Stromovka
+DESCRIPTION:Prahou s mapou - Stromovka\nPraha Stromovka\nEvent day: 2026-12
+ -19\nEntry deadline 1 of 1 closes 2026-12-16 23:59:59\nhttps://oris.ceskyo
+ rientak.cz/Zavod?id=10330\n\nORIS map · region SČ entry deadline feed. M
+ anage or unsubscribe: https://www.matejkala.com/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10330
+LOCATION:Praha Stromovka
+GEO:50.100170483434;14.41994260706
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · SČ · OP · Prahou s mapou - Stromovka 
+ · Praha Stromovka
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-10396-entry-deadline-1-region-sc
+DTSTAMP:20261128T074740Z
+DTSTART;TZID=Europe/Prague:20261213T201731
+SUMMARY:Entry deadline 1/1 · SČ · OP · Vá+Noční Orienťák · Poděb
+ rady\, zámecké nábřeži\, ul. Labská
+DESCRIPTION:Vá+Noční Orienťák\nPoděbrady\, zámecké nábřeži\, ul.
+  Labská\nEvent day: 2026-12-19\nEntry deadline 1 of 1 closes 2026-12-13 2
+ 0:17:31\nhttps://oris.ceskyorientak.cz/Zavod?id=10396\n\nORIS map · regio
+ n SČ entry deadline feed. Manage or unsubscribe: https://www.matejkala.co
+ m/oris-event-map/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=10396
+LOCATION:Poděbrady\, zámecké nábřeži\, ul. Labská
+GEO:50.141341449429;15.120255947113
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/1 · SČ · OP · Vá+Noční Orienťák · Po
+ děbrady\, zámecké nábřeži\, ul. Labská
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-9669-entry-deadline-1-region-sc
+DTSTAMP:20261128T074740Z
+DTSTART;TZID=Europe/Prague:20270110T235959
+SUMMARY:Entry deadline 1/2 · SČ · OP · Opět na Kozla X^2 · Velké Pop
+ ovice\, restaurace Kozlovka
+DESCRIPTION:Opět na Kozla X^2\nVelké Popovice\, restaurace Kozlovka\nEven
+ t day: 2027-01-16\nEntry deadline 1 of 2 closes 2027-01-10 23:59:59\nhttps
+ ://oris.ceskyorientak.cz/Zavod?id=9669\n\nORIS map · region SČ entry dea
+ dline feed. Manage or unsubscribe: https://www.matejkala.com/oris-event-ma
+ p/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9669
+LOCATION:Velké Popovice\, restaurace Kozlovka
+GEO:49.921270739672;14.644167423357
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 1/2 · SČ · OP · Opět na Kozla X^2 · Velké
+  Popovice\, restaurace Kozlovka
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:oris-event-map-9669-entry-deadline-2-region-sc
+DTSTAMP:20261128T074740Z
+DTSTART;TZID=Europe/Prague:20270113T235959
+SUMMARY:Entry deadline 2/2 · SČ · OP · Opět na Kozla X^2 · Velké Pop
+ ovice\, restaurace Kozlovka
+DESCRIPTION:Opět na Kozla X^2\nVelké Popovice\, restaurace Kozlovka\nEven
+ t day: 2027-01-16\nEntry deadline 2 of 2 closes 2027-01-13 23:59:59\nhttps
+ ://oris.ceskyorientak.cz/Zavod?id=9669\n\nORIS map · region SČ entry dea
+ dline feed. Manage or unsubscribe: https://www.matejkala.com/oris-event-ma
+ p/#calendars
+URL:https://oris.ceskyorientak.cz/Zavod?id=9669
+LOCATION:Velké Popovice\, restaurace Kozlovka
+GEO:49.921270739672;14.644167423357
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P1D
+DESCRIPTION:Entry deadline 2/2 · SČ · OP · Opět na Kozla X^2 · Velké
+  Popovice\, restaurace Kozlovka
+END:VALARM
+END:VEVENT
+END:VCALENDAR

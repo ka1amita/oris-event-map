@@ -1,0 +1,18 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//oris-event-map//ORIS map//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:oris-event-map-epo-2026-10-event
+DTSTAMP:20261128T074751Z
+DTSTART;VALUE=DATE:20261209
+DTEND;VALUE=DATE:20261210
+SUMMARY:EPO OB Centrum
+LOCATION:Centrum
+DESCRIPTION:https://drive.google.com/file/d/1oFBIOGqos7nRmBeshVW0hvF1cNUl8F
+ xj/view?usp=sharing
+URL:https://drive.google.com/file/d/1oFBIOGqos7nRmBeshVW0hvF1cNUl8Fxj/view?
+ usp=sharing
+END:VEVENT
+END:VCALENDAR
